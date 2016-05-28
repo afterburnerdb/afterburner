@@ -2,9 +2,9 @@
 
 ##Web browser:
 ######Running from browser:
-
-    firefox ./dist/demo.html
-    google-chrome ./dist/demot.html
+    visit: http://abdb.io
+    firefox ./demo.html
+    google-chrome ./demo.html
 
 ######Loading tables in browser:
 To load data inside browser click [Browse] to pick a file that matches the format described in the loading tables section.
