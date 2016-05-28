@@ -1,0 +1,7 @@
+*.aux
+*.log
+*.bbl
+*.blg
+*.bak
+node_modules
+src/node_modules/

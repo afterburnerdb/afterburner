@@ -1,0 +1,25 @@
+{
+  "name": "afterburner",
+  "version": "1.0.0",
+  "description": "",
+  "main": "gulpfile.js",
+  "dependencies": {
+    "gulp-concat": "^2.6.0",
+    "gulp-notify": "^2.2.0",
+    "gulp-rename": "^1.2.2",
+    "gulp-uglify": "^1.5.3"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lintool/js-sql.git"
+  },
+  "author": "Kareem El Gebaly",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/lintool/js-sql/issues"
+  },
+  "homepage": "https://github.com/lintool/js-sql#readme"
+}
