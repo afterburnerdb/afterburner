@@ -34,8 +34,8 @@ To load data inside browser click [Browse] to pick a file that matches the forma
   2. An example file is provided in the data directory (../data)
   
   3. Another example **TPCH(1GB)**
-      * lineitem: https://drive.google.com/file/d/0B2CdCGGKg6SNQ0s1VThCMzBUYmc/view?usp=sharing
-      * orders: https://drive.google.com/file/d/0B2CdCGGKg6SNUzdzSnNha2tXNHc/view?usp=sharing
+      * lineitem: https://drive.google.com/open?id=0B2CdCGGKg6SNNHlFT0VkeG9jY1U
+      * orders: https://drive.google.com/open?id=0B2CdCGGKg6SNVlNJaloyX05fT1k
       * myview: https://drive.google.com/file/d/0B2CdCGGKg6SNZHFSNlZPM2xLZkU/view?usp=sharing
 
   4. **Note:** Currently afterburner, easily loads three tables: lineitems, orders, myview.
