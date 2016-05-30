@@ -397,15 +397,15 @@ function create_order(colname){
 
 
 
-function mystrcmp(str1, str2){
-  str1=str1|0;
-  str2=str2|0;
-  var i=i|0;
-  while (
-        ( (strStore8[(str1+i)|0]==strStore8[(str2+i)|0]) && strStore8[(str1+i)|0 ] && strStore8[(str2+i)|0])
-        ) i=((i+1)|0);
-  return (strStore8[(str1+i)|0 ]-strStore8[(str2+i)|0 ]);
-}
+//function mystrcmp(str1, str2){
+//  str1=str1|0;
+//  str2=str2|0;
+//  var i=i|0;
+//  while (
+//        ( (strStore8[(str1+i)|0]==strStore8[(str2+i)|0]) && strStore8[(str1+i)|0 ] && strStore8[(str2+i)|0])
+//        ) i=((i+1)|0);
+//  return (strStore8[(str1+i)|0 ]-strStore8[(str2+i)|0 ]);
+//}
 
 function mystrcmplit( str1 , str2){
   var i= i|0;

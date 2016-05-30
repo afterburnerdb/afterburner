@@ -91,6 +91,27 @@ function resetFluentASMq4(){
   .toString()`;
   fluentToASM();
 }
+
+function resetFluentASMTPCHq1(){
+  document.getElementById("TAFluent").value=`ABi.select()
+  .from('lineitem')
+  .field('l_returnflag',
+    'l_linestatus',
+    sum('l_quantity'),
+    sum('l_extendedprice'),
+    sum('l_extendedprice * (1 - l_discount)'),
+    sum('l_extendedprice * (1 - l_discount) * (1 + l_tax)'),
+    avg('l_quantity'),
+    avg('l_extendedprice'),
+    avg('l_discount'),
+    count('*'))
+  .where(leq('l_shipdate',date('1998-09-02')))
+  .group('l_returnflag','l_linestatus')
+  .order('l_returnflag','l_linestatus')
+  .toString()`;
+  fluentToASM();
+}
+
 /*ABi.select().from("myview").field("l_orderkey").field("revenue").field("o_orderdate").field("o_shippriority").where(eq('o_orderdate',date('1996-01-06'))).order([-1]).limit(10).toString()*/
 function fluentToASM(){
         strASM="document.getElementById(\"TAASM\").value="
@@ -200,6 +221,7 @@ function fluentToASM(){
 		<button type="button" onclick="resetFluentASMq2()" class="btn btn-default" href="#" >Q2 Fluent</button>
 		<button type="button" onclick="resetFluentASMq3()" class="btn btn-default" href="#" >Q3 Fluent</button>
 		<button type="button" onclick="resetFluentASMq4()" class="btn btn-default" href="#" >Q4 Fluent</button>
+		<button type="button" onclick="resetFluentASMTPCHq1()" class="btn btn-default" href="#" >TPCHQ1 Fluent</button>
         </div>
         <div class="col-md-6">
           <h2>JavaScript Code</h2>

@@ -40,7 +40,7 @@ function Afterburner(){
     this.joinP=eq(param1,param2);
     return this;
   }
-  this.field = function(param){
+  this.field = function(param, ...rest){
     if (boundAtt=daSchema.bindCol(param)){
       type= daSchema.getColTypeByName(param);
       this.attsA.push(param);
@@ -57,22 +57,34 @@ function Afterburner(){
       this.aggsA.push(param);
       this.fstr.push(param);
     }
-    return this;
+    if (rest.length>0)
+      return this.field(rest[0], ...rest.splice(1));
+    else 
+      return this;
   }
-  this.where = function(param){
+  this.where = function(param, ...rest){
     this.whereA.push(param);
-    return this;
+    if (rest.length>0)
+      return this.where(rest[0], ...rest.splice(1));
+    else 
+      return this;
   }
-  this.group = function(param){
+  this.group = function(param, ...rest){
     this.groupA.push(param);
     if (this.attsA.indexOf(param)<0)
       this.groupA.push(param);
-    return this;
-  }
-  this.order = function(param){
+    if (rest.length>0)
+      return this.group(rest[0], ...rest.splice(1));
+    else 
+      return this;
+   }
+  this.order = function(param, ...rest){
     this.orderA.push(param);
-    return this;
-  }
+    if (rest.length>0)
+      return this.order(rest[0], ...rest.splice(1));
+    else 
+      return this;
+   }
   this.limit = function(param){
     this.limitA=param;
     return this;
@@ -569,6 +581,23 @@ while(redo)
     mem32[(temps+(tempsptr<<2))>>2]=value;
     tempsptr= (tempsptr + 1 )|0;
   };
+  function hash_str(strp){
+    strp=strp|0;
+    i=0;
+    hash=101;
+    for (;mem8[strp];i=(i+1)|0)
+      hash=  ((+(hash)*103)|0) + (mem8[(strp+i)|0]);
+    return (hash |0);
+  };
+  function mystrcmp(str1, str2){
+    str1=str1|0;
+    str2=str2|0;
+    var i=i|0;
+    while (
+          ( ([(str1+i)|0]==mem8[(str2+i)|0]) && mem8[(str1+i)|0 ] && mem8[(str2+i)|0])
+          ) i=((i+1)|0);
+    return ([(str1+i)|0 ]-mem8[(str2+i)|0 ]);
+  }
   return {runner:runner}
 });
 
@@ -720,7 +749,7 @@ function compare(op,p1,p2){
 function field(){
   this.type='';
   this.att='';
-  this.agg;
+  this.aggsh_str;
   this.attribute = function (){
   }
   this.aggregate = function (){
@@ -760,7 +789,7 @@ function max(p){
 function count(p){
   unique=uniqueVarCounter++;
   type = 0;
-  varname="count"+unique
+  varname="count"+unique;
   return `dec:var `+varname+`=0;::
   post:res.addCol2('count(`+p+`)',`+type+`);::
   preexek:`+varname+`=0;::
@@ -788,7 +817,7 @@ function avg(p){
   type= daSchema.getColTypeByName(p);
   tab= daSchema.getParent(p);
   varnamesum="avgsum"+unique
-  varnamesum="avgcount"+unique
+  varnamecount="avgcount"+unique
   return `dec:var `+varnamecount+`=0;::
   dec:var `+varnamesum+`=0;::
   post:res.addCol2('avg(`+p+`)',`+type+`);::
