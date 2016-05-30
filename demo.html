@@ -4,14 +4,133 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="">
-    <meta name="author" content="">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css" integrity="sha384-fLW2N01lMqjakBkx3l/M9EahuwpSfeNvV63J5ezn3uZzapT0u7EYsXMjQV+0En5r" crossorigin="anonymous">
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
 
+    <title>Afterburner Demo</title>
 
+<!--    <link rel="stylesheet" href="bootstrap/bootstrap.min.css">-->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+   <style type="text/css">
+      body {
+        padding-top: 50px;
+      }
+      .modal {
+        text-align: left;
+      }
+      pre.prettyprint {
+        border: 1px solid #ccc;
+        margin-bottom: 0;
+        padding: 9.5px;
+      }
+
+    </style>
+
+  </head>
+  <body>
+
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="#">Afterburner</a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+          <ul class="nav navbar-nav">
+            <li><a href="./index.html">Home</a></li>
+            <li class="active"><a href="./demo.html">Demo</a></li>
+            <li><a href="https://github.com/lintool/afterburner/">Code (GitHub)</a></li>
+          </ul>
+
+        </div><!--/.navbar-collapse -->
+      </div>
+    </nav>
+
+    <!-- Main jumbotron for a primary marketing message or call to action -->
+
+<!--<div>
+      <a>Load a table from a file server.</a><br>
+     Server: <input type="text" name="fserverIP" value="127.0.0.1"><br>
+     Port: <input type="text" name="fserverPort" value="55443"><br>
+     <button submit="submit" id="loadserver">get table from server</button><hr>
+</div>-->
+
+<div class="jumbotron">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-3">
+        <label class="btn btn-default btn-file" href="#" data-toggle="tooltip" data-placement="bot" title="Load a database table from a local file">
+          Load table
+          <input type="file" id="fileInput" style="display: none;"> 
+        </label>
+      </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+          <p id="sconsole" class="row table-responsive"  ></p>
+<!--      <div id="divcons" class="row table-responsive"> </div>-->
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-6">
+          <h2>Fluent SQL</h2>
+		<textarea rows="11" id="TAFluent" name="TAFluent" class="prettyprint form-control animated" placeholder="Type Fluent SQL or use example buttons.."></textarea>
+		<button type="button" onclick="fluentToASM()" class="btn btn-default" href="#" data-toggle="tooltip" data-placement="bot" title="Translate Fluent into JavaScript code">
+                  Fluent to ASM</button><br>
+		<button type="button" onclick="resetFluentASMq1()" class="btn btn-default" href="#" >
+                  Q1 Fluent</button>
+		<button type="button" onclick="resetFluentASMq2()" class="btn btn-default" href="#" >
+                  Q2 Fluent</button>
+		<button type="button" onclick="resetFluentASMq3()" class="btn btn-default" href="#" >
+                  Q3 Fluent</button>
+		<button type="button" onclick="resetFluentASMq4()" class="btn btn-default" href="#" data-toggle="tooltip" data-placement="bot" title="Load Fluent SQL for Q4">
+                  Q4 Fluent</button>
+        </div>
+        <div class="col-md-6">
+          <h2>JavaScript Code</h2>
+		<textarea rows="11" id="TAASM" name="TAASM" class="prettyprint form-control animated" placeholder="" ></textarea>
+		<button type="button" onclick="runASM()" class="btn btn-default" href="#" data-toggle="tooltip" data-placement="bot" title="Run code (Query)">
+                  Run ASM</button>
+       </div>
+      </div>
+
+       <div class="row">
+        <div class="col-md-12">
+          <div id="divcons" class="row table-responsive"> </div>
+        </div>
+      </div>
+
+    <br>
+    <div class="row" id="divconsole">
+      <div class="col-md-12">
+        <p id="console">Console area!</p>
+      </div>
+    </div>
+    <textarea id="mytextareainv" style="display:none;"> </textarea>
+  </div> <!-- /container -->
+
+  <div id="waitForFile" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-body">
+          <p>Loading.. Please wait..</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<!-- Afterburner -->
 
 <script src="./src/core/afterburner.js"></script>
 <script src="./src/core/store.js"></script>
@@ -23,8 +142,7 @@
 <script src="./src/core/common.js"></script>
 <script src="./src/core/html5FileParser.js"></script>
 <script src="./src/frontend/myJS.js"></script>
-<!--<script src="../src/proxy/proxyClient.js"></script>-->
-<!-- <script src="./browser-frontend.min.js"></script> -->
+
 <script>
 function myOnLoad(){
   ABi = new Afterburner();
@@ -37,7 +155,6 @@ window.onload = function() {
   fileInput.addEventListener('change', function(e) {
     var file = fileInput.files[0];
     var ds= new dataSource(file, function(){newTable= new aTable(ds);});
-    //;
   });
   myOnLoad();
 }
@@ -45,7 +162,6 @@ function runASM(){
   asmcode=document.getElementById("TAASM").value;
   document.getElementById("console").innerHTML = "ASM=" + asmcode
   tt0=window.performance.now();
-//        for(zz=0;zz<100;zz++)
   runMyAdhocCode(asmcode);
   tt1=window.performance.now();
   console.log('time to run asm:'+ (tt1-tt0));
@@ -106,134 +222,27 @@ function fluentToASM(){
 	}
 }
 </script>
-  <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css">
-  <script src="//google-code-prettify.googlecode.com/svn/loader/run_prettify.js"></script>
-  <style type="text/css">
-    .modal {
-      text-align: left;
-    }
-    pre.prettyprint {
-      border: 1px solid #ccc;
-      margin-bottom: 0;
-      padding: 9.5px;
-    }
-  </style>
 
 
+<!-- Bootstrap core JavaScript
+================================================== -->
+<!-- Placed at the end of the document so the pages load faster -->
+<!-- <script src="bootstrap/jquery.min.js"></script>-->
+  <!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script> -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.2/jquery.min.js"></script>
 
+<!--<script src="bootstrap/bootstrap.min.js"></script> -->
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
 
-    <title>Afterburner Demo</title>
+<!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+<script src="https://maxcdn.bootstrapcdn.com/js/ie10-viewport-bug-workaround.js"></script>
 
-    <!-- Bootstrap core CSS -->
-<!--   <link href="../../dist/css/bootstrap.min.css" rel="stylesheet"> -->
-    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
-<!--    <link href="../../assets/css/ie10-viewport-bug-workaround.css" rel="stylesheet"> -->
-    <!-- Custom styles for this template -->
-<!--    <link href="jumbotron.css" rel="stylesheet">  -->
-    <!-- Just for debugging purposes. Don't actually copy these 2 lines! -->
-    <!--[if lt IE 9]><script src="../../assets/js/ie8-responsive-file-warning.js"></script><![endif]-->
-<!--    <script src="../../assets/js/ie-emulation-modes-warning.js"></script> -->
-    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
-    <!--[if lt IE 9]>
-      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
-      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
-    <![endif]-->
-  </head>
+<script type="text/javascript">
+  $(document).ready(function() {
+    $("body").tooltip({ selector: '[data-toggle=tooltip]' });
+});
+$( ".selector" ).tooltip({ show: { effect: "blind", duration: 1500 } });
+</script>
 
-  <body>
-
-    <nav class="navbar navbar-inverse navbar-fixed-top">
-      <div class="container">
-        <div class="navbar-header">
-          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
-            <span class="sr-only">Toggle navigation</span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-          </button>
-          <a class="navbar-brand" href="#">Afterburner</a>
-        </div>
-        <div id="navbar" class="navbar-collapse collapse">
-          <ul class="nav navbar-nav">
-            <li><a href="./index.html">Home</a></li>
-            <li class="active"><a href="./demo.html">Demo</a></li>
-            <li><a href="https://github.com/lintool/afterburner/">Code (GitHub)</a></li>
-          </ul>
-
-        </div><!--/.navbar-collapse -->
-      </div>
-    </nav>
-
-    <!-- Main jumbotron for a primary marketing message or call to action -->
-
-<!--<div>
-      <a>Load a table from a file server.</a><br>
-     Server: <input type="text" name="fserverIP" value="127.0.0.1"><br>
-     Port: <input type="text" name="fserverPort" value="55443"><br>
-     <button submit="submit" id="loadserver">get table from server</button><hr>
-</div>-->
-
-   <div class="jumbotron">
-    <div class="container">
-       <div class="row">
-         <div class="col-md-6">
-            <a>Load a table from local file.</a><br>
-            <label class="btn btn-default btn-file">Browse <input type="file"  id="fileInput"> </label>
-          </div>
-      </div>
-
-      <div class="row">
-        <div class="col-md-2">
-          <button type="button" onclick="document.getElementById("TableControl").innerHTML = daSchema.toString(); " class="btn btn-default" href="#" >PrintSchema</button>
-        </div>
-        <div class="col-md-10">
-          <p id="sconsole" class="row table-responsive"  >Schema:</p>
-<!--      <div id="divcons" class="row table-responsive"> </div>-->
-        </div>
-      </div>
-      <div class="row">
-        <div class="col-md-6">
-          <h2>Fluent SQL</h2>
-		<textarea rows="7" id="TAFluent" name="TAFluent" class="prettyprint form-control animated" placeholder="Type Fluent SQL or use example buttons.."></textarea>
-		<button type="button" onclick="fluentToASM()" class="btn btn-default" href="#" >Fluent to ASM</button><br>
-		<button type="button" onclick="resetFluentASMq1()" class="btn btn-default" href="#" >Q1 Fluent</button>
-		<button type="button" onclick="resetFluentASMq2()" class="btn btn-default" href="#" >Q2 Fluent</button>
-		<button type="button" onclick="resetFluentASMq3()" class="btn btn-default" href="#" >Q3 Fluent</button>
-		<button type="button" onclick="resetFluentASMq4()" class="btn btn-default" href="#" >Q4 Fluent</button>
-        </div>
-        <div class="col-md-6">
-          <h2>JavaScript Code</h2>
-		<textarea rows="7" id="TAASM" name="TAASM" class="prettyprint form-control animated" placeholder="" ></textarea>
-		<button type="button" onclick="runASM()" class="btn btn-default" href="#" >Run ASM</button>
-       </div>
-      </div>
-
-      <div id="divcons" class="row table-responsive"> </div>
-
-<!--<button type="button" onclick="runDemo()">Run Demo</button>-->
-<!--<button type="button" onclick="runQuery()">Run Query</button>-->
-
-<br> <hr> 
-<div id="divconsole">
-<p id="console">Console area!</p>
-</div>
-
-
-<textarea id="mytextareainv" style="display:none;">
-</textarea>
-<br> <hr> <br>    </div> <!-- /container -->
-
-<div id="waitForFile" class="modal fade" role="dialog">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-body">
-        <p>Loading.. Please wait..</p>
-      </div>
-    </div>
-
-  </div>
-</div>
-
-  </body>
+</body>
 </html>
-
