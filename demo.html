@@ -99,15 +99,15 @@ function resetFluentASMTPCHq1(){
     'l_linestatus',
     sum('l_quantity'),
     sum('l_extendedprice'),
-    sum('l_extendedprice * (1 - l_discount)'),
-    sum('l_extendedprice * (1 - l_discount) * (1 + l_tax)'),
+    sum(mul('l_extendedprice',sub(1.0 , 'l_discount'))),
+    sum(mul(mul('l_extendedprice',sub(1.0 , 'l_discount')), add(1.0 , 'l_tax'))),
     avg('l_quantity'),
     avg('l_extendedprice'),
     avg('l_discount'),
     count('*'))
   .where(leq('l_shipdate',date('1998-09-02')))
   .group('l_returnflag','l_linestatus')
-  .order('l_returnflag','l_linestatus')
+  .order([0,1])
   .toString()`;
   fluentToASM();
 }
