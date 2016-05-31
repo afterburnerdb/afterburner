@@ -24,10 +24,10 @@ var temps;
 var storemax=temps=memmax-(bufPoolMB*1024*1024);
 //Hash tables
 var hashBits=23;
-var hash1BucketSize=6;
+var hash1BucketSize=5;
 
-var hash2BucketSize=1022;
-var hash3BucketSize=1022;
+var hash2BucketSize=1021;
+var hash3BucketSize=1021;
 var hashBitFilter=Math.pow(2,hashBits)-1;
 var bukpool=100*1024*1024;
 var hbbsize=((hashBitFilter+1)*4);

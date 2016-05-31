@@ -111,17 +111,19 @@ function Afterburner(){
    dec:var trav_`+jTab+`=-1;::
    pre:trav_`+jTab+`=-1; while(1){trav_`+jTab+`=trav_`+jTab+`+1|0; if((trav_`+jTab+`|0)>=`+tabLen+`) break; `+jfilter+`;::
    pre:  hk=(`+daSchema.bindCol(this.onA[1])+` & (hashBitFilter|0))|0;::
-   pre:  if (bp=mem32[((h1bb+(hk<<2))|0)>>2]|0){::
-   pre:    while(mem32[((bp+(((hash1BucketSize+1)|0)<<2))|0)>>2]|0){::
-   pre:      bp= mem32[((bp+(((hash1BucketSize+1)|0)<<2))|0)>>2]|0;::
-   pre:    }::
-   pre:    if((mem32[bp>>2]|0) >= (hash1BucketSize|0)){::
-   pre:      bp=(h1tb+((curr1NumBucks) * (((hash1BucketSize+2)|0)<<2)|0))|0;
-   pre:      bp=(h1tb+(curr1NumBucks<<5))|0;::
+   pre:  if (obp=mem32[((h1bb+(hk<<2))|0)>>2]|0){::
+   pre:    //while(mem32[((bp+(((hash1BucketSize+1)|0)<<2))|0)>>2]|0){::
+   pre:      bp= mem32[((obp+(((hash1BucketSize+2)|0)<<2))|0)>>2]|0;::
+   pre:    //}::
+   pre:    if((mem32[bp>>2]|0) >= (hash1BucketSize|0)){//extension::
+   pre:      nbp=(h1tb+((curr1NumBucks) * (((hash1BucketSize+2)|0)<<2)|0))|0;
+   pre:      nbp=(h1tb+(curr1NumBucks<<5))|0;::
    pre:      curr1NumBucks=(curr1NumBucks+1)|0;::
-   pre:      mem32[((bp+((hash1BucketSize+1|0)<<2))|0)>>2]=bp;::
-   pre:      mem32[bp>>2]=0;::
-   pre:      mem32[((bp+(((hash1BucketSize+1)|0)<<2))|0)>>2]=0;::
+   pre:      mem32[((bp+((hash1BucketSize+1|0)<<2))|0)>>2]=nbp;::
+   pre:      mem32[((obp+((hash1BucketSize+2|0)<<2))|0)>>2]=nbp;::
+   pre:      mem32[nbp>>2]=0;::
+   pre:      mem32[((nbp+(((hash1BucketSize+1)|0)<<2))|0)>>2]=0;::
+   pre:      bp=nbp;::
    pre:    }::
    pre:  }else{//reception::
    pre:    bp=(h1tb+(curr1NumBucks<<5))|0;::
@@ -129,6 +131,7 @@ function Afterburner(){
    pre:    mem32[((h1bb+(hk<<2))|0)>>2]=bp|0;::
    pre:    mem32[bp>>2]=0;::
    pre:    mem32[((bp+(((hash1BucketSize+1)|0)<<2))|0)>>2]=0;::
+   pre:    mem32[((bp+(((hash1BucketSize+2)|0)<<2))|0)>>2]=bp;::
    pre:  };::
    pre:  //put one::
    pre:  tmp=(((mem32[bp>>2]|0)+1)|0);::
@@ -204,16 +207,18 @@ function Afterburner(){
       pre:    if((i|0)>=(hashBitFilter|0)) break;::
       pre:  }::
       group:  hk=`+daHash+`;::
-      group:  if (bp=mem32[((h2bb+(hk<<2))|0)>>2]|0){::
-      group:    while(mem32[((bp+(((hash2BucketSize+1)|0)<<2))|0)>>2]|0){::
-      group:      bp= mem32[((bp+(((hash2BucketSize+1)|0)<<2))|0)>>2]|0;::
-      group:    }::
-      group:    if((mem32[bp>>2]|0) >= (hash2BucketSize|0)){::
-      group:      bp=(h2tb+(curr2NumBucks<<12))|0;::
+      group:  if (obp=mem32[((h2bb+(hk<<2))|0)>>2]|0){::
+      group:    //while(mem32[((bp+(((hash2BucketSize+1)|0)<<2))|0)>>2]|0){::
+      group:      bp= mem32[((obp+(((hash2BucketSize+2)|0)<<2))|0)>>2]|0;::
+      group:    //}::
+      group:    if((mem32[bp>>2]|0) >= (hash2BucketSize|0)){//extension::
+      group:      nbp=(h2tb+(curr2NumBucks<<12))|0;::
       group:      curr2NumBucks=(curr2NumBucks+1)|0;::
-      group:      mem32[((bp+((hash2BucketSize+1|0)<<2))|0)>>2]=bp;::
-      group:      mem32[bp>>2]=0;::
-      group:      mem32[((bp+(((hash2BucketSize+1)|0)<<2))|0)>>2]=0;::
+      group:      mem32[((bp+((hash2BucketSize+1|0)<<2))|0)>>2]=nbp;::
+      group:      mem32[((obp+((hash2BucketSize+2|0)<<2))|0)>>2]=nbp;::
+      group:      mem32[nbp>>2]=0;::
+      group:      mem32[((nbp+(((hash2BucketSize+1)|0)<<2))|0)>>2]=0;::
+      group:      bp=nbp;::
       group:    }::
       group:  }else{//reception::
       group:    bp=(h2tb+(curr2NumBucks<<12))|0;::
@@ -221,6 +226,7 @@ function Afterburner(){
       group:    mem32[((h2bb+(hk<<2))|0)>>2]=bp|0;::
       group:    mem32[bp>>2]=0;::
       group:    mem32[((bp+(((hash2BucketSize+1)|0)<<2))|0)>>2]=0;::
+      group:    mem32[((bp+(((hash2BucketSize+2)|0)<<2))|0)>>2]=bp;::
       group:  };::
       group:  //put one::
       group:  tmp=(((mem32[bp>>2]|0)+1)|0);::
@@ -256,16 +262,18 @@ function Afterburner(){
       pre:    if((i|0)>=(hashBitFilter|0)) break;::
       pre:  }::
       group:  hk=`+daHash+`;::
-      group:  if (bp=mem32[((h2bb+(hk<<2))|0)>>2]|0){::
-      group:    while(mem32[((bp+(((hash2BucketSize+1)|0)<<2))|0)>>2]|0){::
-      group:      bp= mem32[((bp+(((hash2BucketSize+1)|0)<<2))|0)>>2]|0;::
-      group:    }::
-      group:    if((mem32[bp>>2]|0) >= (hash2BucketSize|0)){::
-      group:      bp=(h2tb+(curr2NumBucks<<12))|0;::
+      group:  if (obp=mem32[((h2bb+(hk<<2))|0)>>2]|0){::
+      group:    //while(mem32[((bp+(((hash2BucketSize+1)|0)<<2))|0)>>2]|0){::
+      group:      bp= mem32[((obp+(((hash2BucketSize+2)|0)<<2))|0)>>2]|0;::
+      group:    //}::
+      group:    if((mem32[bp>>2]|0) >= (hash2BucketSize|0)){//extension::
+      group:      nbp=(h2tb+(curr2NumBucks<<12))|0;::
       group:      curr2NumBucks=(curr2NumBucks+1)|0;::
-      group:      mem32[((bp+((hash2BucketSize+1|0)<<2))|0)>>2]=bp;::
-      group:      mem32[bp>>2]=0;::
-      group:      mem32[((bp+(((hash2BucketSize+1)|0)<<2))|0)>>2]=0;::
+      group:      mem32[((bp+((hash2BucketSize+1|0)<<2))|0)>>2]=nbp;::
+      group:      mem32[((obp+((hash2BucketSize+2|0)<<2))|0)>>2]=nbp;::
+      group:      mem32[nbp>>2]=0;::
+      group:      mem32[((nbp+(((hash2BucketSize+1)|0)<<2))|0)>>2]=0;::
+      group:      bp=nbp;::
       group:    }::
       group:  }else{//reception::
       group:    bp=(h2tb+(curr2NumBucks<<12))|0;::
@@ -273,6 +281,7 @@ function Afterburner(){
       group:    mem32[((h2bb+(hk<<2))|0)>>2]=bp|0;::
       group:    mem32[bp>>2]=0;::
       group:    mem32[((bp+(((hash2BucketSize+1)|0)<<2))|0)>>2]=0;::
+      group:    mem32[((bp+(((hash2BucketSize+2)|0)<<2))|0)>>2]=bp;::
       group:  };::
       group:  //put one::
       group:  tmp=(((mem32[bp>>2]|0)+2)|0);::
@@ -346,7 +355,6 @@ while(redo)
            break;
         }else{
           `+combound+`
-          curr=curr+2|0;
         }
         if (`+daConts+`){
           col=1;
@@ -354,6 +362,7 @@ while(redo)
           break;
         }
         `+execs+`
+        curr=curr+2|0;
       }
       if(col){
         //todo: handle cols
@@ -447,7 +456,6 @@ while(redo)
            break;
         }else{
           `+combound+`
-          curr=curr+1|0;
         }
         if (`+daConts+`){
           col=1;
@@ -455,6 +463,7 @@ while(redo)
           break;
         }
         `+execs+`
+          curr=curr+1|0;
       }
       if(col){
         //todo: handle cols
@@ -571,7 +580,9 @@ while(redo)
   var currb=0;
   var curr=0;
   var i=0;
+  var obp=0;
   var bp=0;
+  var nbp=0;
   var hk=0;
   var tmp=0;
   `+core+`
