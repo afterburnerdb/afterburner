@@ -86,7 +86,7 @@ function aSchema(){
   }
   this.toHTMLTable = function() {
     var table=document.createElement('table');
-    table.setAttribute('class',"table");
+    table.setAttribute('class',"table table-bordered table-condensed table-nonfluid");
 
     var thead = table.createTHead();
     thead.setAttribute('class',"thead-default");
@@ -101,6 +101,7 @@ function aSchema(){
     tr.appendChild(th);
 
     thead.appendChild(tr);
+    var tbody = table.createTBody();
 
     for (var i=0;i<this.tables.length;i++){
 
@@ -121,7 +122,7 @@ function aSchema(){
         td.appendChild(document.createTextNode(""+this.tables[i].colnames[ii]));
         trname.appendChild(td);
       }
-      table.appendChild(trname);
+      tbody.appendChild(trname);
 
       for (var ii=0;ii<this.tables[i].numcols;ii++){
         var td = document.createElement('td');
@@ -138,7 +139,7 @@ function aSchema(){
           }
         trtype.appendChild(td);
       }
-      table.appendChild(trtype);
+      tbody.appendChild(trtype);
 
     }
     return table;

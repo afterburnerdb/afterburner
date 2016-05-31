@@ -7,8 +7,8 @@
 
     <title>Afterburner Demo</title>
 
-<!--    <link rel="stylesheet" href="bootstrap/bootstrap.min.css">-->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+<!--    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"> -->
+    <link rel="stylesheet" href="bootstrap/css/bootstrap.min.css"> 
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
     <!--[if lt IE 9]>
@@ -28,7 +28,13 @@
         margin-bottom: 0;
         padding: 9.5px;
       }
-
+      .table-nonfluid {
+        width: auto !important;
+      }
+      .table-responsive {
+        max-height: 150px;
+        overflow: auto;
+      }
     </style>
 
   </head>
@@ -65,7 +71,7 @@
      <button submit="submit" id="loadserver">get table from server</button><hr>
 </div>-->
 
-<div class="jumbotron">
+<!-- <div class="jumbotron"> -->
   <div class="container">
     <div class="row">
       <div class="col-md-3">
@@ -78,14 +84,14 @@
 
     <div class="row">
         <div class="col-md-12">
-          <p id="sconsole" class="row table-responsive"  ></p>
-<!--      <div id="divcons" class="row table-responsive"> </div>-->
+        <div id="sconsole" class="table-responsive">
         </div>
+        <div>
       </div>
       <div class="row">
         <div class="col-md-6">
           <h2>Fluent SQL</h2>
-		<textarea rows="11" id="TAFluent" name="TAFluent" class="prettyprint form-control animated" placeholder="Type Fluent SQL or use example buttons.."></textarea>
+		<textarea rows="11" id="TAFluent" name="TAFluent" class="prettyprint form-control animated linenums language-css" placeholder="Type Fluent SQL or use example buttons.."></textarea>
 		<button type="button" onclick="fluentToASM()" class="btn btn-default" href="#" data-toggle="tooltip" data-placement="bot" title="Translate Fluent into JavaScript code">
                   Fluent to ASM</button><br>
 		<button type="button" onclick="resetFluentASMq1()" class="btn btn-default" href="#" >
@@ -98,16 +104,16 @@
                   Q4 Fluent</button>
         </div>
         <div class="col-md-6">
-          <h2>JavaScript Code</h2>
+          <h2>JavaScript</h2>
 		<textarea rows="11" id="TAASM" name="TAASM" class="prettyprint form-control animated" placeholder="" ></textarea>
 		<button type="button" onclick="runASM()" class="btn btn-default" href="#" data-toggle="tooltip" data-placement="bot" title="Run code (Query)">
                   Run ASM</button>
        </div>
       </div>
-
+       <div class="row"><div class="col-xs-12" style="height:50px;"></div></div>
        <div class="row">
         <div class="col-md-12">
-          <div id="divcons" class="row table-responsive"> </div>
+          <div id="divcons" class="table-responsive"> </div>
         </div>
       </div>
 
@@ -116,8 +122,7 @@
       <div class="col-md-12">
         <p id="console">Console area!</p>
       </div>
-    </div>
-    <textarea id="mytextareainv" style="display:none;"> </textarea>
+<!--    </div> -->
   </div> <!-- /container -->
 
   <div id="waitForFile" class="modal fade" role="dialog">
@@ -231,17 +236,17 @@ function fluentToASM(){
   <!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script> -->
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.2/jquery.min.js"></script>
 
-<!--<script src="bootstrap/bootstrap.min.js"></script> -->
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
+<!-- <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script> -->
+<script src="bootstrap/js/bootstrap.min.js"></script>
 
 <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
 <script src="https://maxcdn.bootstrapcdn.com/js/ie10-viewport-bug-workaround.js"></script>
 
 <script type="text/javascript">
   $(document).ready(function() {
-    $("body").tooltip({ selector: '[data-toggle=tooltip]' });
+    $("body").tooltip({ selector: '[data-toggle=tooltip]', show: { effect: "blind", duration: 1500} });
 });
-$( ".selector" ).tooltip({ show: { effect: "blind", duration: 1500 } });
+
 </script>
 
 </body>

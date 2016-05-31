@@ -3,5 +3,6 @@
 *.bbl
 *.blg
 *.bak
+*.zip
 node_modules
 src/node_modules/
