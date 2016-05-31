@@ -7,8 +7,6 @@ var ABi;
 var ptr2srt = ptr2srt |0;
 
 
-
-
 if (inNode){
   console.log('Running in Node');
   var aSchema=require('aSchema.js');
@@ -24,20 +22,13 @@ if (inNode){
   console.log('Running in Browser');
 }
 
-
 function runMyAdhocCode(code){
     new Function('ignore', code)();
 }
 
-
-
-
-
 function showVal(val) {
     document.getElementById("console").innerHTML = "slider val:" + val + "";
 }
-
-
 
 function createTableControls(schemaDefT)
 {
@@ -61,10 +52,6 @@ function createTableControl(tableDefT)
 
     tableControl.appendChild(tabNameLabel);
 
-//    for( var i=1; i<tabDefA.length; i++)
-//    {
-//      tableControl.appendChild(createTabChoiceControl(tabDefA[i]));
-//    }
     pickTableN = document.createElement("input");
     pickTableN.setAttribute('type', 'radio');
     pickTableN.setAttribute('id', 'tabNorth');
@@ -154,7 +141,6 @@ function createSelectControl(attrDefT){
 
     var attributes = [];
 
- 
     elem = document.createElement("label");
     elem.innerHTML='min';
     selectControl.appendChild(elem);
@@ -231,8 +217,6 @@ function createFilterControl(attrDefT){
     attributes[0].setAttribute('min', 0);
     attributes[0].setAttribute('max', 10000);
     attributes[0].setAttribute('oninput','tempFluent(this.value);');
-//    attributes[0].setAttribute('onchange','tempFluent(this.value);');
-//    attributes[0].setAttribute('onclick', 'tempFluent(this.value);');
  
     attributes[1] = document.createElement("label");
     attributes[1].innerHTML='&gt';
@@ -269,7 +253,6 @@ function createFilterControl(attrDefT){
     attributes[8].setAttribute('name', 'filter'+attrDefT);
     attributes[8].setAttribute('id', 'join');
     attributes[8].setAttribute('onchange','showVal(this.value);');
-//    attributes[8].setAttribute('checked', 'true');
 
     filterControl.appendChild(attrNameLabel);
     filterControl.appendChild(attributes[0]);
@@ -282,10 +265,8 @@ function createFilterControl(attrDefT){
     filterControl.appendChild(attributes[7]);
     filterControl.appendChild(attributes[8]);
 
-    //filterControl.setAttribute('oncontextmenu', 'alert(this)');
     filterControl.addEventListener('contextmenu', function(ev) {
       ev.preventDefault();
-      //this.parent().removeChild(this);
       this.remove();
       return false;
       }, false);
@@ -309,7 +290,7 @@ function create_index(colname){
   type=daSchema.getColTypeByName(colname);
   len=daSchema.getColLenByName(colname);
   ht=new Map();
-  if (type ==0){
+  if (type ==0 || type==3 || type==4){
     for (var i=0|0;i<len;i++){
       if (tmp=ht.get( numStore32[(ptr+i)|0] )){
         tmp.push(i);
@@ -336,7 +317,7 @@ function create_index(colname){
       }
     }
   } else {
-    alert("unkown type cannot build ht");
+    alert("unknown type cannot build ht");
   }
   return ht;
 }
@@ -373,7 +354,6 @@ function mycompstr(str1,str2){
 
 
 function create_order(colname){
-//  var len = len;
   ptr=daSchema.getColPByName(colname);
   type=daSchema.getColTypByName(colname);
   len=daSchema.getColLenByName(colname);
@@ -391,7 +371,7 @@ function create_order(colname){
   else if (type == 2)
     order.sort(mycompstr);
   else 
-    alert("unkown type @create_order" + type);
+    alert("unknown type @create_order" + type);
   return order;
 }
 

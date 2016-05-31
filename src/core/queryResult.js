@@ -95,9 +95,10 @@ function queryResult(tempsptr) {
               alert("cant sort on this colname :" +toSort[a]) ;
             last= ((a+1)==toSort.length);
              if (this.coltypes[toSort[a]] == 1) axr="(memF32"; else axr= "(mem32";
-             if ((this.coltypes[toSort[a]] == 0)  ||
-                (this.coltypes[toSort[a]] == 1)  ||
-                (this.coltypes[toSort[a]] == 3))  {
+             if ((this.coltypes[toSort[a]] == 0) ||
+                 (this.coltypes[toSort[a]] == 1) ||
+                 (this.coltypes[toSort[a]] == 3) ||
+                 (this.coltypes[toSort[a]] == 4)    ){
                axr=  "(mem32";
                if (last){
                  fbody+="("+sign+axr+"[(temps + (((a*"+this.numcols+")+"+toSort[a]+")<<2))>>2])";
@@ -121,7 +122,7 @@ function queryResult(tempsptr) {
                 }
               }
               else 
-                alert("unkown type @qr.sort type:"+this.coltypes[toSort[a]]+" toSort[a]:"+toSort[a]);
+                alert("unknown type @qr.sort type:"+this.coltypes[toSort[a]]+" toSort[a]:"+toSort[a]);
         }
         
         qcomp=Function('a','b',fbody + "}");
@@ -156,8 +157,10 @@ function queryResult(tempsptr) {
             td.appendChild(document.createTextNode(strToString(mem32[(this.cols[ii] + (i<<2))>>2])));
           } else if (this.coltypes[ii]==3){
             td.appendChild(document.createTextNode(""+int_to_strdate(mem32[(this.cols[ii] + (i<<2))>>2])));
+          } else if (this.coltypes[ii]==4){
+            td.appendChild(document.createTextNode(""+int_to_strchar(mem32[(this.cols[ii] + (i<<2))>>2])));
           } else{
-            alert("unkown type");
+            alert("unknown type");
           }
           tr.appendChild(td);
         }
@@ -187,6 +190,8 @@ function queryResult(tempsptr) {
             ret=ret+strToString(mem32[this.cols[ii]+(i<<2)])+ "\t|\t";
           } else if (this.coltypes[ii]==3){
             ret=ret+int_to_strdate(mem32[(this.cols[ii] + (i<<2))>>2])+ "\t|\t";
+          } else if (this.coltypes[ii]==4){
+            ret=ret+int_to_strchar(mem32[(this.cols[ii] + (i<<2))>>2])+ "\t|\t";
           } else{
             alert("unkown type");
           }

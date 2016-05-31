@@ -22,14 +22,14 @@ function dataSource(src,funk){
   var handyColNames={};
   var handyColTypes={};
   handyColNames["lineitem"]=[
-"l_orderkey",
-"l_partkey",
-"l_suppkey",
-"l_linenumber",
-"l_quantity",
-"l_extendedprice",
-"l_discount",
-"l_tax",
+"l_orderkey",     //0
+"l_partkey",      //0
+"l_suppkey",      //0
+"l_linenumber",   //0
+"l_quantity",     //1
+"l_extendedprice",//1
+"l_discount",     //1
+"l_tax",          //1
 "l_returnflag",
 "l_linestatus",
 "l_shipdate",
@@ -47,8 +47,8 @@ handyColTypes["lineitem"]=[
 1,
 1,
 1,
-2,
-2,
+4,
+4,
 3,
 3,
 3,
@@ -69,7 +69,7 @@ handyColNames["orders"]=[
 handyColTypes["orders"]=[
 0,
 0,
-2,
+4,
 1,
 3,
 2,
@@ -145,10 +145,10 @@ handyColTypes["myview"]=[
         this.coltypes.push(1);
       else if (src.structure[i].type== 'varchar')
         this.coltypes.push(2);
-      else if (src.structure[i].type== 'char')
-        this.coltypes.push(2);
       else if (src.structure[i].type== 'date')
         this.coltypes.push(3);
+      else if (src.structure[i].type== 'char')
+        this.coltypes.push(4);
       else {
         consolue.log('unsupported data types from monetdb:i'+i);
         consolue.log('unsupported data types from monetdb:' + src.structure[i].type );

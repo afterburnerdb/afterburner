@@ -499,6 +499,9 @@ while(redo)
    ret=ret+"return tempsptr|0;}";
     return ret;
   }
+  this.badFSQL = function(where){
+    console.log("Bad Fluent SQL at:"+where);
+  }
 //////////////////////////////////////////////////////////////////////////////
 //TOSTRING
   this.toVanilla = function(){
@@ -581,23 +584,23 @@ while(redo)
     mem32[(temps+(tempsptr<<2))>>2]=value;
     tempsptr= (tempsptr + 1 )|0;
   };
-  function hash_str(strp){
-    strp=strp|0;
-    i=0;
-    hash=101;
-    for (;mem8[strp];i=(i+1)|0)
-      hash=  ((+(hash)*103)|0) + (mem8[(strp+i)|0]);
-    return (hash |0);
-  };
-  function mystrcmp(str1, str2){
-    str1=str1|0;
-    str2=str2|0;
-    var i=i|0;
-    while (
-          ( ([(str1+i)|0]==mem8[(str2+i)|0]) && mem8[(str1+i)|0 ] && mem8[(str2+i)|0])
-          ) i=((i+1)|0);
-    return ([(str1+i)|0 ]-mem8[(str2+i)|0 ]);
-  }
+//  function hash_str(strp){
+//    strp=strp|0;
+//    i=0;
+//    hash=101;
+//    for (;mem8[strp];i=(i+1)|0)
+//      hash=  ((+(hash)*103)|0) + (mem8[(strp+i)|0]);
+//    return (hash |0);
+//  };
+//  function mystrcmp(str1, str2){
+//    str1=str1|0;
+//    str2=str2|0;
+//    var i=i|0;
+//    while (
+//          ( ([(str1+i)|0]==mem8[(str2+i)|0]) && mem8[(str1+i)|0 ] && mem8[(str2+i)|0])
+//          ) i=((i+1)|0);
+//    return ([(str1+i)|0 ]-mem8[(str2+i)|0 ]);
+//  }
   return {runner:runner}
 });
 
@@ -659,7 +662,7 @@ function contbind(pfield) {
   obound= daSchema.obindCol(pfield);
   type= daSchema.getColTypeByName(pfield);
   travname='trav';
-  if ((type==0) || (type==1) || (type==3))
+  if ((type==0) || (type==1) || (type==3) || (type==4))
     return "(("+obound+"|0)-("+bound+")|0)";
   else if (type==2)
     return "(mystrcmp("+obound+","+bound+"))";
@@ -671,7 +674,7 @@ function gbind(pfield) {
   type= daSchema.getColTypeByName(pfield);
   tab= daSchema.getParent(pfield);
   ret='';
-  if ((type==0) || (type==1) || (type==3))
+  if ((type==0) || (type==1) || (type==3) || (type==4))
     ret ="(mem32[("+ppfield+"+ (trav_"+tab+"<<2)) >>2]|0 & (hashBitFilter|0) )";
   else if (type==2)
     ret ="(hash_str(mem32[("+ppfield+"+ (trav_"+tab+"<<2)) >>2]))";
@@ -683,7 +686,7 @@ function gbindn(pfield) {
   type= daSchema.getColTypeByName(pfield);
   tab= daSchema.getParent(pfield);
   ret="";
-  if ((type==0) || (type==1) || (type==3))
+  if ((type==0) || (type==1) || (type==3) || (type==4))
     ret= "(hash_int(mem32[("+ppfield+"+ (trav_"+tab+"<<2))>>2]),h)";
   else if (type==2)
     ret= "(hashn_strp(mem32[("+ppfield+"+ (trav_"+tab+"<<2)) >>2]),h)";
@@ -726,23 +729,36 @@ function betweenlit(p1,p2,p3){
 function compare(op,p1,p2){
   p1b=daSchema.bindCol(p1);
   p2b=daSchema.bindCol(p2);
+  p1t=daSchema.getColTypeByName(p1);
+  p2t=daSchema.getColTypeByName(p2);
+
   if (p1b && p2b){
     return '(' +p1b+ op + p2b+')';
-  }
-  else if (p1b ){
-    if ((typeof p2) == 'string' && (op == '=='))
-      return expandStrLitComp(p1b,p2);
-    else 
-      return expandLitComp(op,daSchema.getColTypeByName(p1),p1b,p2);  
-  }
-  else if (p2b ){
-    if ((typeof p1) == 'string' && (op == '=='))
-      return expandStrLitComp(p2b,p1);
-    else 
-      return expandLitComp(op,daSchema.getColTypeByName(p2),p2b,p1);  
+  } else if (p1b){
+    if ((typeof p2) == 'string' && (op == '==')){
+      if (p1t == 2)
+        return expandStrLitComp(p1b,p2);
+      else if (p1t == 4 && p2.length==1)
+        return expandLitComp(op,p1t,p1b,p2.charCodeAt(0));
+      else 
+        this.badFSQL('@compare');
+    } else {
+      return expandLitComp(op,p1t,p1b,p2);  
+    }
+  } else if (p2b){
+    if ((typeof p1) == 'string' && (op == '==')){
+      if (p2t == 2)
+        return expandStrLitComp(p2b,p1);
+      else if (p2t == 4 && p1.length==1)
+        return expandLitComp(op,p2t,p2b,p1.charCodeAt(0));
+      else 
+        this.badFSQL('@compare');
 
+    } else {
+      return expandLitComp(op,p2t,p2b,p1);  
+    }
   }
-  else{
+  else{//todo: eval here 
     return '(' +p1+ op + p2+')';
   }
 }
@@ -853,6 +869,15 @@ function expandLitComp(op,type,bp,lp){
 
 function date(p1){
   return strdate_to_int(p1);
+}
+
+function add(p1,p2){
+}
+function sub(p1,p2){
+}
+function mul(p1,p2){
+}
+function div(p1,p2){
 }
 
 

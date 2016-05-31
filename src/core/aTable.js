@@ -51,6 +51,10 @@ function aTable(dSrc) {
               tmps=fp.nextstr();
               tmp=strdate_to_int(tmps);
               mem32[(mem32[(colptrs+(i<<2))>>2]+(ii<<2))>>2]=tmp;
+            } else if(coltypes[i]==4){
+              tmps=fp.nextstr();
+              tmp=strchar_to_int(tmps);
+              mem32[(mem32[(colptrs+(i<<2))>>2]+(ii<<2))>>2]=tmp;
             } else{
               alert('cannot handle data type:' + coltypes[i])
             }
@@ -69,13 +73,6 @@ function aTable(dSrc) {
 	}
         daSchema.addTable(this);
     };
-//    this.regTabPointer = function(pname,size,colnames,coltypes){
-//      this.name=strToString(pname);
-//      this.size=size;
-//      this.colnames=colnames;
-//      this.coltypes=coltypes;
-//      this.colptrs=ptr;
-//    };
     this.setsize = function(size){
       this.numrows=size;
     };
@@ -122,8 +119,10 @@ function aTable(dSrc) {
             td.appendChild(document.createTextNode(strToString(mem32[this.cols[ii]+(i<<2)])));
           } else if (this.coltypes[ii]==3){
             td.appendChild(document.createTextNode(""+mem32[(this.cols[ii] + (i<<2))>>2]));
+          } else if (this.coltypes[ii]==4){
+            td.appendChild(document.createTextNode(""+mem32[(this.cols[ii] + (i<<2))>>2]));
           } else{
-            alert("unkown type");
+            alert("unknown type");
           }
           tr.appendChild(td);
         }
@@ -149,9 +148,11 @@ function aTable(dSrc) {
           } else if (this.coltypes[ii]==2){
             ret=ret+strToString(mem32[this.cols[ii]+(i<<2)])+ "\t|\t";
           } else if (this.coltypes[ii]==3){
-            ret=ret+mem32[(this.cols[ii] + (i<<2))>>2]+ "\t|\t";
+            ret=ret+int_to_strdate(mem32[(this.cols[ii] + (i<<2))>>2])+ "\t|\t";
+          } else if (this.coltypes[ii]==4){
+            ret=ret+int_to_strchar(mem32[(this.cols[ii] + (i<<2))>>2])+ "\t|\t";
           } else{
-            alert("unkown type");
+            alert("unknown type");
           }
         }
       }

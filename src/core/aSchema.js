@@ -60,7 +60,7 @@ function aSchema(){
   this.bindCol = function(colname){
     ctype=this.getColTypeByName(colname)
     cptr=this.getColPByName(colname)
-    if (ctype==0 || ctype==2 || ctype==3)
+    if (ctype==0 || ctype==2 || ctype==3 || ctype==4)
       return '(mem32[(('+cptr+' +(trav_'+this.getParent(colname)+'<<2))|0)>>2]|0)';
     if (ctype==1)
       return '+(memF32[(('+cptr+' +(trav_'+this.getParent(colname)+'<<2))|0)>>2])';
@@ -68,7 +68,7 @@ function aSchema(){
   this.obindCol = function(colname){
     ctype=this.getColTypeByName(colname)
     cptr=this.getColPByName(colname)
-    if (ctype==0 || ctype==2 || ctype==3)
+    if (ctype==0 || ctype==2 || ctype==3 || ctype==4)
       return '(mem32[(('+cptr+' +(otrav_'+this.getParent(colname)+'<<2))|0)>>2]|0)';
     if (ctype==1)
       return '+(memF32[(('+cptr+' +(otrav_'+this.getParent(colname)+'<<2))|0)>>2])';
@@ -133,8 +133,10 @@ function aSchema(){
             td.appendChild(document.createTextNode("String"));
           } else if (this.tables[i].coltypes[ii]==3){
             td.appendChild(document.createTextNode("Date"));
+          } else if (this.tables[i].coltypes[ii]==4){
+            td.appendChild(document.createTextNode("Char"));
           } else{
-            alert("unkown type");
+            alert("unknown type");
           }
         trtype.appendChild(td);
       }

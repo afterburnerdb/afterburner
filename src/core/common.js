@@ -19,7 +19,12 @@ function int_to_strdate(days){
   var dayof=dte.getUTCDate();
   return (dayof>9)? (strdate+dayof): (strdate+"0"+dayof);
 }
-
+function strchar_to_int(strchar){
+    return strchar.charCodeAt(0);
+}
+function int_to_strchar(charcode){
+    return String.fromCharCode(charcode);
+}
 function printSchema(){
   if(inNode){
     console.log(daSchema.toString());
@@ -46,5 +51,8 @@ if(inNode){
   module.exports.printSchema=printSchema;
   global.strdate_to_int=strdate_to_int;
   global.int_to_strdate=int_to_strdate;
+  global.strchar_to_int=strchar_to_int;
+  global.int_to_strchar=int_to_strchar;
+
 }else delete module;
 ///////////////////////////////////////////////////////////////////////////////
