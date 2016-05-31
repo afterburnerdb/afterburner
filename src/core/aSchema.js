@@ -39,6 +39,8 @@ function aSchema(){
         return this.tables[i].name;
   }
   this.getColTypeByName = function(colname){
+    if ((colname != null) && typeof colname == 'string' && colname.indexOf('pb')==0)
+      return 1;
     for (var i=0;i<this.tables.length;i++)
       if ((ret=this.tables[i].getColTypeByName(colname)) > -1)
         return ret;
@@ -58,6 +60,10 @@ function aSchema(){
     return daSchema.getTable(tabname).numrows;
   }
   this.bindCol = function(colname){
+    if ((colname != null) && typeof colname == 'string' && colname.indexOf('pb')==0){
+      console.log('@binCol..colname:'+colname);
+      return colname.substring(2,colname.length);
+    }
     ctype=this.getColTypeByName(colname)
     cptr=this.getColPByName(colname)
     if (ctype==0 || ctype==2 || ctype==3 || ctype==4)

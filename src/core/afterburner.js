@@ -668,11 +668,11 @@ function extractfrom(fromtext,what,opt,filt){
 }
 
 function contbind(pfield) {
-  ppfield= daSchema.getColPByName(pfield);
-  bound= daSchema.bindCol(pfield);
-  obound= daSchema.obindCol(pfield);
-  type= daSchema.getColTypeByName(pfield);
-  travname='trav';
+//  var ppfield= daSchema.getColPByName(pfield);
+  var bound= daSchema.bindCol(pfield);
+  var obound= daSchema.obindCol(pfield);
+  var type= daSchema.getColTypeByName(pfield);
+  var travname='trav';
   if ((type==0) || (type==1) || (type==3) || (type==4))
     return "(("+obound+"|0)-("+bound+")|0)";
   else if (type==2)
@@ -681,10 +681,10 @@ function contbind(pfield) {
 }
 
 function gbind(pfield) {
-  ppfield= daSchema.getColPByName(pfield);
-  type= daSchema.getColTypeByName(pfield);
-  tab= daSchema.getParent(pfield);
-  ret='';
+  var ppfield= daSchema.getColPByName(pfield);
+  var type= daSchema.getColTypeByName(pfield);
+  var tab= daSchema.getParent(pfield);
+  var ret='';
   if ((type==0) || (type==1) || (type==3) || (type==4))
     ret ="(mem32[("+ppfield+"+ (trav_"+tab+"<<2)) >>2]|0 & (hashBitFilter|0) )";
   else if (type==2)
@@ -693,10 +693,10 @@ function gbind(pfield) {
 //  else throw new Error "filter does not support datatype:" + type;
 }
 function gbindn(pfield) {
-  ppfield= daSchema.getColPByName(pfield);
-  type= daSchema.getColTypeByName(pfield);
-  tab= daSchema.getParent(pfield);
-  ret="";
+  var ppfield= daSchema.getColPByName(pfield);
+  var type= daSchema.getColTypeByName(pfield);
+  var tab= daSchema.getParent(pfield);
+  var ret="";
   if ((type==0) || (type==1) || (type==3) || (type==4))
     ret= "(hash_int(mem32[("+ppfield+"+ (trav_"+tab+"<<2))>>2]),h)";
   else if (type==2)
@@ -738,10 +738,10 @@ function betweenlit(p1,p2,p3){
 }
 
 function compare(op,p1,p2){
-  p1b=daSchema.bindCol(p1);
-  p2b=daSchema.bindCol(p2);
-  p1t=daSchema.getColTypeByName(p1);
-  p2t=daSchema.getColTypeByName(p2);
+  var p1b=daSchema.bindCol(p1);
+  var p2b=daSchema.bindCol(p2);
+  var p1t=daSchema.getColTypeByName(p1);
+  var p2t=daSchema.getColTypeByName(p2);
 
   if (p1b && p2b){
     return '(' +p1b+ op + p2b+')';
@@ -785,13 +785,20 @@ function field(){
 function aggregate(){
   this.type='';
 }
+///////////////////////////////////////////////////////////
 function min(p){
-  ppfield= daSchema.getColPByName(p);
-  bound= daSchema.bindCol(p);
-  unique=uniqueVarCounter++;
-  type= daSchema.getColTypeByName(p);
-  tab= daSchema.getParent(p);
-  varname="min"+unique
+//  ppfield= daSchema.getColPByName(p);
+  var bound="";
+  if ((p != null) && typeof p == 'string' && p.indexOf('pb')>-1){
+    bound=p.substring(3,str.length);
+  } else {
+    var ppfield= daSchema.getColPByName(p);
+    bound=daSchema.bindCol(p)
+  }
+  var unique=uniqueVarCounter++;
+  var type= daSchema.getColTypeByName(p);
+  var tab= daSchema.getParent(p);
+  var varname="min"+unique
   return `dec:var `+varname+`=10000000000.1;::
   post:res.addCol2('min(`+p+`)',`+type+`);::
   preexek:`+varname+`=10000000000.1;::
@@ -801,11 +808,18 @@ function min(p){
   
 }
 function max(p){
-  ppfield= daSchema.getColPByName(p);
-  unique=uniqueVarCounter++;
-  type= daSchema.getColTypeByName(p);
-  tab= daSchema.getParent(p);
-  varname="max"+unique
+//  ppfield= daSchema.getColPByName(p);
+  var bound="";
+  if ((p != null) && typeof p == 'string' && p.indexOf('pb')>-1){
+    bound=p.substring(3,str.length);
+  } else {
+    var ppfield= daSchema.getColPByName(p);
+    bound=daSchema.bindCol(p)
+  }
+  var unique=uniqueVarCounter++;
+  var type= daSchema.getColTypeByName(p);
+  var tab= daSchema.getParent(p);
+  var varname="max"+unique
   return `dec:var `+varname+`=-10000000000.1;::
   post:res.addCol2('max(`+p+`)',`+type+`);::
   preexek:`+varname+`=-10000000000.1;::
@@ -825,12 +839,11 @@ function count(p){
   postexek:mem32[(temps+(tempsptr<<2))>>2]=`+varname+`;tempsptr= (tempsptr + 1 )|0;::`;
 }
 function sum(p){
-  ppfield= daSchema.getColPByName(p);
-  bound=daSchema.bindCol(p)
-  unique=uniqueVarCounter++;
-  type= daSchema.getColTypeByName(p);
-  tab= daSchema.getParent(p);
-  varname="sum"+unique
+  var bound=daSchema.bindCol(p)
+  var unique=uniqueVarCounter++;
+  var type= daSchema.getColTypeByName(p);
+  var tab= daSchema.getParent(p);
+  var varname="sum"+unique
   return `dec:var `+varname+`=0.0;::
   post:res.addCol2('sum(`+p+`)',`+type+`);::
   preexek:`+varname+`=+(0);::
@@ -839,22 +852,25 @@ function sum(p){
   postexek:memF32[(temps+(tempsptr<<2))>>2]=+(`+varname+`);tempsptr= (tempsptr + 1 )|0;::`;
 }
 function avg(p){
-  ppfield= daSchema.getColPByName(p);
-  unique=uniqueVarCounter++;
-  type= daSchema.getColTypeByName(p);
-  tab= daSchema.getParent(p);
-  varnamesum="avgsum"+unique
-  varnamecount="avgcount"+unique
-  return `dec:var `+varnamecount+`=0;::
-  dec:var `+varnamesum+`=0;::
+//  var ppfield= daSchema.getColPByName(p);
+  var bound=daSchema.bindCol(p)
+  var unique=uniqueVarCounter++;
+  var type= daSchema.getColTypeByName(p);
+  var tab= daSchema.getParent(p);
+  var varnamesum="avgsum"+unique
+  var varnamecount="avgcount"+unique
+  return `dec:var `+varnamecount+`=0.0;::
+  dec:var `+varnamesum+`=0.0;::
   post:res.addCol2('avg(`+p+`)',`+type+`);::
-  preexek:`+varname+`=0;::
-  exec:`+varnamesum+`=`+varnamesum+`+(mem32[(`+ppfield+`+ (trav_`+tab+`<<2)) >>2]|0)|0;::
-  exec:`+varnamecount+`=`+varnamecount+`+1|0;::
-  execg:`+varnamesum+`=`+varnamesum+`+(mem32[(`+ppfield+`+ (trav_`+tab+`<<2)) >>2]|0)|0;::
-  execg:`+varnamecount+`=`+varnamecount+`+1|0;::
-  postexek:memF32[(temps+(tempsptr<<2))>>2]=+(`+(varnamesum/varnamecount)+`);tempsptr= (tempsptr + 1 )|0;::`;
+  preexek:`+varnamesum+`=0.0;::
+  preexek:`+varnamecount+`=0.0;::
+  exec:`+varnamesum+`=`+varnamesum+`+(`+bound+`);::
+  execg:`+varnamesum+`=`+varnamesum+`+(`+bound+`);::
+  exec:`+varnamecount+`=`+varnamecount+`+1.0;::
+  execg:`+varnamecount+`=`+varnamecount+`+1.0;::
+  postexek:memF32[(temps+(tempsptr<<2))>>2]=+(+(` +  varnamesum  + `)/ +(` + varnamecount + `));tempsptr= (tempsptr + 1 )|0;::`;
 }
+///////////////////////////////////////////////////////////
 function expandStrLitComp(strp, strlit){
   quartets=Math.ceil((strlit.length+1)/4);
   ret="";
@@ -881,16 +897,36 @@ function expandLitComp(op,type,bp,lp){
 function date(p1){
   return strdate_to_int(p1);
 }
+function coerceFloat(p){
+  p = p+"";
+  if (p.indexOf('.')>-1) return p
+  else return p + ".0";
+} 
+function arith(op,p1,p2){
+  var p1b=daSchema.bindCol(p1);
+  var p2b=daSchema.bindCol(p2);
+  if (p1b && p2b)
+    return 'pb(('+p1b+')' +op +'(' + p2b+'))';
+  else if (p1b)
+    return 'pb(('+p1b+')' +op +'(' + coerceFloat(p2)+'))';
+  else if (p2b)
+    return 'pb(('+coerceFloat(p1) +')' +op +'(' + p2b+'))';
+  else 
+    return 'pb(('+coerceFloat(p1)+')' +op +'(' + coerceFloat(p2)+'))';
 
+}
 function add(p1,p2){
+  return arith('+',p1,p2);
 }
 function sub(p1,p2){
+  return arith('-',p1,p2);
 }
 function mul(p1,p2){
+  return arith('*',p1,p2);
 }
 function div(p1,p2){
+  return arith('/',p1,p2);
 }
-
 
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
