@@ -521,7 +521,7 @@ while(redo)
   this.toAsm = function(){
     return this.string();
   }
-  this.toString = function(){
+  this.toString = function(debugFlag){
     core=this.validate();
     posts=';';
     for(var i=0;i< (this.resA.length);i++)
@@ -648,8 +648,13 @@ env={'temps':temps,
   res.limit(`+this.limitA+`);
 //}
 `
-    code= code+ debug;
-    return code;
+    if (debugFlag == false)
+      return code + `return res.firstCell()`;
+    else 
+      return code + debug;
+  }
+  this.eval = function(){
+    return new Function('ignore', this.toString(false))();
   }
 }
 //////////////////////////////////////////////////////////////////////////////

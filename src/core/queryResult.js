@@ -204,6 +204,27 @@ function queryResult(tempsptr) {
     this.toString= function() {
       return this.toStringN(1/0);
     };
+    this.firstCell= function() {
+      if (inNode){
+        require('common.js');
+      }
+      var ret;
+          if (this.coltypes[0]==0){
+            ret=mem32[(this.cols[0])>>2];
+          } else if (this.coltypes[0]==1){
+            ret=memF32[(this.cols[0])>>2];
+          } else if (this.coltypes[0]==2){
+            ret=strToString(mem32[this.cols[0]]);
+          } else if (this.coltypes[0]==3){
+            ret=int_to_strdate(mem32[(this.cols[0])>>2]);
+          } else if (this.coltypes[0]==4){
+            ret=int_to_strchar(mem32[(this.cols[0])>>2]);
+          } else{
+            alert("unkown type");
+          }
+      return ret;
+    };
+
     this.registerTable = function(){
       var ds = new dataSource(this);
       aSchema.addTable(ds);
