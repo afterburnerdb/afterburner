@@ -22,6 +22,7 @@ function Afterburner(){
     this.orderA=[];
     this.limitA=-1;
     this.resA=[];
+    this.funs=[];
     return this;
   }
 //////////////////////////////////////////////////////////////////////////////
@@ -46,10 +47,10 @@ function Afterburner(){
       this.attsA.push(param);
       if (daSchema.getColTypeByName(param)!==1)
         this.fstr.push(`exec:mem32[(temps+(tempsptr<<2))>>2]=`+daSchema.bindCol(param)+`;tempsptr= (tempsptr + 1 )|0;::
-  postexek:mem32[(temps+(tempsptr<<2))>>2]=`+daSchema.bindCol(param)+`;tempsptr= (tempsptr + 1 )|0;::`);
+                        postexek:mem32[(temps+(tempsptr<<2))>>2]=`+daSchema.bindCol(param)+`;tempsptr= (tempsptr + 1 )|0;::`);
       else 
         this.fstr.push(`exec:memF32[(temps+(tempsptr<<2))>>2]=`+daSchema.bindCol(param)+`;tempsptr= (tempsptr + 1 )|0;::
-  postexek:memF32[(temps+(tempsptr<<2))>>2]=`+daSchema.bindCol(param)+`;tempsptr= (tempsptr + 1 )|0;::`);
+                        postexek:memF32[(temps+(tempsptr<<2))>>2]=`+daSchema.bindCol(param)+`;tempsptr= (tempsptr + 1 )|0;::`);
 
       this.resA.push("res.addCol2('"+param+"',"+type+");");
     } else {
@@ -585,6 +586,7 @@ while(redo)
   var nbp=0;
   var hk=0;
   var tmp=0;
+  var tmpstrlen=0;
   `+core+`
   function setsize(size){
     size=size|0;
@@ -603,15 +605,16 @@ while(redo)
 //      hash=  ((+(hash)*103)|0) + (mem8[(strp+i)|0]);
 //    return (hash |0);
 //  };
-//  function mystrcmp(str1, str2){
-//    str1=str1|0;
-//    str2=str2|0;
-//    var i=i|0;
-//    while (
-//          ( ([(str1+i)|0]==mem8[(str2+i)|0]) && mem8[(str1+i)|0 ] && mem8[(str2+i)|0])
-//          ) i=((i+1)|0);
-//    return ([(str1+i)|0 ]-mem8[(str2+i)|0 ]);
-//  }
+  function mystrcmp(str1, str2){
+    str1=str1|0;
+    str2=str2|0;
+    var i=0;
+    while (
+          ( ([(str1+i)|0]==mem8[(str2+i)|0]) && mem8[(str1+i)|0 ] && mem8[(str2+i)|0])
+          ) i=((i+1)|0);
+    return ([(str1+i)|0 ]-mem8[(str2+i)|0 ]);
+  }
+  `+this.funs.join('\n')+`
   return {runner:runner}
 });
 
@@ -704,8 +707,85 @@ function gbindn(pfield) {
   return ret;
 //  else throw new Error "filter does not support datatype:" + type;
 }
+
+function buildLikeFun(strlit, likeFun){
+  for (var i=0;i<strlit.length;i++){
+    var currc=strlit.charCodeAt(i)
+    if (currc!=33 && //!
+        currc!=37 && //%
+        currc!=45 && //-
+        currc!=91 && //[
+        currc!=93 && //]
+        currc!=94 && //^
+        currc!=95){   //_
+     likeFun+='if ((mem8[(strp+'    + i +')|0]|0)!=('+currc+')) return 0;';
+    } else if (currc == 37){
+      return buildLikeFun_pct(strlit.substring(i),likeFun);
+    }
+  }
+}
+
+function buildLikeFun_pct(strlit, likeFun){
+  for (var i=1;i<strlit.length;i++){
+    var currc=strlit.charCodeAt(i)
+    if (currc!=33 && //!
+        currc!=37 && //%
+        currc!=45 && //-
+        currc!=91 && //[
+        currc!=93 && //]
+        currc!=94 && //^
+        currc!=95){   //_
+     likeFun+='if ((mem8[(strp+'    + i +')|0]|0)!=('+currc+')) return 0;';
+    } else if (currc == 37){
+      return buildLikeFun_(strlit,likeFun);
+    }
+  }
+}
+
+function defun(fbody){
+  uniqueVarCounter++;
+  var fname=' fun' + uniqueVarCounter;
+  funs.push( 'function ' + funname + fbody );
+  return fname;
+}
+function like_begins(){
+}
+function like_ends(strp, strlit){
+  ret="((tmpstrlen=strlen("+strp+"))|1)&";
+  c=0;
+  var strlitlen=strlit.length;
+  for (var i=0;i<strlitlen;i++){
+    intval=(strlit.charCodeAt(c++)||0);
+    ret+='((mem8[(('+strp+' + ( tmpstrlen - '+ (strlitlen-i)+' ))|0)]|0)==('+intval+'|0))&';
+  }
+  return ret.substring(0,ret.length-1);
+}
+
 //////////////////////////////////////////////////////////////////////////////
 //API
+function like(p1,strlit){
+  var strp=daSchema.bindCol(p1);
+  var numpct=(strlit.match(/\%/g) || []).length;
+  if (numpct ==0)
+    return eq(p1,strlit);
+  else if (numpct ==1){
+    if (strlit.charCodeAt(0)==37){
+      return like_ends(strp,strlit.substring(1,strlit.length));
+    }
+    else if (strlit.charCodeAt(stlit.length-1)==37){
+      return like_begins(strp,strlit.substring(0,strlit.length-1));
+    }
+    else{
+      return '(' + like_begins(strp,strlit.substring(0,strlit.indexOf('%'))) + "&" + like_ends(strp,strlit.substring(strlit.indexOf('%')+1,strlit.length)) + ')' ;
+    }
+  }
+  else {
+    var likeFun=buildLikeFun(strlit,"")
+    var fun=defun(likeFun);
+    return fun + "(strp)";
+  }
+}
+
 function eq(p1,p2){
   return compare('==',p1,p2);
 }
@@ -935,6 +1015,7 @@ if(inNode){
   module.exports.Afterburner=Afterburner;
   global.count=count;
   global.sum=sum;
+  global.like=like;
   global.eq=eq;
   global.lt=lt;
   global.geq=geq;

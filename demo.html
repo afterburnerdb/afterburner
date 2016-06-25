@@ -112,6 +112,11 @@ function resetFluentASMTPCHq1(){
   fluentToASM();
 }
 
+function resetFluentASMTPCHq2(){
+  document.getElementById("TAFluent").value=`222`;
+  fluentToASM();
+}
+
 /*ABi.select().from("myview").field("l_orderkey").field("revenue").field("o_orderdate").field("o_shippriority").where(eq('o_orderdate',date('1996-01-06'))).order([-1]).limit(10).toString()*/
 function fluentToASM(){
         strASM="document.getElementById(\"TAASM\").value="
@@ -222,6 +227,7 @@ function fluentToASM(){
 		<button type="button" onclick="resetFluentASMq3()" class="btn btn-default" href="#" >Q3 Fluent</button>
 		<button type="button" onclick="resetFluentASMq4()" class="btn btn-default" href="#" >Q4 Fluent</button>
 		<button type="button" onclick="resetFluentASMTPCHq1()" class="btn btn-default" href="#" >TPCHQ1 Fluent</button>
+		<button type="button" onclick="resetFluentASMTPCHq2()" class="btn btn-default" href="#" >TPCHQ1 Fluent</button>
         </div>
         <div class="col-md-6">
           <h2>JavaScript Code</h2>
