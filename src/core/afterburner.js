@@ -571,6 +571,7 @@ while(redo)
   var curr2NumBucks=1;
   var curr3NumBucks=1
   var mem32 = new global.Int32Array(mem);
+  var mem8 = new global.Int8Array(mem);
   var memF32 = new global.Float32Array(mem);
   var redo=1;
   var col=0;
@@ -605,14 +606,21 @@ while(redo)
 //      hash=  ((+(hash)*103)|0) + (mem8[(strp+i)|0]);
 //    return (hash |0);
 //  };
-  function mystrcmp(str1, str2){
-    str1=str1|0;
-    str2=str2|0;
+//  function mystrcmp(str1, str2){
+//    str1=str1|0;
+//    str2=str2|0;
+//    var i=0;
+//    while (
+//          ( ([(str1+i)|0]==mem8[(str2+i)|0]) && mem8[(str1+i)|0 ] && mem8[(str2+i)|0])
+//          ) i=((i+1)|0);
+//    return ([(str1+i)|0 ]-mem8[(str2+i)|0 ]);
+//  }
+  function strlen(str){
+    str=str|0;
     var i=0;
-    while (
-          ( ([(str1+i)|0]==mem8[(str2+i)|0]) && mem8[(str1+i)|0 ] && mem8[(str2+i)|0])
-          ) i=((i+1)|0);
-    return ([(str1+i)|0 ]-mem8[(str2+i)|0 ]);
+    while(mem8[(str+i)|0]|0)
+      i=(i+1)|0;
+    return i|0;
   }
   `+this.funs.join('\n')+`
   return {runner:runner}
@@ -751,7 +759,7 @@ function defun(fbody){
 function like_begins(){
 }
 function like_ends(strp, strlit){
-  ret="((tmpstrlen=strlen("+strp+"))|1)&";
+  ret="((tmpstrlen=(strlen("+strp+"))|0)|1)&";
   c=0;
   var strlitlen=strlit.length;
   for (var i=0;i<strlitlen;i++){
