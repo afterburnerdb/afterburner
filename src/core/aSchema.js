@@ -21,24 +21,29 @@ function aSchema(){
     return ret;
   }
   this.getChildAttributes = function(tabname){
+    tabname=tabname.toLowerCase();
     this.getTable(tabname).getColNames();
   }
   this.getPeerAttributes = function(colname){
+    colname=colname.toLowerCase();
     for (var i=0;i<this.tables.length;i++)
      if (this.tables[i].getColTypeByName(colname) > -1)
        return this.tables[i].getColNames();
   }
   this.getTable = function(tabname){
+    tabname=tabname.toLowerCase();
     for (var i=0;i<this.tables.length;i++)
       if (this.tables[i].name == tabname)
         return this.tables[i];
   }
   this.getParent = function(colname){
+    colname=colname.toLowerCase();
     for (var i=0;i<this.tables.length;i++)
       if (this.tables[i].getColTypeByName(colname) > -1)
         return this.tables[i].name;
   }
   this.getColTypeByName = function(colname){
+    colname=colname.toLowerCase();
     if ((colname != null) && typeof colname == 'string' && colname.indexOf('pb')==0)
       return 1;
     for (var i=0;i<this.tables.length;i++)
@@ -47,19 +52,23 @@ function aSchema(){
     return -1;
   }
   this.getColLenByName = function(colname){
+    colname=colname.toLowerCase();
      for (var i=0;i<this.tables.length;i++)
       if (this.tables[i].getColTypeByName(colname) > -1)
         return this.tables[i].numrows;
   }
   this.getColPByName = function(colname){
-     for (var i=0;i<this.tables.length;i++)
+    colname=colname.toLowerCase();
+    for (var i=0;i<this.tables.length;i++)
       if (this.tables[i].getColPByName(colname) > -1)
         return this.tables[i].getColPByName(colname);
   }
   this.getTabSizeByName = function(tabname){
+    tabname=tabname.toLowerCase();
     return daSchema.getTable(tabname).numrows;
   }
   this.bindCol = function(colname){
+    colname=colname.toLowerCase();
     if ((colname != null) && typeof colname == 'string' && colname.indexOf('pb')==0){
       console.log('@binCol..colname:'+colname);
       return colname.substring(2,colname.length);
@@ -72,6 +81,7 @@ function aSchema(){
       return '+(memF32[(('+cptr+' +(trav_'+this.getParent(colname)+'<<2))|0)>>2])';
   }
   this.obindCol = function(colname){
+    colname=colname.toLowerCase();
     ctype=this.getColTypeByName(colname)
     cptr=this.getColPByName(colname)
     if (ctype==0 || ctype==2 || ctype==3 || ctype==4)

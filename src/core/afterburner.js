@@ -521,7 +521,7 @@ while(redo)
   this.toAsm = function(){
     return this.string();
   }
-  this.toString = function(debugFlag){
+  this.toString = function(purpose){
     core=this.validate();
     posts=';';
     for(var i=0;i< (this.resA.length);i++)
@@ -648,13 +648,18 @@ env={'temps':temps,
   res.limit(`+this.limitA+`);
 //}
 `
-    if (debugFlag == false)
+    if (purpose == 'fc')
       return code + `return res.firstCell()`;
+    else if (purpose == 'mat')
+      return code + `return res.registerTable()`;
     else 
       return code + debug;
   }
   this.eval = function(){
-    return new Function('ignore', this.toString(false))();
+    return new Function('ignore', this.toString('fc'))();
+  }
+  this.materialize = function(){
+    return new Function('ignore', this.toString('mat'))();
   }
 }
 //////////////////////////////////////////////////////////////////////////////
@@ -845,7 +850,7 @@ function compare(op,p1,p2){
       else if (p1t == 4 && p2.length==1)
         return expandLitComp(op,p1t,p1b,p2.charCodeAt(0));
       else 
-        this.badFSQL('@compare');
+        this.badFSQL(' at compare');
     } else {
       return expandLitComp(op,p1t,p1b,p2);  
     }
@@ -856,7 +861,7 @@ function compare(op,p1,p2){
       else if (p2t == 4 && p1.length==1)
         return expandLitComp(op,p2t,p2b,p1.charCodeAt(0));
       else 
-        this.badFSQL('@compare');
+        this.badFSQL(' at compare');
 
     } else {
       return expandLitComp(op,p2t,p2b,p1);  

@@ -227,7 +227,8 @@ function queryResult(tempsptr) {
 
     this.registerTable = function(){
       var ds = new dataSource(this);
-      aSchema.addTable(ds);
+      daSchema.addTable(new aTable(ds));
+      return this.name;
     };
     this.limit = function(n){
       if (n<1) return;

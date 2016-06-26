@@ -84,14 +84,16 @@ function aTable(dSrc) {
     return ret.replace(/,$/, '');
   }
   this.getColTypeByName = function(colname){
+    colname=colname.toLowerCase();
     for (var i=0;i<this.numcols;i++)
-      if (this.colnames[i]==colname)
+      if (this.colnames[i].toLowerCase()==colname)
         return this.coltypes[i];
     return -1;
   }
   this.getColPByName = function(colname){
+    colname=colname.toLowerCase();
     for (var i=0;i<this.numcols;i++)
-      if (this.colnames[i]==colname)
+      if (this.colnames[i].toLowerCase()==colname)
         return mem32[(this.colptrs+(i<<2))>>2];
     return -1;
   }
@@ -170,11 +172,14 @@ function aTable(dSrc) {
     this.colnames=dSrc.colnames;
     this.coltypes=dSrc.coltypes;
 
-    if (this.src.parser !== 'undefined'){
+    if (this.src.parser !== null){
+      console.log('new table from a parser')
       this.parseTable();
     } else if (this.src.type='query') {
-      this.colptrs=src.colptrs;
+      console.log('new table from query')
+      this.colptrs=dSrc.colptrs;
     } else if (this.src.type='monetjsn') {
+      console.log('new table from a monetjsn, **not implemented**')
     } else { 
       console.log("invalid data source type");
     }

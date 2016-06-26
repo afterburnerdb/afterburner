@@ -212,7 +212,7 @@ handyColTypes["myview"]=[
     this.numrows=qr.numrows;
     this.numcols=qr.numcols;
     this.colptrs=ptrcolptrs;
-    this.colnames=qr.colname;
+    this.colnames=qr.colnames;
     this.coltypes=qr.coltypes;
   }
   this.fromMonetJSON= function(src){
