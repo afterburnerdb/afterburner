@@ -24,11 +24,11 @@ function aSchema(){
     tabname=tabname.toLowerCase();
     this.getTable(tabname).getColNames();
   }
-  this.getPeerAttributes = function(colname){
+  this.getPeerAttributes = function(colname, qcontext){
     colname=colname.toLowerCase();
     for (var i=0;i<this.tables.length;i++)
-     if (this.tables[i].getColTypeByName(colname) > -1)
-       return this.tables[i].getColNames();
+      if (this.tables[i].getColTypeByName(colname, qcontext) > -1)
+        return this.tables[i].getColNames();
   }
   this.getTable = function(tabname){
     tabname=tabname.toLowerCase();
@@ -36,28 +36,41 @@ function aSchema(){
       if (this.tables[i].name == tabname)
         return this.tables[i];
   }
-  this.getParent = function(colname){
+  this.getParent = function(colname, qcontext){
     colname=colname.toLowerCase();
     for (var i=0;i<this.tables.length;i++)
-      if (this.tables[i].getColTypeByName(colname) > -1)
+      if (this.tables[i].getColTypeByName(colname, qcontext) > -1)
         return this.tables[i].name;
   }
-  this.getColTypeByName = function(colname){
+  this.getColTypeByName = function(colname,qcontext){
     colname=colname.toLowerCase();
+    if (typeof qcontext == 'undefined'){
+      console.log('qcontext is undefined');
+      return -1;
+    }
     if ((colname != null) && typeof colname == 'string' && colname.indexOf('pb')==0)
       return 1;
-    for (var i=0;i<this.tables.length;i++)
-      if ((ret=this.tables[i].getColTypeByName(colname)) > -1)
-        return ret;
+    for (var i=0;i<this.tables.length;i++){
+      if ((ret=this.tables[i].getColTypeByName(colname, qcontext)) > -1){
+        if (qcontext.indexOf(this.tables[i].name) > -1){
+          return ret;
+        }
+        else{
+          console.log('colname found in schema but not found in query context');
+          console.log('colname' + colname);
+          console.log('qcontext' + qcontext);
+        }
+      }
+    }
     return -1;
   }
-  this.getColLenByName = function(colname){
+  this.getColLenByName = function(colname,qcontext){
     colname=colname.toLowerCase();
      for (var i=0;i<this.tables.length;i++)
-      if (this.tables[i].getColTypeByName(colname) > -1)
+      if (this.tables[i].getColTypeByName(colname, qcontext) > -1)
         return this.tables[i].numrows;
   }
-  this.getColPByName = function(colname){
+  this.getColPByName = function(colname,qcontext){
     colname=colname.toLowerCase();
     for (var i=0;i<this.tables.length;i++)
       if (this.tables[i].getColPByName(colname) > -1)
@@ -67,34 +80,34 @@ function aSchema(){
     tabname=tabname.toLowerCase();
     return daSchema.getTable(tabname).numrows;
   }
-  this.bindCol = function(colname){
+  this.bindCol = function(colname,qcontext){
     colname=colname.toLowerCase();
     if ((colname != null) && typeof colname == 'string' && colname.indexOf('pb')==0){
       console.log('@binCol..colname:'+colname);
       return colname.substring(2,colname.length);
     }
-    ctype=this.getColTypeByName(colname)
-    cptr=this.getColPByName(colname)
+    ctype=this.getColTypeByName(colname, qcontext)
+    cptr=this.getColPByName(colname,qcontext)
     if (ctype==0 || ctype==2 || ctype==3 || ctype==4)
-      return '(mem32[(('+cptr+' +(trav_'+this.getParent(colname)+'<<2))|0)>>2]|0)';
+      return '(mem32[(('+cptr+' +(trav_'+this.getParent(colname,qcontext)+'<<2))|0)>>2]|0)';
     if (ctype==1)
-      return '+(memF32[(('+cptr+' +(trav_'+this.getParent(colname)+'<<2))|0)>>2])';
+      return '+(memF32[(('+cptr+' +(trav_'+this.getParent(colname,qcontext)+'<<2))|0)>>2])';
   }
-  this.obindCol = function(colname){
+  this.obindCol = function(colname,qcontext){
     colname=colname.toLowerCase();
-    ctype=this.getColTypeByName(colname)
-    cptr=this.getColPByName(colname)
+    ctype=this.getColTypeByName(colname, qcontext)
+    cptr=this.getColPByName(colname,qcontext)
     if (ctype==0 || ctype==2 || ctype==3 || ctype==4)
-      return '(mem32[(('+cptr+' +(otrav_'+this.getParent(colname)+'<<2))|0)>>2]|0)';
+      return '(mem32[(('+cptr+' +(otrav_'+this.getParent(colname,qcontext)+'<<2))|0)>>2]|0)';
     if (ctype==1)
-      return '+(memF32[(('+cptr+' +(otrav_'+this.getParent(colname)+'<<2))|0)>>2])';
+      return '+(memF32[(('+cptr+' +(otrav_'+this.getParent(colname,qcontext)+'<<2))|0)>>2])';
   }
 
-  this.bindColComp = function(col1,col2,op){
-    colb1=this.bindCol(col1);
-    colb2=this.bindCol(col2);
-    ctyp1=this.getColTypeByName(col1);
-    ctyp2=this.getColTypeByName(col2);
+  this.bindColComp = function(col1,col2,op, qcontext){
+    colb1=this.bindCol(col1,qcontext);
+    colb2=this.bindCol(col2,qcontext);
+    ctyp1=this.getColTypeByName(col1, qcontext);
+    ctyp2=this.getColTypeByName(col2, qcontext);
     if (ctyp1==0 || ctype1==1 || ctyp1==3)
       return colb1 + '==' + colb2;
     else

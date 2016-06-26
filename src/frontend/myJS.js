@@ -284,11 +284,11 @@ function get_index(colname){
   }
 }
 
-function create_index(colname){
+function create_index(colname, tabname){
   var len = len|0;
-  ptr=daSchema.getColPByName(colname);
-  type=daSchema.getColTypeByName(colname);
-  len=daSchema.getColLenByName(colname);
+  ptr=daSchema.getColPByName(colname,[tabname]);
+  type=daSchema.getColTypeByName(colname,[tabname]);
+  len=daSchema.getColLenByName(colname,[tabname]);
   ht=new Map();
   if (type ==0 || type==3 || type==4){
     for (var i=0|0;i<len;i++){
@@ -353,10 +353,10 @@ function mycompstr(str1,str2){
  }
 
 
-function create_order(colname){
-  ptr=daSchema.getColPByName(colname);
-  type=daSchema.getColTypByName(colname);
-  len=daSchema.getColLenByName(colname);
+function create_order(colname,tabname){
+  ptr=daSchema.getColPByName(colname,[tabname]);
+  type=daSchema.getColTypByName(colname,[tabname]);
+  len=daSchema.getColLenByName(colname,[tabname]);
   order= new Array(len);
   
   fbody=" function mycomp(a,b) {return ";

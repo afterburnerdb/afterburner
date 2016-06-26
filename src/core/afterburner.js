@@ -42,15 +42,15 @@ function Afterburner(){
     return this;
   }
   this.field = function(param, ...rest){
-    if (boundAtt=daSchema.bindCol(param)){
-      type= daSchema.getColTypeByName(param);
+    if (boundAtt=daSchema.bindCol(param,qc(this))){
+      type= daSchema.getColTypeByName(param,qc(this));
       this.attsA.push(param);
-      if (daSchema.getColTypeByName(param)!==1)
-        this.fstr.push(`exec:mem32[(temps+(tempsptr<<2))>>2]=`+daSchema.bindCol(param)+`;tempsptr= (tempsptr + 1 )|0;::
-                        postexek:mem32[(temps+(tempsptr<<2))>>2]=`+daSchema.bindCol(param)+`;tempsptr= (tempsptr + 1 )|0;::`);
+      if (daSchema.getColTypeByName(param,qc(this))!==1)
+        this.fstr.push(`exec:mem32[(temps+(tempsptr<<2))>>2]=`+daSchema.bindCol(param,qc(this))+`;tempsptr= (tempsptr + 1 )|0;::
+                        postexek:mem32[(temps+(tempsptr<<2))>>2]=`+daSchema.bindCol(param,qc(this))+`;tempsptr= (tempsptr + 1 )|0;::`);
       else 
-        this.fstr.push(`exec:memF32[(temps+(tempsptr<<2))>>2]=`+daSchema.bindCol(param)+`;tempsptr= (tempsptr + 1 )|0;::
-                        postexek:memF32[(temps+(tempsptr<<2))>>2]=`+daSchema.bindCol(param)+`;tempsptr= (tempsptr + 1 )|0;::`);
+        this.fstr.push(`exec:memF32[(temps+(tempsptr<<2))>>2]=`+daSchema.bindCol(param,qc(this))+`;tempsptr= (tempsptr + 1 )|0;::
+                        postexek:memF32[(temps+(tempsptr<<2))>>2]=`+daSchema.bindCol(param,qc(this))+`;tempsptr= (tempsptr + 1 )|0;::`);
 
       this.resA.push("res.addCol2('"+param+"',"+type+");");
     } else {
@@ -111,7 +111,7 @@ function Afterburner(){
    pre:  }::
    dec:var trav_`+jTab+`=-1;::
    pre:trav_`+jTab+`=-1; while(1){trav_`+jTab+`=trav_`+jTab+`+1|0; if((trav_`+jTab+`|0)>=`+tabLen+`) break; `+jfilter+`;::
-   pre:  hk=(`+daSchema.bindCol(this.onA[1])+` & (hashBitFilter|0))|0;::
+   pre:  hk=(`+daSchema.bindCol(this.onA[1],qc(this))+` & (hashBitFilter|0))|0;::
    pre:  if (obp=mem32[((h1bb+(hk<<2))|0)>>2]|0){::
    pre:    //while(mem32[((bp+(((hash1BucketSize+1)|0)<<2))|0)>>2]|0){::
    pre:      bp= mem32[((obp+(((hash1BucketSize+2)|0)<<2))|0)>>2]|0;::
@@ -139,7 +139,7 @@ function Afterburner(){
    pre:  mem32[bp>>2]=tmp;::
    pre:  mem32[((bp+(tmp<<2))|0)>>2]= trav_`+jTab+`|0;::
    pre:}::
-       prej:hk=`+daSchema.bindCol(this.onA[0])+`;::
+       prej:hk=`+daSchema.bindCol(this.onA[0],qc(this))+`;::
        prej:currb=-1;::
        prej:curr=0;::
        prej:currb=mem32[((h1bb+(hk<<2))|0)>>2]|0;::
@@ -689,10 +689,9 @@ function extractfrom(fromtext,what,opt,filt){
 }
 
 function contbind(pfield) {
-//  var ppfield= daSchema.getColPByName(pfield);
-  var bound= daSchema.bindCol(pfield);
-  var obound= daSchema.obindCol(pfield);
-  var type= daSchema.getColTypeByName(pfield);
+  var bound= daSchema.bindCol(pfield,qc(this));
+  var obound= daSchema.obindCol(pfield,qc(this));
+  var type= daSchema.getColTypeByName(pfield,qc(this));
   var travname='trav';
   if ((type==0) || (type==1) || (type==3) || (type==4))
     return "(("+obound+"|0)-("+bound+")|0)";
@@ -702,9 +701,9 @@ function contbind(pfield) {
 }
 
 function gbind(pfield) {
-  var ppfield= daSchema.getColPByName(pfield);
-  var type= daSchema.getColTypeByName(pfield);
-  var tab= daSchema.getParent(pfield);
+  var ppfield= daSchema.getColPByName(pfield,qc(this));
+  var type= daSchema.getColTypeByName(pfield,qc(this));
+  var tab= daSchema.getParent(pfield,qc(this));
   var ret='';
   if ((type==0) || (type==1) || (type==3) || (type==4))
     ret ="(mem32[("+ppfield+"+ (trav_"+tab+"<<2)) >>2]|0 & (hashBitFilter|0) )";
@@ -714,9 +713,9 @@ function gbind(pfield) {
 //  else throw new Error "filter does not support datatype:" + type;
 }
 function gbindn(pfield) {
-  var ppfield= daSchema.getColPByName(pfield);
-  var type= daSchema.getColTypeByName(pfield);
-  var tab= daSchema.getParent(pfield);
+  var ppfield= daSchema.getColPByName(pfield,qc(this));
+  var type= daSchema.getColTypeByName(pfield,qc(this));
+  var tab= daSchema.getParent(pfield,qc(this));
   var ret="";
   if ((type==0) || (type==1) || (type==3) || (type==4))
     ret= "(hash_int(mem32[("+ppfield+"+ (trav_"+tab+"<<2))>>2]),h)";
@@ -779,10 +778,13 @@ function like_ends(strp, strlit){
   return ret.substring(0,ret.length-1);
 }
 
+function qc(it){
+  return it.fromA.concat(this.joinA);
+}
 //////////////////////////////////////////////////////////////////////////////
 //API
 function like(p1,strlit){
-  var strp=daSchema.bindCol(p1);
+  var strp=daSchema.bindCol(p1,qc(this));
   var numpct=(strlit.match(/\%/g) || []).length;
   if (numpct ==0)
     return eq(p1,strlit);
@@ -836,10 +838,10 @@ function betweenlit(p1,p2,p3){
 }
 
 function compare(op,p1,p2){
-  var p1b=daSchema.bindCol(p1);
-  var p2b=daSchema.bindCol(p2);
-  var p1t=daSchema.getColTypeByName(p1);
-  var p2t=daSchema.getColTypeByName(p2);
+  var p1b=daSchema.bindCol(p1,qc(this));
+  var p2b=daSchema.bindCol(p2,qc(this));
+  var p1t=daSchema.getColTypeByName(p1,qc(this));
+  var p2t=daSchema.getColTypeByName(p2,qc(this));
 
   if (p1b && p2b){
     return '(' +p1b+ op + p2b+')';
@@ -885,17 +887,16 @@ function aggregate(){
 }
 ///////////////////////////////////////////////////////////
 function min(p){
-//  ppfield= daSchema.getColPByName(p);
   var bound="";
   if ((p != null) && typeof p == 'string' && p.indexOf('pb')>-1){
     bound=p.substring(3,str.length);
   } else {
-    var ppfield= daSchema.getColPByName(p);
-    bound=daSchema.bindCol(p)
+    var ppfield= daSchema.getColPByName(p,qc(this));
+    bound=daSchema.bindCol(p,qc(this))
   }
   var unique=uniqueVarCounter++;
-  var type= daSchema.getColTypeByName(p);
-  var tab= daSchema.getParent(p);
+  var type= daSchema.getColTypeByName(p,qc(this));
+  var tab= daSchema.getParent(p,qc(this));
   var varname="min"+unique
   return `dec:var `+varname+`=10000000000.1;::
   post:res.addCol2('min(`+p+`)',`+type+`);::
@@ -906,17 +907,16 @@ function min(p){
   
 }
 function max(p){
-//  ppfield= daSchema.getColPByName(p);
   var bound="";
   if ((p != null) && typeof p == 'string' && p.indexOf('pb')>-1){
     bound=p.substring(3,str.length);
   } else {
-    var ppfield= daSchema.getColPByName(p);
-    bound=daSchema.bindCol(p)
+    var ppfield= daSchema.getColPByName(p,qc(this));
+    bound=daSchema.bindCol(p,qc(this))
   }
   var unique=uniqueVarCounter++;
-  var type= daSchema.getColTypeByName(p);
-  var tab= daSchema.getParent(p);
+  var type= daSchema.getColTypeByName(p,qc(this));
+  var tab= daSchema.getParent(p,qc(this));
   var varname="max"+unique
   return `dec:var `+varname+`=-10000000000.1;::
   post:res.addCol2('max(`+p+`)',`+type+`);::
@@ -937,10 +937,10 @@ function count(p){
   postexek:mem32[(temps+(tempsptr<<2))>>2]=`+varname+`;tempsptr= (tempsptr + 1 )|0;::`;
 }
 function sum(p){
-  var bound=daSchema.bindCol(p)
+  var bound=daSchema.bindCol(p,qc(this));
   var unique=uniqueVarCounter++;
-  var type= daSchema.getColTypeByName(p);
-  var tab= daSchema.getParent(p);
+  var type= daSchema.getColTypeByName(p,qc(this));
+  var tab= daSchema.getParent(p,qc(this));
   var varname="sum"+unique
   return `dec:var `+varname+`=0.0;::
   post:res.addCol2('sum(`+p+`)',`+type+`);::
@@ -950,11 +950,10 @@ function sum(p){
   postexek:memF32[(temps+(tempsptr<<2))>>2]=+(`+varname+`);tempsptr= (tempsptr + 1 )|0;::`;
 }
 function avg(p){
-//  var ppfield= daSchema.getColPByName(p);
-  var bound=daSchema.bindCol(p)
+  var bound=daSchema.bindCol(p,qc(this));
   var unique=uniqueVarCounter++;
-  var type= daSchema.getColTypeByName(p);
-  var tab= daSchema.getParent(p);
+  var type= daSchema.getColTypeByName(p,qc(this));
+  var tab= daSchema.getParent(p,qc(this));
   var varnamesum="avgsum"+unique
   var varnamecount="avgcount"+unique
   return `dec:var `+varnamecount+`=0.0;::
@@ -1001,8 +1000,8 @@ function coerceFloat(p){
   else return p + ".0";
 } 
 function arith(op,p1,p2){
-  var p1b=daSchema.bindCol(p1);
-  var p2b=daSchema.bindCol(p2);
+  var p1b=daSchema.bindCol(p1,qc(this));
+  var p2b=daSchema.bindCol(p2,qc(this));
   if (p1b && p2b)
     return 'pb(('+p1b+')' +op +'(' + p2b+'))';
   else if (p1b)
