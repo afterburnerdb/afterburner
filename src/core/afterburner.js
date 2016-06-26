@@ -6,7 +6,7 @@ if(typeof module == 'undefined'){
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 var uniqueVarCounter=0;
-
+var theGeneratingAB;
 function Afterburner(){
   this.select = function(param){
     uniqueVarCounter=0;
@@ -23,6 +23,7 @@ function Afterburner(){
     this.limitA=-1;
     this.resA=[];
     this.funs=[];
+    theGeneratingAB=this;
     return this;
   }
 //////////////////////////////////////////////////////////////////////////////
@@ -509,9 +510,6 @@ while(redo)
    ret=ret+"return tempsptr|0;}";
     return ret;
   }
-  this.badFSQL = function(where){
-    console.log("Bad Fluent SQL at:"+where);
-  }
 //////////////////////////////////////////////////////////////////////////////
 //TOSTRING
   this.toVanilla = function(){
@@ -779,8 +777,14 @@ function like_ends(strp, strlit){
 }
 
 function qc(it){
-  return it.fromA.concat(this.joinA);
+  if (typeof it !='undefined')
+     it=theGeneratingAB;
+  return it.fromA.concat(it.joinA);
 }
+function badFSQL (where){
+  console.log("Bad Fluent SQL at:"+where);
+}
+
 //////////////////////////////////////////////////////////////////////////////
 //API
 function like(p1,strlit){
@@ -852,7 +856,7 @@ function compare(op,p1,p2){
       else if (p1t == 4 && p2.length==1)
         return expandLitComp(op,p1t,p1b,p2.charCodeAt(0));
       else 
-        this.badFSQL(' at compare');
+        badFSQL('@compare');
     } else {
       return expandLitComp(op,p1t,p1b,p2);  
     }
@@ -863,7 +867,7 @@ function compare(op,p1,p2){
       else if (p2t == 4 && p1.length==1)
         return expandLitComp(op,p2t,p2b,p1.charCodeAt(0));
       else 
-        this.badFSQL(' at compare');
+        badFSQL('@compare');
 
     } else {
       return expandLitComp(op,p2t,p2b,p1);  

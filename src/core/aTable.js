@@ -84,14 +84,14 @@ function aTable(dSrc) {
     return ret.replace(/,$/, '');
   }
   this.getColTypeByName = function(colname){
-    colname=colname.toLowerCase();
+    if (typeof colname == 'string') colname=colname.toLowerCase();
     for (var i=0;i<this.numcols;i++)
       if (this.colnames[i].toLowerCase()==colname)
         return this.coltypes[i];
     return -1;
   }
   this.getColPByName = function(colname){
-    colname=colname.toLowerCase();
+    if (typeof colname == 'string') colname=colname.toLowerCase();
     for (var i=0;i<this.numcols;i++)
       if (this.colnames[i].toLowerCase()==colname)
         return mem32[(this.colptrs+(i<<2))>>2];
