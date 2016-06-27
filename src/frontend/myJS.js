@@ -347,9 +347,9 @@ function mycompstr(str1,str2){
   var str1=numStore32[(ptr2srt+a)|0];
   var str2=numStore32[(ptr2srt+b)|0];
   while (
-        ((strStore8[(str1+i)|0]==strStore8[(str2+i)|0]) && strStore8[(str1+i)|0 ] && strStore8[(str2+i)|0])
+        ((mem8[(str1+i)|0]==mem8[(str2+i)|0]) && mem8[(str1+i)|0 ] && mem8[(str2+i)|0])
         ) i=(i+1)|0;
-  return (strStore8[(str1+i)|0]-strStore8[(str2+i)|0]);
+  return (mem8[(str1+i)|0]-mem8[(str2+i)|0]);
  }
 
 
@@ -377,21 +377,21 @@ function create_order(colname,tabname){
 
 
 
-//function mystrcmp(str1, str2){
-//  str1=str1|0;
-//  str2=str2|0;
-//  var i=i|0;
-//  while (
-//        ( (strStore8[(str1+i)|0]==strStore8[(str2+i)|0]) && strStore8[(str1+i)|0 ] && strStore8[(str2+i)|0])
-//        ) i=((i+1)|0);
-//  return (strStore8[(str1+i)|0 ]-strStore8[(str2+i)|0 ]);
-//}
+function mystrcmp(str1, str2){
+  str1=str1|0;
+  str2=str2|0;
+  var i=i|0;
+  while (
+        ( (mem8[(str1+i)|0]==mem8[(str2+i)|0]) && mem8[(str1+i)|0 ] && mem8[(str2+i)|0])
+        ) i=((i+1)|0);
+  return (mem8[(str1+i)|0 ]-mem8[(str2+i)|0 ]);
+}
 
 function mystrcmplit( str1 , str2){
   var i= i|0;
   do{
-     if (strStore8[(str1+i)]!=str2.charCodeAt(i) )
-        return ( strStore8[(str1+i)] == 0) && isNaN(str2.charCodeAt(i)) ;
+     if (mem8[(str1+i)]!=str2.charCodeAt(i) )
+        return ( mem8[(str1+i)] == 0) && isNaN(str2.charCodeAt(i)) ;
      i++;
   }while (true);
 }
@@ -401,8 +401,8 @@ function strToString(str){
   str=str|0;
   ret="";
   var i = i|0;
-  while (strStore8[(str+i)|0]){
-    ret+=String.fromCharCode(strStore8[(str+i)|0]|0);
+  while (mem8[(str+i)|0]){
+    ret+=String.fromCharCode(mem8[(str+i)|0]|0);
     i=(i+1)|0;
   }
   return ret;
