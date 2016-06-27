@@ -74,7 +74,8 @@ function aSchema(){
     if (typeof colname == 'string') colname=colname.toLowerCase();
     for (var i=0;i<this.tables.length;i++)
       if (this.tables[i].getColPByName(colname) > -1)
-        return this.tables[i].getColPByName(colname);
+        if (qcontext.indexOf(this.tables[i].name) > -1)
+          return this.tables[i].getColPByName(colname);
   }
   this.getTabSizeByName = function(tabname){
     tabname=tabname.toLowerCase();

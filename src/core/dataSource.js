@@ -205,7 +205,8 @@ handyColTypes["myview"]=[
     this.qr=qr;
     var ptrcolptrs= malloc(qr.numcols<<2);
     for (var i=0;i<qr.numcols;i++){
-      mem32[(ptrcolptrs+i<<2)>>2]= src.colptrs[i];
+      console.log('src.colptrs[i]:' + src.cols[i]);
+      mem32[(ptrcolptrs+(i<<2))>>2]= src.cols[i];
     }
     this.name=qr.name;
     this.fname=null;

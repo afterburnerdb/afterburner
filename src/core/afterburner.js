@@ -405,7 +405,7 @@ while(redo)
    ret=ret+prejoiner+'/*prejoiner*/';
    ret=ret+joiner+'/*joiner*/';
    ret=ret+execs+'}/*execs*/}';
-   ret=ret+postexek+'/*postexek*/';
+//   ret=ret+postexek+'/*postexek*/';
 //   ret=ret+'transpose('+sorter+');';
    ret=ret+limiter+'/*limiter*/';
    ret=ret+"return tempsptr|0;}";
@@ -702,7 +702,7 @@ function gbind(pfield) {
   var ppfield= daSchema.getColPByName(pfield,qc(this));
   var type= daSchema.getColTypeByName(pfield,qc(this));
   var tab= daSchema.getParent(pfield,qc(this));
-  var ret='';
+  var ret='ERROR AT gbind';
   if ((type==0) || (type==1) || (type==3) || (type==4))
     ret ="(mem32[("+ppfield+"+ (trav_"+tab+"<<2)) >>2]|0 & (hashBitFilter|0) )";
   else if (type==2)

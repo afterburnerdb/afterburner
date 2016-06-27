@@ -13,7 +13,7 @@ function queryResult(tempsptr) {
     this.numrows = -1;
     this.numcols = 0;
     this.colnames = [];
-    this.colptrs = 0;
+//    this.colptrs = 0;
     this.cols = [];
     this.coltypes = [];
     this.tempsptr=tempsptr||0;
