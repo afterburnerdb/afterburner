@@ -319,7 +319,7 @@ function Afterburner(){
       new Error('No from tables ');
     if (this.fromA.length>1)
       new Error('Too many from tables:' + this.fromA.length);
-    if ((this.fromA.length==1) &&  (this.joinA.length==1) && (this.groupA.length>1))
+    if ((this.fromA.length==1) &&  (this.joinA.length==1) && (this.groupA.length>0))
       return this.buildGroupJoin();
     if ((this.fromA.length==1) &&  (this.joinA.length==1))
       return this.buildJoin();
@@ -330,6 +330,7 @@ function Afterburner(){
     return 'bug';
   }
   this.buildGroupJoin = function(){
+   console.log('@buildGroupJoin');
    combound="trav_"+this.fromA[0]+"=(mem32[((currb+(curr<<2))|0)>>2]|0);"
    combound+="trav_"+this.joinA[0]+"=(mem32[((currb+(((curr+1)|0)<<2))|0)>>2]|0);"
    ocombound="otrav_"+this.fromA[0]+"=(mem32[((currb+(curr<<2))|0)>>2]|0);"
@@ -400,6 +401,7 @@ while(redo)
     return ret;
   }
   this.buildJoin = function(){
+    console.log('@buildJoin');
    all=this.expandJoin();
    all=all+this.expandFrom();
 //   all=all+this.expandFilter();
@@ -432,6 +434,7 @@ while(redo)
   }
 
   this.buildGroup = function(){
+    console.log('@buildGroup');
     combound="trav_"+this.fromA[0]+"=mem32[((currb+(curr<<2))|0)>>2]|0;"
     ocombound="otrav_"+this.fromA[0]+"=(mem32[((currb+(curr<<2))|0)>>2]|0);"
     all=this.expandFrom();
@@ -503,6 +506,7 @@ while(redo)
 
   }
   this.build = function(){
+   console.log('@build');
    all=this.expandFrom();
    all=all+this.expandFilter();
    all=all+this.expandFields();
