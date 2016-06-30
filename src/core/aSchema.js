@@ -22,7 +22,7 @@ function aSchema(){
   }
   this.getChildAttributes = function(tabname){
     tabname=tabname.toLowerCase();
-    this.getTable(tabname).getColNames();
+    return this.getTable(tabname).getColNamesA();
   }
   this.getPeerAttributes = function(colname, qcontext){
     if (typeof colname == 'string') colname=colname.toLowerCase();
@@ -34,7 +34,7 @@ function aSchema(){
   this.getTable = function(tabname){
     tabname=tabname.toLowerCase();
     for (var i=0;i<this.tables.length;i++)
-      if (this.tables[i].name == tabname)
+      if (this.tables[i].name.toLowerCase() == tabname)
         return this.tables[i];
   }
   this.getParent = function(colname, qcontext){

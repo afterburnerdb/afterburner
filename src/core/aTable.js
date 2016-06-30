@@ -83,6 +83,10 @@ function aTable(dSrc) {
       ret=ret+this.colnames[i] + ",";
     return ret.replace(/,$/, '');
   }
+  this.getColNamesA = function(){
+    return this.colnames.slice();
+  }
+
   this.getColTypeByName = function(colname){
     if (typeof colname == 'string') colname=colname.toLowerCase();
     for (var i=0;i<this.numcols;i++)

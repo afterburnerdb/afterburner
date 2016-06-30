@@ -43,6 +43,15 @@ function Afterburner(){
     return this;
   }
   this.field = function(param, ...rest){
+    if (param == '*'){
+      console.log('select *');
+      var wildCard=daSchema.getChildAttributes(this.fromA[0]);
+      console.log('wildCard:'+ wildCard);
+      if (this.joinA.length > 0){
+        wildCard.contact(daSchema.getChildAttributes(this.joinA[0]));
+      } else{console.log("joinA.length==0")}
+      return this.field(wildCard[0], ...wildCard.splice(1));
+    }
     if (boundAtt=daSchema.bindCol(param,qc(this))){
       type= daSchema.getColTypeByName(param,qc(this));
       this.attsA.push(param);
