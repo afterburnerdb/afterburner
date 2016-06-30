@@ -29,12 +29,22 @@ function Afterburner(){
 //////////////////////////////////////////////////////////////////////////////
 //API
   this.from = function(param){
-    this.fromA.push(param);
-    return this;
+    if (daSchema.getTable(param)){
+      this.fromA.push(param);
+      return this;
+    }
+    else {
+      badFSQL('@from', param +' is not a table')
+    }
   }
   this.join = function(param){
-    this.joinA.push(param);
-    return this;
+    if (daSchema.getTable(param)){
+      this.joinA.push(param);
+      return this;
+    }
+    else {
+      badFSQL('@join', param +' is not a table')
+    }
   }
   this.on = function(param1, param2){
     this.onA.push(param1);
@@ -790,8 +800,8 @@ function qc(it){
      it=theGeneratingAB;
   return it.fromA.concat(it.joinA);
 }
-function badFSQL (where){
-  console.log("Bad Fluent SQL at:"+where);
+function badFSQL (where,what){
+  console.log("Bad Fluent SQL at: "+where+ ": " + what);
 }
 
 //////////////////////////////////////////////////////////////////////////////
