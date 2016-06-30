@@ -204,6 +204,7 @@ function Afterburner(){
     return ret.substring(0,ret.length-1)+')) continue;';
   }
   this.expandGroup = function(){
+    console.log('@expandGroup');
     daTrav=this.fromA[0];
     daConts="(";
     daHash="(hk=(";
@@ -426,7 +427,7 @@ while(redo)
    ret=ret+prejoiner+'/*prejoiner*/';
    ret=ret+joiner+'/*joiner*/';
    ret=ret+execs+'}/*execs*/}';
-//   ret=ret+postexek+'/*postexek*/';
+   ret=ret+postexek+'/*postexek*/';
 //   ret=ret+'transpose('+sorter+');';
    ret=ret+limiter+'/*limiter*/';
    ret=ret+"return tempsptr|0;}";
@@ -609,6 +610,7 @@ while(redo)
   var hk=0;
   var tmp=0;
   var tmpstrlen=0;
+  var hash=0;
   `+core+`
   function setsize(size){
     size=size|0;
@@ -619,23 +621,25 @@ while(redo)
     mem32[(temps+(tempsptr<<2))>>2]=value;
     tempsptr= (tempsptr + 1 )|0;
   };
-//  function hash_str(strp){
-//    strp=strp|0;
-//    i=0;
-//    hash=101;
-//    for (;mem8[strp];i=(i+1)|0)
-//      hash=  ((+(hash)*103)|0) + (mem8[(strp+i)|0]);
-//    return (hash |0);
-//  };
-//  function mystrcmp(str1, str2){
-//    str1=str1|0;
-//    str2=str2|0;
-//    var i=0;
-//    while (
-//          ( ([(str1+i)|0]==mem8[(str2+i)|0]) && mem8[(str1+i)|0 ] && mem8[(str2+i)|0])
-//          ) i=((i+1)|0);
-//    return ([(str1+i)|0 ]-mem8[(str2+i)|0 ]);
-//  }
+  function hash_str(strp){
+    strp=strp|0;
+    i=0;
+    hash=101;
+    for (;(mem8[(strp+i)|0]|0)>0;i=(i+1)|0){
+      hash= (hash*103)|0;
+      hash= (hash + (mem8[(strp+i)|0]|0))|0;
+    }
+    return (hash |0);
+  };
+  function mystrcmp(str1, str2){
+    str1=str1|0;
+    str2=str2|0;
+    i=0;
+    while (
+          ( ( (mem8[(str1+i)|0]|0)==(mem8[(str2+i)|0]|0)) & mem8[(str1+i)|0 ] & mem8[(str2+i)|0])
+          ) i=((i+1)|0);
+    return (((mem8[(str1+i)|0]|0)-(mem8[(str2+i)|0]|0)))|0;
+  }
   function strlen(str){
     str=str|0;
     var i=0;
@@ -729,7 +733,7 @@ function gbind(pfield) {
   if ((type==0) || (type==1) || (type==3) || (type==4))
     ret ="(mem32[("+ppfield+"+ (trav_"+tab+"<<2)) >>2]|0 & (hashBitFilter|0) )";
   else if (type==2)
-    ret ="(hash_str(mem32[("+ppfield+"+ (trav_"+tab+"<<2)) >>2]))";
+    ret ="(hash_str(mem32[("+ppfield+"+ (trav_"+tab+"<<2)) >>2]|0))";
   return ret;
 //  else throw new Error "filter does not support datatype:" + type;
 }
@@ -737,7 +741,7 @@ function gbindn(pfield) {
   var ppfield= daSchema.getColPByName(pfield,qc(this));
   var type= daSchema.getColTypeByName(pfield,qc(this));
   var tab= daSchema.getParent(pfield,qc(this));
-  var ret="";
+  var ret="ERROR AT gbindn";
   if ((type==0) || (type==1) || (type==3) || (type==4))
     ret= "(hash_int(mem32[("+ppfield+"+ (trav_"+tab+"<<2))>>2]),h)";
   else if (type==2)
