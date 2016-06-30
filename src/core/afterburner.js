@@ -832,10 +832,10 @@ function like(p1,strlit){
 function eq(p1,p2){
   return compare('==',p1,p2);
 }
-function leq(p1,p2){
+function lte(p1,p2){
   return compare('<=',p1,p2);
 }
-function geq(p1,p2){
+function gte(p1,p2){
   return compare('>=',p1,p2);
 }
 function lt(p1,p2){
