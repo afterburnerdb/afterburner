@@ -238,7 +238,7 @@ function Afterburner(){
       group:      bp= mem32[((obp+(((hash2BucketSize+2)|0)<<2))|0)>>2]|0;::
       group:    //}::
       group:    if((mem32[bp>>2]|0) >= (hash2BucketSize|0)){//extension::
-      group:      nbp=(h2tb+(curr2NumBucks<<12))|0;::
+      group:      nbp=(h2tb+(curr2NumBucks<<7))|0;::
       group:      curr2NumBucks=(curr2NumBucks+1)|0;::
       group:      mem32[((bp+((hash2BucketSize+1|0)<<2))|0)>>2]=nbp;::
       group:      mem32[((obp+((hash2BucketSize+2|0)<<2))|0)>>2]=nbp;::
@@ -247,7 +247,8 @@ function Afterburner(){
       group:      bp=nbp;::
       group:    }::
       group:  }else{//reception::
-      group:    bp=(h2tb+(curr2NumBucks<<12))|0;::
+      group:    //bp=(h2tb+(curr2NumBucks<<12))|0;::
+      group:    bp=(h2tb+(curr2NumBucks<<7))|0;::
       group:    curr2NumBucks=(curr2NumBucks+1)|0;::
       group:    mem32[((h2bb+(hk<<2))|0)>>2]=bp|0;::
       group:    mem32[bp>>2]=0;::
@@ -293,7 +294,8 @@ function Afterburner(){
       group:      bp= mem32[((obp+(((hash2BucketSize+2)|0)<<2))|0)>>2]|0;::
       group:    //}::
       group:    if(((mem32[bp>>2]|0)+1) >= (hash2BucketSize|0)){//extension::
-      group:      nbp=(h2tb+(curr2NumBucks<<12))|0;::
+      group:      //nbp=(h2tb+(curr2NumBucks<<12))|0;::
+      group:      nbp=(h2tb+(curr2NumBucks<<7))|0;::
       group:      curr2NumBucks=(curr2NumBucks+1)|0;::
       group:      mem32[((bp+((hash2BucketSize+1|0)<<2))|0)>>2]=nbp;::
       group:      mem32[((obp+((hash2BucketSize+2|0)<<2))|0)>>2]=nbp;::
@@ -302,7 +304,7 @@ function Afterburner(){
       group:      bp=nbp;::
       group:    }::
       group:  }else{//reception::
-      group:    bp=(h2tb+(curr2NumBucks<<12))|0;::
+      group:    bp=(h2tb+(curr2NumBucks<<7))|0;::
       group:    curr2NumBucks=(curr2NumBucks+1)|0;::
       group:    mem32[((h2bb+(hk<<2))|0)>>2]=bp|0;::
       group:    mem32[bp>>2]=0;::
