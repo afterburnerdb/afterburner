@@ -93,7 +93,7 @@ function Afterburner(){
   this.group = function(param, ...rest){
     this.groupA.push(param);
     if (this.attsA.indexOf(param)<0)
-      this.groupA.push(param);
+      this.attsA.push(param);
     if (rest.length>0)
       return this.group(rest[0], ...rest.splice(1));
     else 
@@ -193,13 +193,17 @@ function Afterburner(){
     return ret.substring(0,ret.length-1)+')) continue;';
   }
   this.expandJFilter = function(){
+    var toSplice=[];
     ret='if(!('
     for (var i=0;i<this.whereA.length;i++){
-      if (this.whereA[i].match(new RegExp(".*"+this.joinA[0]+".*",'g'))){
+      if (!(this.whereA[i].match(new RegExp(".*trav_"+this.fromA[0]+".*",'g')))){
           ret=ret + '(' +this.whereA[i] + ')&';
-          this.whereA.splice(i,1);
+          toSplice.push(i);
         }
     }
+    toSplice.reverse();
+    for (var i=0;i<toSplice.length;i++)
+      this.whereA.splice(toSplice[i],1);
     if (ret=='if(!(') return '';
     return ret.substring(0,ret.length-1)+')) continue;';
   }
@@ -288,7 +292,7 @@ function Afterburner(){
       group:    //while(mem32[((bp+(((hash2BucketSize+1)|0)<<2))|0)>>2]|0){::
       group:      bp= mem32[((obp+(((hash2BucketSize+2)|0)<<2))|0)>>2]|0;::
       group:    //}::
-      group:    if((mem32[bp>>2]|0) >= (hash2BucketSize|0)){//extension::
+      group:    if(((mem32[bp>>2]|0)+1) >= (hash2BucketSize|0)){//extension::
       group:      nbp=(h2tb+(curr2NumBucks<<12))|0;::
       group:      curr2NumBucks=(curr2NumBucks+1)|0;::
       group:      mem32[((bp+((hash2BucketSize+1|0)<<2))|0)>>2]=nbp;::
@@ -305,7 +309,7 @@ function Afterburner(){
       group:    mem32[((bp+(((hash2BucketSize+1)|0)<<2))|0)>>2]=0;::
       group:    mem32[((bp+(((hash2BucketSize+2)|0)<<2))|0)>>2]=bp;::
       group:  };::
-      group:  //put one::
+      group:  //put two::
       group:  tmp=(((mem32[bp>>2]|0)+2)|0);::
       group:  mem32[bp>>2]=(tmp)|0;::
       group:  mem32[((bp+(tmp<<2))|0)>>2]= trav_`+aTrav+`|0;::
@@ -733,7 +737,7 @@ function gbind(pfield) {
   if ((type==0) || (type==1) || (type==3) || (type==4))
     ret ="(mem32[("+ppfield+"+ (trav_"+tab+"<<2)) >>2]|0 & (hashBitFilter|0) )";
   else if (type==2)
-    ret ="(hash_str(mem32[("+ppfield+"+ (trav_"+tab+"<<2)) >>2]|0))";
+    ret ="((hash_str(mem32[("+ppfield+"+ (trav_"+tab+"<<2)) >>2]|0)|0) & (hashBitFilter|0) )";
   return ret;
 //  else throw new Error "filter does not support datatype:" + type;
 }
