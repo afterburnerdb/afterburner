@@ -112,12 +112,12 @@ function queryResult(tempsptr) {
              } else if (this.coltypes[toSort[a]] == 2){
                axr=  "";
                if (last){
-                  fbody+="mystrcmp(mem8[temps+ (a*"+ this.numcols+")+" +toSort[a]+"],";
-                  fbody+="mem8[temps + (b*"+ this.numcols+")+" +toSort[a]+"])" ;
+                  fbody+="mystrcmp(mem32[(temps + (((a*"+this.numcols+")+"+toSort[a]+")<<2))>>2],";
+                  fbody+="mem32[(temps + (((b*"+this.numcols+")+"+toSort[a]+")<<2))>>2])" ;
                 }else{
                   fbody+="(tmp=("
-                  fbody+="mystrcmp(mem8[temps+ (a*"+ this.numcols+")+" +toSort[a]+"],";
-                  fbody+="mem8[temps + (b*"+ this.numcols+")+" +toSort[a]+"])" ;
+                  fbody+="mystrcmp(mem32[(temps + (((a*"+this.numcols+")+"+toSort[a]+")<<2))>>2],";
+                  fbody+="mem32[(temps + (((b*"+this.numcols+")+"+toSort[a]+")<<2))>>2])" ;
                   fbody+="))?tmp:"
                 }
               }
