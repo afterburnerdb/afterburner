@@ -49,6 +49,9 @@ function malloctmpstr(size){
   tmpstrStoredB= (tmpstrStoredB+ size4b)|0;
   return ret|0;
 }
+function deletetmpstr(){
+  tmpstrStoredB=0;
+}
 function malloc(size){
   size=size|0;
   if (size<1) return storedB;
