@@ -889,6 +889,12 @@ function gtlit(p1,p2){
 }
 function betweenlit(p1,p2,p3){
 }
+function or(p1,p2){
+  return '(' + p1 + '|' +p2 + ')';
+}
+function and(p1,p2){
+  return '(' + p1 + '&' +p2 + ')';
+}
 
 function compare(op,p1,p2){
   var p1b=daSchema.bindCol(p1,qc(this));
