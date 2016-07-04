@@ -629,7 +629,7 @@ while(redo)
   var tmpstrlen=0;
   var hash=0;
   var dtyluptr=`+dateToYearLUTab()+`;
-  var dtyby=1970;
+  var dtyby=1969;
   `+core+`
   function setsize(size){
     size=size|0;
@@ -669,13 +669,15 @@ while(redo)
   function intDayToYear(day){
     day=day|0;
     var fg=0;
-    fg = (+(day/356))|0;
-    if (day >= (mem32[(dtyluptr + (((fg+1)|0)<<2))|0]|0))
-      return (dtyby + fg + 1)|0;
-    if (day >= (mem32[(dtyluptr + (((fg)|0)<<2))|0]|0))
-      return (dtyby + fg)|0;
+    var ret = 0;
+    fg = (~~(+(day|0) / 365.0));
+    if ((~~day) >= (mem32[(dtyluptr + (((fg+1)|0)<<2))>>2]|0))
+      ret = (dtyby + fg + 1)|0;
+    else if (~~day >= (mem32[(dtyluptr + (((fg)|0)<<2))>>2]|0))
+      ret = (dtyby + fg)|0;
     else 
-      return (dtyby + fg - 1)|0;
+      ret = (dtyby + fg - 1)|0;
+    return ret |0;
   };
   `+this.funs.join('\n')+`
   return {runner:runner}
@@ -947,7 +949,7 @@ function toYear(p1){
   if (p1t!=3){
     badFSQL('@toYear', p1 + 'is not a date')
   } else {
-    return 'pb(intDayToYear(' + p1b + ')|0)';
+    return 'pb(+(intDayToYear(' + p1b + ')|0))';
   }
 }
 function field(){
