@@ -56,9 +56,10 @@ function Afterburner(){
     if (param == '*'){
       console.log('select *');
       var wildCard=daSchema.getChildAttributes(this.fromA[0]);
-      console.log('wildCard:'+ wildCard);
+      console.log('wildCard fromA:'+ wildCard);
       if (this.joinA.length > 0){
-        wildCard.contact(daSchema.getChildAttributes(this.joinA[0]));
+        wildCard=wildCard.concat(daSchema.getChildAttributes(this.joinA[0]));
+      console.log('wildCard joinA:'+ wildCard);
       } else{console.log("joinA.length==0")}
       return this.field(wildCard[0], ...wildCard.splice(1));
     }
@@ -433,7 +434,9 @@ while(redo)
    ret=ret+prejoiner+'/*prejoiner*/';
    ret=ret+joiner+'/*joiner*/';
    ret=ret+execs+'}/*execs*/}';
-   ret=ret+postexek+'/*postexek*/';
+   if (this.aggsA.length>0)
+     ret=ret+postexek+'/*postexek*/';
+//   ret=ret+postexek+'/*postexek*/';
 //   ret=ret+'transpose('+sorter+');';
    ret=ret+limiter+'/*limiter*/';
    ret=ret+"return tempsptr|0;}";
