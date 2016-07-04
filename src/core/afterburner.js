@@ -63,6 +63,14 @@ function Afterburner(){
       } else{console.log("joinA.length==0")}
       return this.field(wildCard[0], ...wildCard.splice(1));
     }
+    var alias=param;
+    if (param.substring(0,2)=='as'){
+      console.log('has alias');
+      alias=param.substring(param.indexOf('~')+1,param.indexOf('}'));
+      param=param.substring(param.indexOf('{')+1,param.indexOf('~'));
+      console.log('alias:'+alias);
+      console.log('param:'+param);
+    }
     if (boundAtt=daSchema.bindCol(param,qc(this))){
       type= daSchema.getColTypeByName(param,qc(this));
       this.attsA.push(param);
@@ -73,9 +81,9 @@ function Afterburner(){
         this.fstr.push(`exec:memF32[(temps+(tempsptr<<2))>>2]=`+daSchema.bindCol(param,qc(this))+`;tempsptr= (tempsptr + 1 )|0;::
                         postexek:memF32[(temps+(tempsptr<<2))>>2]=`+daSchema.bindCol(param,qc(this))+`;tempsptr= (tempsptr + 1 )|0;::`);
 
-      this.resA.push("res.addCol2('"+param+"',"+type+");");
+      this.resA.push("res.addCol2('"+alias+"',"+type+");");
     } else {
-      this.resA.push(extractfrom(param,'post'));
+      this.resA.push(extractfrom(param,'post').replace(param,alias));
       this.aggsA.push(param);
       this.fstr.push(param);
     }
@@ -1093,7 +1101,9 @@ function mul(p1,p2){
 function div(p1,p2){
   return arith('/',p1,p2);
 }
-
+function as(p1,al){
+ return 'as{'+p1+'~'+al+'}';
+}
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 if(inNode){
