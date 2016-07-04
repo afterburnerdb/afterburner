@@ -620,6 +620,8 @@ while(redo)
   var tmp=0;
   var tmpstrlen=0;
   var hash=0;
+  var dtyluptr=`+dateToYearLUTab()+`;
+  var dtyby=1970;
   `+core+`
   function setsize(size){
     size=size|0;
@@ -648,14 +650,25 @@ while(redo)
           ( ( (mem8[(str1+i)|0]|0)==(mem8[(str2+i)|0]|0)) & mem8[(str1+i)|0 ] & mem8[(str2+i)|0])
           ) i=((i+1)|0);
     return (((mem8[(str1+i)|0]|0)-(mem8[(str2+i)|0]|0)))|0;
-  }
+  };
   function strlen(str){
     str=str|0;
     var i=0;
     while(mem8[(str+i)|0]|0)
       i=(i+1)|0;
     return i|0;
-  }
+  };
+  function intDayToYear(day){
+    day=day|0;
+    var fg=0;
+    fg = (+(day/356))|0;
+    if (day >= (mem32[(dtyluptr + (((fg+1)|0)<<2))|0]|0))
+      return (dtyby + fg + 1)|0;
+    if (day >= (mem32[(dtyluptr + (((fg)|0)<<2))|0]|0))
+      return (dtyby + fg)|0;
+    else 
+      return (dtyby + fg - 1)|0;
+  };
   `+this.funs.join('\n')+`
   return {runner:runner}
 });
@@ -911,6 +924,16 @@ function compare(op,p1,p2){
   }
   else{//todo: eval here 
     return '(' +p1+ op + p2+')';
+  }
+}
+
+function toYear(p1){
+  var p1b=daSchema.bindCol(p1,qc(this));
+  var p1t=daSchema.getColTypeByName(p1,qc(this));
+  if (p1t!=3){
+    badFSQL('@toYear', p1 + 'is not a date')
+  } else {
+    return 'pb(intDayToYear(' + p1b + ')|0)';
   }
 }
 function field(){
