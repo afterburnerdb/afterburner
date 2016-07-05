@@ -320,7 +320,7 @@ function Afterburner(){
       group:    //while(mem32[((bp+(((hash2BucketSize+1)|0)<<2))|0)>>2]|0){::
       group:      bp= mem32[((obp+(((hash2BucketSize+2)|0)<<2))|0)>>2]|0;::
       group:    //}::
-      group:    if(((mem32[bp>>2]|0)+1) >= (hash2BucketSize|0)){//extension::
+      group:    if((((mem32[bp>>2]|0)+1)|0) >= (hash2BucketSize|0)){//extension::
       group:      //nbp=(h2tb+(curr2NumBucks<<12))|0;::
       group:      nbp=(h2tb+(curr2NumBucks<<7))|0;::
       group:      curr2NumBucks=(curr2NumBucks+1)|0;::
@@ -771,7 +771,7 @@ function contbind(pfield) {
   if ((type==0) || (type==1) || (type==3) || (type==4))
     return "(("+obound+"|0)-("+bound+")|0)";
   else if (type==2)
-    return "(mystrcmp("+obound+","+bound+"))";
+    return "(mystrcmp("+obound+","+bound+")|0)";
 //  else throw new Error "filter does not support datatype:" + type;
 }
 
