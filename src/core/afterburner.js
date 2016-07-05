@@ -629,7 +629,7 @@ while(redo)
   var tmpstrlen=0;
   var hash=0;
   var dtyluptr=`+dateToYearLUTab()+`;
-  var dtyby=1969;
+  var dtyby=1970;
   `+core+`
   function setsize(size){
     size=size|0;
@@ -885,13 +885,13 @@ function gt(p1,p2){
   return compare('>',p1,p2);
 }
 function between(p1,p2,p3){
-  return '('+ geq(p1,p2) + '&' + leq(p1,p3) + ')';
+  return '('+ gte(p1,p2) + '&' + lte(p1,p3) + ')';
 }
 function eqlit(p1,p2){
 }
-function leqlit(p1,p2){
+function ltelit(p1,p2){
 }
-function geqlit(p1,p2){
+function gtelit(p1,p2){
 }
 function ltlit(p1,p2){
 }
@@ -1116,8 +1116,8 @@ if(inNode){
   global.like=like;
   global.eq=eq;
   global.lt=lt;
-  global.geq=geq;
-  global.leq=leq;
+  global.gte=gte;
+  global.lte=lte;
   global.between=between;
   global.date=date;
   global.compare=compare;

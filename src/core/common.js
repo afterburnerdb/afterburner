@@ -48,7 +48,7 @@ function dateToYearLUTab(){
   var ptr=malloc(1000);
   for (var i=0;i<1000;i++){
     var year= (1970+i)+"";
-    mem32[ptr + (i<<2)]= strdate_to_int(year+"-01-01");
+    mem32[(ptr + (i<<2))>>2]= strdate_to_int(year+"-01-01");
   }
   return ptr;
 }
