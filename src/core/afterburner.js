@@ -122,16 +122,17 @@ function Afterburner(){
 //////////////////////////////////////////////////////////////////////////////
 //EXPANDS
   this.expandFrom = function(){
-  fromTab=this.fromA[0];
-  tabLen=daSchema.getTabSizeByName(fromTab);
-  filter=this.expandFilter();
+  var fromTab=this.fromA[0];
+  var tabLen=daSchema.getTabSizeByName(fromTab);
+  var filter=this.expandFilter();
   return `dec:var trav_`+fromTab+`=-1;:: 
 	 loop: while(1){ trav_`+fromTab+`=trav_`+fromTab+`+1|0; if ((trav_`+fromTab+`|0) >= `+tabLen+`) break; `+filter+`  ::`;
   }
   this.expandJoin = function(){
-  jTab=this.joinA[0];
-  tabLen=daSchema.getTabSizeByName(jTab);
-  jfilter=this.expandJFilter();
+  var jTab=this.joinA[0];
+  var tabLen=daSchema.getTabSizeByName(jTab);
+  var pbfilter=this.expandPreBuildJFilter();
+  var ppfilter=this.expandPostProbeJFilter();
   return  `
    pre:i=0;while(1){::
    pre:    mem32[((h1bb+(i<<2))|0)>>2]=0;::
@@ -139,7 +140,7 @@ function Afterburner(){
    pre:    if((i|0)>=(hashBitFilter|0)) break;::
    pre:  }::
    dec:var trav_`+jTab+`=-1;::
-   pre:trav_`+jTab+`=-1; while(1){trav_`+jTab+`=trav_`+jTab+`+1|0; if((trav_`+jTab+`|0)>=`+tabLen+`) break; `+jfilter+`;::
+   pre:trav_`+jTab+`=-1; while(1){trav_`+jTab+`=trav_`+jTab+`+1|0; if((trav_`+jTab+`|0)>=`+tabLen+`) break; `+pbfilter+`;::
    pre:  hk=(`+daSchema.bindCol(this.onA[1],qc(this))+` & (hashBitFilter|0))|0;::
    pre:  if (obp=mem32[((h1bb+(hk<<2))|0)>>2]|0){::
    pre:    //while(mem32[((bp+(((hash1BucketSize+1)|0)<<2))|0)>>2]|0){::
@@ -183,7 +184,8 @@ function Afterburner(){
        join:    curr=curr+1|0;::
        join:    trav_`+jTab+`=mem32[((currb+(curr<<2))|0)>>2]|0;::
        join:  }::
-       join:  if(!(`+this.joinP+`)) continue; ::`;
+       join:  if(!(`+this.joinP+`)) continue; ::
+       join:  `+ppfilter+`;::`; 
   }
 
   this.expandFields = function(){
@@ -201,7 +203,7 @@ function Afterburner(){
     if (ret=='if(!(') return '';
     return ret.substring(0,ret.length-1)+')) continue;';
   }
-  this.expandJFilter = function(){
+  this.expandPreBuildJFilter = function(){
     var toSplice=[];
     ret='if(!('
     for (var i=0;i<this.whereA.length;i++){
@@ -216,6 +218,22 @@ function Afterburner(){
     if (ret=='if(!(') return '';
     return ret.substring(0,ret.length-1)+')) continue;';
   }
+  this.expandPostProbeJFilter = function(){
+    var toSplice=[];
+    ret='if(!('
+    for (var i=0;i<this.whereA.length;i++){
+      if ((this.whereA[i].match(new RegExp(".*trav_"+this.joinA[0]+".*",'g')))){
+          ret=ret + '(' +this.whereA[i] + ')&';
+          toSplice.push(i);
+        }
+    }
+    toSplice.reverse();
+    for (var i=0;i<toSplice.length;i++)
+      this.whereA.splice(toSplice[i],1);
+    if (ret=='if(!(') return '';
+    return ret.substring(0,ret.length-1)+')) continue;';
+  }
+
   this.expandGroup = function(){
     console.log('@expandGroup');
     daTrav=this.fromA[0];
