@@ -238,16 +238,17 @@ function Afterburner(){
     console.log('@expandGroup');
     daTrav=this.fromA[0];
     daConts="(";
-    daHash="((hk=(";
+    daHash="((";
     daHashn="(hk=(";
     for(var i=0;i<this.attsA.length;i++){
       daConts+=contbind(this.attsA[i]) + "|";
-      daHash+= "("+gbind(this.attsA[i]) + "<<" + (i*7)%32 + ")+";
+      daHash+= "("+gbind(this.attsA[i]) + "<<" + (i*7)%11 + ")+";
       daHashn+= gbindn(this.attsA[i]) + "+"
     }
     daConts=daConts.substring(0,daConts.length-2);
     daConts+=")|0)";
-    daHash=daHash.substring(0,daHash.length-1) + "&hashBitFilter))|0)";
+    daHash=daHash.substring(0,daHash.length-1);
+    daHash+="&hashBitFilter)|0)";
     daHashn=daHashn.substring(0,daHashn.length-1);
     daHashn+="))";
 
@@ -296,15 +297,12 @@ function Afterburner(){
     daHashn="(hk=(";
     for(var i=0;i<this.attsA.length;i++){
       daConts+=contbind(this.attsA[i]) + "|";
-      daHash+= gbind(this.attsA[i]) + "+"
+      daHash+= "("+gbind(this.attsA[i]) + "<<" + (i*7)%11 + ")+";
       daHashn+= gbindn(this.attsA[i]) + "+"
     }
-    daConts=daConts.substring(0,daConts.length-2);
-    daConts+=")|0)";
-    daHash=daHash.substring(0,daHash.length-1);
-    daHash+=")|0)";
-    daHashn=daHashn.substring(0,daHashn.length-1);
-    daHashn+="))";
+    daConts=daConts.substring(0,daConts.length-2) + ")|0)";
+    daHash=daHash.substring(0,daHash.length-1) + "&hashBitFilter)|0)";
+    daHashn=daHashn.substring(0,daHashn.length-1) + "))";
 
     return `
       dec:var otrav_`+this.fromA[0]+`=-1;::
