@@ -141,7 +141,7 @@ function Afterburner(){
    pre:  }::
    dec:var trav_`+jTab+`=-1;::
    pre:trav_`+jTab+`=-1; while(1){trav_`+jTab+`=trav_`+jTab+`+1|0; if((trav_`+jTab+`|0)>=`+tabLen+`) break; `+pbfilter+`;::
-   pre:  hk=(`+daSchema.bindCol(this.onA[1],qc(this))+` & (hashBitFilter|0))|0;::
+   pre:  hk=((`+daSchema.bindCol(this.onA[1],qc(this))+`) & (hashBitFilter|0))|0;::
    pre:  if (obp=mem32[((h1bb+(hk<<2))|0)>>2]|0){::
    pre:    //while(mem32[((bp+(((hash1BucketSize+1)|0)<<2))|0)>>2]|0){::
    pre:      bp= mem32[((obp+(((hash1BucketSize+2)|0)<<2))|0)>>2]|0;::
@@ -519,7 +519,7 @@ while(redo)
         }
         if (`+daConts+`){
           col=1;
-          redo=1;
+          //redo=1;
           break;
         }
         `+execs+`
@@ -768,8 +768,13 @@ function contbind(pfield) {
   var obound= daSchema.obindCol(pfield,qc(this));
   var type= daSchema.getColTypeByName(pfield,qc(this));
   var travname='trav';
-  if ((type==0) || (type==1) || (type==3) || (type==4))
+  if ((type==0) || (type==3) || (type==4))
     return "(("+obound+"|0)-("+bound+")|0)";
+  else if (type==1){
+    var ppfield= daSchema.getColPByName(pfield,qc(this));
+    var tab= daSchema.getParent(pfield,qc(this));
+    return "((mem32[("+ppfield+"+ (otrav_"+tab+"<<2)) >>2]|0)-(mem32[("+ppfield+"+ (otrav_"+tab+"<<2)) >>2]|0))"
+  }
   else if (type==2)
     return "(mystrcmp("+obound+","+bound+")|0)";
 //  else throw new Error "filter does not support datatype:" + type;
@@ -780,10 +785,13 @@ function gbind(pfield) {
   var type= daSchema.getColTypeByName(pfield,qc(this));
   var tab= daSchema.getParent(pfield,qc(this));
   var ret='ERROR AT gbind';
-  if ((type==0) || (type==1) || (type==3) || (type==4))
-    ret ="(mem32[("+ppfield+"+ (trav_"+tab+"<<2)) >>2]|0 & (hashBitFilter|0) )";
+  if ((type==0) || (type==3) || (type==4))
+    ret ="((mem32[("+ppfield+"+ (trav_"+tab+"<<2)) >>2]|0) & (hashBitFilter|0) )";
+  else if (type==1)
+    ret ="(((mem32[("+ppfield+"+ (trav_"+tab+"<<2)) >>2]|0)      & (hashBitFilter|0))^(((mem32[("+ppfield+"+ (trav_"+tab+"<<2)) >>2]|0)>>12) & (hashBitFilter|0))^(((mem32[("+ppfield+"+ (trav_"+tab+"<<2)) >>2]|0)>>20) & (hashBitFilter|0)))";
   else if (type==2)
     ret ="((hash_str(mem32[("+ppfield+"+ (trav_"+tab+"<<2)) >>2]|0)|0) & (hashBitFilter|0) )";
+  console.log('ret:'+ret);
   return ret;
 //  else throw new Error "filter does not support datatype:" + type;
 }
