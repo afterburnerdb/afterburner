@@ -6,6 +6,7 @@ if(typeof module == 'undefined'){
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 var uniqueVarCounter=0;
+var funs=[];
 var theGeneratingAB;
 function Afterburner(){
   this.select = function(param){
@@ -22,7 +23,7 @@ function Afterburner(){
     this.orderA=[];
     this.limitA=-1;
     this.resA=[];
-    this.funs=[];
+    funs=[];
     theGeneratingAB=this;
     return this;
   }
@@ -694,7 +695,7 @@ while(redo)
       ret = (dtyby + fg - 1)|0;
     return ret |0;
   };
-  `+this.funs.join('\n')+`
+  `+funs.join('\n')+`
   return {runner:runner}
 });
 
@@ -856,9 +857,9 @@ function buildLikeFun_pct(strlit, likeFun){
 
 function defun(fbody){
   uniqueVarCounter++;
-  var fname=' fun' + uniqueVarCounter;
+  var funname=' fun' + uniqueVarCounter;
   funs.push( 'function ' + funname + fbody );
-  return fname;
+  return funname;
 }
 function like_begins(){
 }
@@ -872,7 +873,28 @@ function like_ends(strp, strlit){
   }
   return ret.substring(0,ret.length-1);
 }
-
+function like_has(strp, strlit){
+  var strlitlen=strlit.length;
+  var snake="";
+  for (var i=0;i<strlitlen;i++){
+    var intval=(strlit.charCodeAt(i)||0);
+    snake+='((mem8[((strp + ( i + '+ (i)+')|0)|0)]|0)==('+intval+'|0))&';
+  }
+  snake= snake.substring(0,snake.length-1);
+  var fbody=`(strp){
+    strp|0;
+    var len=0;
+    var i=0;
+    len=strlen(strp);
+    while(1){
+      if (len<(`+strlitlen+`+i)) return 0;
+      if (`+snake+`) return 1;
+      i=(i+1)|0;
+    }
+  }`;
+  console.log('finished like_has');
+  return "("+defun(fbody)+"("+strp+")|0)";
+}
 function qc(it){
   if (typeof it !='undefined')
      it=theGeneratingAB;
@@ -887,20 +909,24 @@ function badFSQL (where,what){
 function like(p1,strlit){
   var strp=daSchema.bindCol(p1,qc(this));
   var numpct=(strlit.match(/\%/g) || []).length;
-  if (numpct ==0)
+  if (numpct ==0){
     return eq(p1,strlit);
-  else if (numpct ==1){
+  } else if (numpct ==1){
     if (strlit.charCodeAt(0)==37){
       return like_ends(strp,strlit.substring(1,strlit.length));
     }
-    else if (strlit.charCodeAt(stlit.length-1)==37){
+    else if (strlit.charCodeAt(strlit.length-1)==37){
       return like_begins(strp,strlit.substring(0,strlit.length-1));
     }
     else{
       return '(' + like_begins(strp,strlit.substring(0,strlit.indexOf('%'))) + "&" + like_ends(strp,strlit.substring(strlit.indexOf('%')+1,strlit.length)) + ')' ;
     }
-  }
-  else {
+  } else if (numpct ==2){
+    if ((strlit.charCodeAt(0)==37) && (strlit.charCodeAt(strlit.length-1)==37)){
+      console.log('@like got like_has');
+      return like_has(strp,strlit.substring(1,strlit.length-1));
+    }
+  }  else {
     var likeFun=buildLikeFun(strlit,"")
     var fun=defun(likeFun);
     return fun + "(strp)";
