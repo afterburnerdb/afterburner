@@ -1068,10 +1068,12 @@ function sum(p){
   var bound=daSchema.bindCol(p,qc(this));
   var unique=uniqueVarCounter++;
   var type= daSchema.getColTypeByName(p,qc(this));
+  if ((type==0) || (type==3) || (type==4))
+    bound=coerceFloat(bound);
   var tab= daSchema.getParent(p,qc(this));
   var varname="sum"+unique
   return `dec:var `+varname+`=0.0;::
-  post:res.addCol2('sum(`+p+`)',`+type+`);::
+  post:res.addCol2('sum(`+p+`)',1);::
   preexek:`+varname+`=+(0);::
   exec:`+varname+`=`+varname+`+(`+bound+`);::
   execg:`+varname+`=`+varname+`+(`+bound+`);::
@@ -1081,10 +1083,12 @@ function sumif(p,cond){
   var bound=daSchema.bindCol(p,qc(this));
   var unique=uniqueVarCounter++;
   var type= daSchema.getColTypeByName(p,qc(this));
+  if ((type==0) || (type==3) || (type==4))
+    bound=coerceFloat(bound);
   var tab= daSchema.getParent(p,qc(this));
   var varname="sum"+unique
   return `dec:var `+varname+`=0.0;::
-  post:res.addCol2('sum(`+p+`)',`+type+`);::
+  post:res.addCol2('sum(`+p+`)',1);::
   preexek:`+varname+`=+(0);::
   exec: if(`+cond+`)`+varname+`=`+varname+`+(`+bound+`);::
   execg:if(`+cond+`)`+varname+`=`+varname+`+(`+bound+`);::
@@ -1094,12 +1098,14 @@ function avg(p){
   var bound=daSchema.bindCol(p,qc(this));
   var unique=uniqueVarCounter++;
   var type= daSchema.getColTypeByName(p,qc(this));
+  if ((type==0) || (type==3) || (type==4))
+    bound=coerceFloat(bound);
   var tab= daSchema.getParent(p,qc(this));
   var varnamesum="avgsum"+unique
   var varnamecount="avgcount"+unique
   return `dec:var `+varnamecount+`=0.0;::
   dec:var `+varnamesum+`=0.0;::
-  post:res.addCol2('avg(`+p+`)',`+type+`);::
+  post:res.addCol2('avg(`+p+`)',1);::
   preexek:`+varnamesum+`=0.0;::
   preexek:`+varnamecount+`=0.0;::
   exec:`+varnamesum+`=`+varnamesum+`+(`+bound+`);::
@@ -1137,7 +1143,8 @@ function date(p1){
 }
 function coerceFloat(p){
   p = p+"";
-  if (p.indexOf('.')>-1) return p
+  if (p.indexOf('.')>-1) return p;
+  else if (p.indexOf('mem')>-1) return  "(+(" + p + "|0))";
   else return p + ".0";
 } 
 function arith(op,p1,p2){
