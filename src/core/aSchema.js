@@ -82,6 +82,7 @@ function aSchema(){
     return daSchema.getTable(tabname).numrows;
   }
   this.bindCol = function(colname,qcontext){
+    if (parseFloat(colname) == colname) return colname;
     if ((colname != null) && typeof colname == 'string' && colname.indexOf('pb')==0){
       console.log('@binCol..colname:'+colname);
       return colname.substring(2,colname.length);
