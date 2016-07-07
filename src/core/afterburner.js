@@ -238,17 +238,16 @@ function Afterburner(){
     console.log('@expandGroup');
     daTrav=this.fromA[0];
     daConts="(";
-    daHash="(hk=(";
+    daHash="((hk=(";
     daHashn="(hk=(";
     for(var i=0;i<this.attsA.length;i++){
       daConts+=contbind(this.attsA[i]) + "|";
-      daHash+= gbind(this.attsA[i]) + "+"
+      daHash+= "("+gbind(this.attsA[i]) + "<<" + (i*7)%32 + ")+";
       daHashn+= gbindn(this.attsA[i]) + "+"
     }
     daConts=daConts.substring(0,daConts.length-2);
     daConts+=")|0)";
-    daHash=daHash.substring(0,daHash.length-1);
-    daHash+=")|0)";
+    daHash=daHash.substring(0,daHash.length-1) + "&hashBitFilter))|0)";
     daHashn=daHashn.substring(0,daHashn.length-1);
     daHashn+="))";
 
@@ -663,7 +662,7 @@ while(redo)
     i=0;
     hash=101;
     for (;(mem8[(strp+i)|0]|0)>0;i=(i+1)|0){
-      hash= (hash*103)|0;
+      hash= ((hash*103)|0)&hashBitFilter;
       hash= (hash + (mem8[(strp+i)|0]|0))|0;
     }
     return (hash |0);
@@ -780,7 +779,7 @@ function contbind(pfield) {
 //  else throw new Error "filter does not support datatype:" + type;
 }
 
-function gbind(pfield) {
+function gbind_alt(pfield) {
   var ppfield= daSchema.getColPByName(pfield,qc(this));
   var type= daSchema.getColTypeByName(pfield,qc(this));
   var tab= daSchema.getParent(pfield,qc(this));
@@ -795,6 +794,21 @@ function gbind(pfield) {
   return ret;
 //  else throw new Error "filter does not support datatype:" + type;
 }
+function gbind(pfield) {
+  var ppfield= daSchema.getColPByName(pfield,qc(this));
+  var type= daSchema.getColTypeByName(pfield,qc(this));
+  var tab= daSchema.getParent(pfield,qc(this));
+  var ret='ERROR AT gbind';
+  if ((type==0) || (type==3) || (type==4))
+    ret ="((mem32[("+ppfield+"+ (trav_"+tab+"<<2)) >>2]|0))";
+  else if (type==1)
+    ret ="(((mem32[("+ppfield+"+ (trav_"+tab+"<<2)) >>2]|0))^(((mem32[("+ppfield+"+ (trav_"+tab+"<<2))>>2]|0)>>12))^(((mem32[("+ppfield+"+ (trav_"+tab+"<<2))>>2]|0)>>20)))";
+  else if (type==2)
+    ret ="((hash_str(mem32[("+ppfield+"+ (trav_"+tab+"<<2)) >>2]|0)|0))";
+  return ret;
+//  else throw new Error "filter does not support datatype:" + type;
+}
+
 function gbindn(pfield) {
   var ppfield= daSchema.getColPByName(pfield,qc(this));
   var type= daSchema.getColTypeByName(pfield,qc(this));
