@@ -1053,6 +1053,17 @@ function count(p){
   execg:`+varname+`=`+varname+`+1|0;::
   postexek:mem32[(temps+(tempsptr<<2))>>2]=`+varname+`;tempsptr= (tempsptr + 1 )|0;::`;
 }
+function countif(p,cond){
+  unique=uniqueVarCounter++;
+  type = 0;
+  varname="count"+unique;
+  return `dec:var `+varname+`=0;::
+  post:res.addCol2('count(`+p+`)',`+type+`);::
+  preexek:`+varname+`=0;::
+  exec: if(`+cond+`)`+varname+`=`+varname+`+1|0;::
+  execg:if(`+cond+`)`+varname+`=`+varname+`+1|0;::
+  postexek:mem32[(temps+(tempsptr<<2))>>2]=`+varname+`;tempsptr= (tempsptr + 1 )|0;::`;
+}
 function sum(p){
   var bound=daSchema.bindCol(p,qc(this));
   var unique=uniqueVarCounter++;
@@ -1064,6 +1075,19 @@ function sum(p){
   preexek:`+varname+`=+(0);::
   exec:`+varname+`=`+varname+`+(`+bound+`);::
   execg:`+varname+`=`+varname+`+(`+bound+`);::
+  postexek:memF32[(temps+(tempsptr<<2))>>2]=+(`+varname+`);tempsptr= (tempsptr + 1 )|0;::`;
+}
+function sumif(p,cond){
+  var bound=daSchema.bindCol(p,qc(this));
+  var unique=uniqueVarCounter++;
+  var type= daSchema.getColTypeByName(p,qc(this));
+  var tab= daSchema.getParent(p,qc(this));
+  var varname="sum"+unique
+  return `dec:var `+varname+`=0.0;::
+  post:res.addCol2('sum(`+p+`)',`+type+`);::
+  preexek:`+varname+`=+(0);::
+  exec: if(`+cond+`)`+varname+`=`+varname+`+(`+bound+`);::
+  execg:if(`+cond+`)`+varname+`=`+varname+`+(`+bound+`);::
   postexek:memF32[(temps+(tempsptr<<2))>>2]=+(`+varname+`);tempsptr= (tempsptr + 1 )|0;::`;
 }
 function avg(p){
