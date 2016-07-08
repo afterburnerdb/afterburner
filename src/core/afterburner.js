@@ -933,8 +933,14 @@ function like(p1,strlit){
   }
 }
 
+function not(p1){
+  return "(!(" + p1 + "))";
+}
 function eq(p1,p2){
   return compare('==',p1,p2);
+}
+function neq(p1,p2){
+  return not(compare('==',p1,p2));
 }
 function lte(p1,p2){
   return compare('<=',p1,p2);
