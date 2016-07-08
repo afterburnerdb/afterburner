@@ -15,6 +15,7 @@ function Afterburner(){
     this.joinA=[];
     this.onA=[];
     this.joinP='';
+    this.hasljoin=0;
     this.attsA=[];
     this.fstr=[];
     this.aggsA=[];
@@ -46,6 +47,10 @@ function Afterburner(){
     else {
       badFSQL('@join', param +' is not a table')
     }
+  }
+  this.ljoin = function(param){
+    this.hasljoin=1;
+    return this.join(param);
   }
   this.on = function(param1, param2){
     this.onA.push(param1);
@@ -174,18 +179,22 @@ function Afterburner(){
        prej:currb=-1;::
        prej:curr=0;::
        prej:currb=mem32[((h1bb+(hk<<2))|0)>>2]|0;::
-       join:while(currb){ ::
-       join:  if ((curr|0)>=(mem32[currb>>2]|0)){::
-       join:    if (currb=mem32[(currb+(((hash1BucketSize+1)|0)<<2)|0)>>2]|0){::
-       join:      curr=1;::
-       join:      trav_`+jTab+`=mem32[((currb+(curr<<2))|0)>>2]|0;}::
-       join:    else::
-       join:     break;::
-       join:  }else{::
-       join:    curr=curr+1|0;::
-       join:    trav_`+jTab+`=mem32[((currb+(curr<<2))|0)>>2]|0;::
-       join:  }::
-       join:  if(!(`+this.joinP+`)) continue; ::
+       join:odidonce=0;::
+       join:while(currb | (ljoin & (!odidonce)) ){ ::
+       join:  if (currb){::    
+       join:    if ((curr|0)>=(mem32[currb>>2]|0)){::
+       join:      if (currb=mem32[(currb+(((hash1BucketSize+1)|0)<<2)|0)>>2]|0){::
+       join:        curr=1;::
+       join:        trav_`+jTab+`=mem32[((currb+(curr<<2))|0)>>2]|0;}::
+       join:      else::
+       join:       break;::
+       join:    }else{::
+       join:      curr=curr+1|0;::
+       join:      trav_`+jTab+`=mem32[((currb+(curr<<2))|0)>>2]|0;::
+       join:    }::
+       join:  } else trav_`+jTab+`= -666;//NULL::
+       join:  if((!(`+this.joinP+`)) & (ljoin & odidonce))  continue; ::
+       join:   odidonce=1;::
        join:  `+ppfilter+`;::`; 
   }
 
@@ -646,6 +655,8 @@ while(redo)
   var hash=0;
   var dtyluptr=`+dateToYearLUTab()+`;
   var dtyby=1970;
+  var ljoin=`+this.hasljoin+`;
+  var odidonce=0;
   `+core+`
   function setsize(size){
     size=size|0;
@@ -1164,24 +1175,36 @@ function max(p){
 }
 function count(p){
   unique=uniqueVarCounter++;
-  type = 0;
-  varname="count"+unique;
+  var type = 0;
+  var varname="count"+unique;
+  var checknull=""
+  if ((theGeneratingAB.hasljoin >0) &  p!="*"){
+    var tab=daSchema.getParent(p,qc(this));
+    if (theGeneratingAB.fromA.indexOf(tab)<0)
+      checknull="if (trav_"+tab+" !=-666) "; // is not NULL
+  }
   return `dec:var `+varname+`=0;::
   post:res.addCol2('count(`+p+`)',`+type+`);::
   preexek:`+varname+`=0;::
-  exec:`+varname+`=`+varname+`+1|0;::
-  execg:`+varname+`=`+varname+`+1|0;::
+  exec: `+checknull+varname+`=`+varname+`+1|0;::
+  execg:`+checknull+varname+`=`+varname+`+1|0;::
   postexek:mem32[(temps+(tempsptr<<2))>>2]=`+varname+`;tempsptr= (tempsptr + 1 )|0;::`;
 }
 function countif(p,cond){
   unique=uniqueVarCounter++;
   type = 0;
   varname="count"+unique;
+  var checknull=""
+  if ((theGeneratingAB.hasljoin >0) &  p!="*"){
+    var tab=daSchema.getParent(p,qc(this));
+    if (theGeneratingAB.fromA.indexOf(tab)<0)
+      checknull="if (trav_"+tab+" !=-666) "; // is not NULL
+  }
   return `dec:var `+varname+`=0;::
   post:res.addCol2('count(`+p+`)',`+type+`);::
   preexek:`+varname+`=0;::
-  exec: if(`+cond+`)`+varname+`=`+varname+`+1|0;::
-  execg:if(`+cond+`)`+varname+`=`+varname+`+1|0;::
+  exec: if(`+cond+`)`+checknull+varname+`=`+varname+`+1|0;::
+  execg:if(`+cond+`)`+checknull+varname+`=`+varname+`+1|0;::
   postexek:mem32[(temps+(tempsptr<<2))>>2]=`+varname+`;tempsptr= (tempsptr + 1 )|0;::`;
 }
 function sum(p){
