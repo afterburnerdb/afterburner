@@ -957,6 +957,11 @@ function gt(p1,p2){
 function between(p1,p2,p3){
   return '('+ gte(p1,p2) + '&' + lte(p1,p3) + ')';
 }
+function isin(p1,list){
+  if (list.length==0) return "";
+  if (list.length==1) return eq(p1,list[0]);
+  return or(eq(p1,list[0]),isin(p1,list.splice(1)));
+}
 function eqlit(p1,p2){
 }
 function ltelit(p1,p2){
