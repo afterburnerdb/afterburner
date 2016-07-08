@@ -1199,7 +1199,12 @@ function div(p1,p2){
   return arith('/',p1,p2);
 }
 function as(p1,al){
- return 'as{'+p1+'~'+al+'}';
+  var oNameI=p1.indexOf("'",p1.indexOf("addCol2",0));
+  if (oNameI>-1){
+    var oNamelI=p1.indexOf("'",oNameI+1);
+    return p1.substring(0,oNameI+1) + al + p1.substring(oNamelI)
+  }
+  return 'as{'+p1+'~'+al+'}';
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
