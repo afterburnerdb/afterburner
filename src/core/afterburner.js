@@ -115,7 +115,16 @@ function Afterburner(){
       return this;
    }
   this.order = function(param, ...rest){
-    this.orderA.push(param);
+    if (typeof param == 'string'){
+      param= "\'"+param+"\'";
+      this.orderA.push(param);
+    } else if (typeof param== 'number'){
+      this.orderA.push(param);
+    } else if (typeof param == 'object'){//consider removing
+      for (var i=0; i<param.length; i++)
+        this.order(param[i]);
+    }
+      
     if (rest.length>0)
       return this.order(rest[0], ...rest.splice(1));
     else 

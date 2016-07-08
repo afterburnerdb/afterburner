@@ -81,11 +81,10 @@ function queryResult(tempsptr) {
             if (typeof toSort[a] == 'string'){
               if (toSort[a][0]=='-'){
                 sign="-";osgn="+";
+                toSort[a]=toSort[a].substring(1);
               }
-              toSort[a]=toSort[a].substring(1,toSort[a].length);
               toSort[a]=this.colnames.indexOf(toSort[a]);
-            }
-            else{
+            } else{
                if (toSort[a] < 0){
                 sign="-";osgn="+";
                 toSort[a]=-toSort[a];
