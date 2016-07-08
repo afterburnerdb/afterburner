@@ -891,10 +891,10 @@ function like_has(strp, strlit){
   }
   snake= snake.substring(0,snake.length-1);
   var fbody=`(strp){
-    strp|0;
+    strp=strp|0;
     var len=0;
     var i=0;
-    len=strlen(strp);
+    len=strlen(strp)|0;
     while(1){
       if (len<(`+strlitlen+`+i)) return 0;
       if (`+snake+`) return 1;
@@ -918,7 +918,7 @@ function build_snake(strlit, islast){
   if (islast) fin='return 1';
 
   return `while(1){
-      if (len<(`+strlitlen+`+i)) return 0;
+      if ((len|0)<((`+strlitlen+`+i)|0)) return 0;
       if (`+snake+`) `+fin+`;
       i=(i+1)|0;
     }`;
@@ -932,11 +932,12 @@ function like_haslist(strp, list){
     snakes+=build_snake(list[i], i==(list.length-1))
   }
   var fbody=`(strp){
-    strp|0;
+    strp=strp|0;
     var len=0;
     var i=0;
-    len=strlen(strp);
+    len=strlen(strp)|0;
     `+snakes+`
+    return 0;
   }`;
   console.log('finished like_has');
   return "("+defun(fbody)+"("+strp+")|0)";
