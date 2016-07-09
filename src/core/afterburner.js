@@ -67,7 +67,7 @@ function Afterburner(){
         wildCard=wildCard.concat(daSchema.getChildAttributes(this.joinA[0]));
       console.log('wildCard joinA:'+ wildCard);
       } else{console.log("joinA.length==0")}
-      return this.field(wildCard[0], ...wildCard.splice(1));
+      return this.field(wildCard[0], ...wildCard.slice(1));
     }
     var alias=param;
     if (param.substring(0,2)=='as'){
@@ -94,14 +94,14 @@ function Afterburner(){
       this.fstr.push(param);
     }
     if (rest.length>0)
-      return this.field(rest[0], ...rest.splice(1));
+      return this.field(rest[0], ...rest.slice(1));
     else 
       return this;
   }
   this.where = function(param, ...rest){
     this.whereA.push(param);
     if (rest.length>0)
-      return this.where(rest[0], ...rest.splice(1));
+      return this.where(rest[0], ...rest.slice(1));
     else 
       return this;
   }
@@ -110,7 +110,7 @@ function Afterburner(){
     if (this.attsA.indexOf(param)<0)
       this.attsA.push(param);
     if (rest.length>0)
-      return this.group(rest[0], ...rest.splice(1));
+      return this.group(rest[0], ...rest.slice(1));
     else 
       return this;
    }
@@ -126,7 +126,7 @@ function Afterburner(){
     }
       
     if (rest.length>0)
-      return this.order(rest[0], ...rest.splice(1));
+      return this.order(rest[0], ...rest.slice(1));
     else 
       return this;
    }
@@ -743,10 +743,15 @@ env={'temps':temps,
 `
     if (purpose == 'fc')
       return code + `return res.firstCell()`;
+    else if (purpose == 'array')
+      return code + `return res.toArray()`;
     else if (purpose == 'mat')
       return code + `return res.registerTable()`;
     else 
       return code + debug;
+  }
+  this.toArray = function(){
+    return new Function('ignore', this.toString('array'))();
   }
   this.eval = function(){
     return new Function('ignore', this.toString('fc'))();
@@ -1063,7 +1068,7 @@ function between(p1,p2,p3){
 function isin(p1,list){
   if (list.length==0) return "";
   if (list.length==1) return eq(p1,list[0]);
-  return or(eq(p1,list[0]),isin(p1,list.splice(1)));
+  return or(eq(p1,list[0]),isin(p1,list.slice(1)));
 }
 function eqlit(p1,p2){
 }

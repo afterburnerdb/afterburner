@@ -186,7 +186,7 @@ function queryResult(tempsptr) {
           } else if (this.coltypes[ii]==1){
             ret=ret+memF32[(this.cols[ii] +(i<<2))>>2]+ "\t|\t";
           } else if (this.coltypes[ii]==2){
-            ret=ret+strToString(mem32[this.cols[ii]+(i<<2)])+ "\t|\t";
+            ret=ret+strToString(mem32[(this.cols[ii] +(i<<2))>>2])+ "\t|\t";
           } else if (this.coltypes[ii]==3){
             ret=ret+int_to_strdate(mem32[(this.cols[ii] + (i<<2))>>2])+ "\t|\t";
           } else if (this.coltypes[ii]==4){
@@ -203,7 +203,29 @@ function queryResult(tempsptr) {
     this.toString= function() {
       return this.toStringN(1/0);
     };
-    this.firstCell= function() {
+    this.toArray= function() {
+      if (inNode){
+        require('common.js');
+      }
+      var ret=[];
+      for (var i=0;(i<this.numrows);i++){
+          if (this.coltypes[0]==0){
+            ret.push(mem32[(this.cols[0]+(i<<2))>>2]);
+          } else if (this.coltypes[0]==1){
+            ret.push(memF32[(this.cols[0]+(i<<2))>>2]);
+          } else if (this.coltypes[0]==2){
+            ret.push(strToString([(this.cols[0]+(i<<2))>>2]));
+          } else if (this.coltypes[0]==3){
+            ret.push(int_to_strdate(mem32[(this.cols[0]+(i<<2))>>2]));
+          } else if (this.coltypes[0]==4){
+            ret.push(int_to_strchar(mem32[(this.cols[0]+(i<<2))>>2]));
+          } else{
+            alert("unkown type");
+          }
+      }
+      return ret;
+    };
+    this.firsCell = function(){
       if (inNode){
         require('common.js');
       }
@@ -222,8 +244,8 @@ function queryResult(tempsptr) {
             alert("unkown type");
           }
       return ret;
-    };
-
+      
+    }
     this.registerTable = function(){
       var ds = new dataSource(this);
       daSchema.addTable(new aTable(ds));
