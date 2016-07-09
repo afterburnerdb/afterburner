@@ -225,7 +225,7 @@ function queryResult(tempsptr) {
       }
       return ret;
     };
-    this.firsCell = function(){
+    this.firstCell = function(){
       if (inNode){
         require('common.js');
       }
