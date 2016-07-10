@@ -1082,13 +1082,23 @@ function gtlit(p1,p2){
 }
 function betweenlit(p1,p2,p3){
 }
-function or(p1,p2){
-  return '(' + p1 + '|' +p2 + ')';
-}
-function and(p1,p2){
-  return '(' + p1 + '&' +p2 + ')';
-}
+function or(p1,p2, ...rest){
+  if (rest.length>0)
+    return or(p1, or(p2,rest[0], ...rest.slice(1)));
+  else if (p2)
+    return '((' + p1 + ')|(' +p2 + '))';
+  else
+    return '(' + p1 + ')';
 
+}
+function and(p1,p2, ...rest){
+  if (rest.length>0)
+    return and(p1, and(p2,rest[0], ...rest.slice(1)));
+  else if (p2)
+    return '((' + p1 + ')&(' +p2 + '))';
+  else
+    return '(' + p1 + ')';
+}
 function compare(op,p1,p2){
   var p1b=daSchema.bindCol(p1,qc(this));
   var p2b=daSchema.bindCol(p2,qc(this));

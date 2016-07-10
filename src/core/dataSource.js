@@ -57,7 +57,7 @@ handyColTypes["part"]=[
 2,
 2,
 0,
-4,
+2,
 1,
 2];
 handyColNames["supplier"]=[
