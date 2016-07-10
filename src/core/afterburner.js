@@ -16,6 +16,7 @@ function Afterburner(){
     this.onA=[];
     this.joinP='';
     this.hasljoin=0;
+    this.hasin=0;
     this.attsA=[];
     this.fstr=[];
     this.aggsA=[];
@@ -52,11 +53,18 @@ function Afterburner(){
     this.hasljoin=1;
     return this.join(param);
   }
+  this.infrom = function(param){
+    this.hasin=1;
+    return this.join(param);
+  }
   this.on = function(param1, param2){
     this.onA.push(param1);
     this.onA.push(param2);
     this.joinP=eq(param1,param2);
     return this;
+  }
+  this.isin = function(param1,param2){
+    return this.on(param1,param2)
   }
   this.field = function(param, ...rest){
     if (param == '*'){
@@ -191,6 +199,7 @@ function Afterburner(){
        join:odidonce=0;::
        join:while(currb | (ljoin & (!odidonce)) ){ ::
        join:  if (currb){::    
+       join:    if (hasin& odidonce) break;::
        join:    if ((curr|0)>=(mem32[currb>>2]|0)){::
        join:      if (currb=mem32[(currb+(((hash1BucketSize+1)|0)<<2)|0)>>2]|0){::
        join:        curr=1;::
@@ -665,6 +674,7 @@ while(redo)
   var dtyluptr=`+dateToYearLUTab()+`;
   var dtyby=1970;
   var ljoin=`+this.hasljoin+`;
+  var hasin=`+this.hasin+`;
   var odidonce=0;
   `+core+`
   function setsize(size){
