@@ -1378,14 +1378,20 @@ function expandStrLitComp(strp, strlit){
   ret="";
   c=0;
   for (var i=0;i<quartets;i++){
+    if((c==strlit.length)){
+        ret+='((mem8[(('+strp+' + ('+i+'<<2))|0)]|0)==0)&';
+    }
+    else{
     intval=(strlit.charCodeAt(c++)||0)+
            ((strlit.charCodeAt(c++)||0)<<8)+
            ((strlit.charCodeAt(c++)||0)<<16)+
            ((strlit.charCodeAt(c++)||0)<<24);
         ret+='((mem32[(('+strp+' + ('+i+'<<2))|0)>>2]|0)==('+intval+'|0))&';
+    }
   }
   return ret.substring(0,ret.length-1);
 }
+
 function expandLitComp(op,type,bp,lp){
   if (type==1){
     lp= '(+('+lp+'))';
