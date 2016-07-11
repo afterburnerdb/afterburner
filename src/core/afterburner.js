@@ -102,17 +102,17 @@ function Afterburner(){
     var alias=param;
     if (param.substring(0,2)=='as'){
       alias=param.substring(param.indexOf('~')+1,param.indexOf('}'));
-      param=param.substring(param.indexOf('{')+1,param.indexOf('~'));
+    param=param.substring(param.indexOf('{')+1,param.indexOf('~'));
     }
     if (boundAtt=bindCol(param)){
-      var type= typeCol(param);
-      this.attsA.push(param);
-      if (typeCol(param)!==1)
-        this.fstr.push(`exec:mem32[(temps+(tempsptr<<2))>>2]=`+bindCol(param)+`;tempsptr= (tempsptr + 1 )|0;::
-                        postexek:mem32[(temps+(tempsptr<<2))>>2]=`+bindCol(param)+`;tempsptr= (tempsptr + 1 )|0;::`);
+    var type= typeCol(param);
+    this.attsA.push(param);
+    if (typeCol(param)!==1)
+    this.fstr.push(`exec:mem32[(temps+(tempsptr<<2))>>2]=`+bindCol(param)+`;tempsptr= (tempsptr + 1 )|0;::
+    postexek:mem32[(temps+(tempsptr<<2))>>2]=`+bindCol(param)+`;tempsptr= (tempsptr + 1 )|0;::`);
       else 
-        this.fstr.push(`exec:memF32[(temps+(tempsptr<<2))>>2]=`+bindCol(param)+`;tempsptr= (tempsptr + 1 )|0;::
-                        postexek:memF32[(temps+(tempsptr<<2))>>2]=`+bindCol(param)+`;tempsptr= (tempsptr + 1 )|0;::`);
+      this.fstr.push(`exec:memF32[(temps+(tempsptr<<2))>>2]=`+bindCol(param)+`;tempsptr= (tempsptr + 1 )|0;::
+      postexek:memF32[(temps+(tempsptr<<2))>>2]=`+bindCol(param)+`;tempsptr= (tempsptr + 1 )|0;::`);
 
       this.resA.push("res.addCol2('"+alias+"',"+type+");");
     } else {
@@ -894,7 +894,8 @@ function tabSize(tabname){
 }
 function bindCol(colname){
   var ocolname=colname;
-  if (parseFloat(colname) == colname) return colname;
+  //if (parseFloat(colname) == colname && typeof colname == 'number') return colname;
+  if (typeof colname == 'number') return colname;
   if ((colname != null) && typeof colname == 'string' && colname.indexOf('pb')==0){
     if (colname.indexOf('pb$')==0)
       return colname.substring(3,colname.length);
@@ -1203,9 +1204,15 @@ function between(p1,p2,p3){
   return '('+ gte(p1,p2) + '&' + lte(p1,p3) + ')';
 }
 function isin(p1,list){
+  var ret="";
   if (list.length==0) return "";
   if (list.length==1) return eq(p1,list[0]);
-  return or(eq(p1,list[0]),isin(p1,list.slice(1)));
+  if (isPreBoundString(p1)){
+   console.log("@isin: prebountstring:"+ p1);
+   var p1b=p1.substring(3);
+   ret='((isintmpstr='+p1b+')&0)|';
+  }
+  return ret+or(eq('pb$((isintmpstr))',list[0]),isin('pb$((isintmpstr))',list.slice(1))) + "";
 }
 function eqlit(p1,p2){
 }
@@ -1241,14 +1248,25 @@ function compare(op,p1,p2){
   var p2b=bindCol(p2);
   var p1t=typeCol(p1);
   var p2t=typeCol(p2);
-  if (p1b && p2b){
+  console.log("@compare: p11:"+p1 + "p1t" + p1t);
+  console.log("@compare: p1b:"+p1b + "p1t" + p1t);
+  console.log("@compare: p2t:"+p2 + "p2t" + p2t);
+
+
+  if (p1b && p2b && p1t==2 && p2t==2 && op=='=='){
+    console.log("compare two strp's")
+    return '(mystrcp(' +p1b+ op + p2b+')|0)';
+  } else if (p1b && p2b){
+    console.log("compare two number variables")
     return '(' +p1b+ op + p2b+')';
   } else if (p1b){
+    console.log("compare strp with ?")
     if ((typeof p2) == 'string' && (op == '==')){
-      if (p1t == 2)
+      if ((p1t == 2) || isPreBoundString(p1))
         return expandStrLitComp(p1b,p2);
-      else if (p1t == 4 && p2.length==1)
+      else if (p1t == 4 && p2.length==1){
         return expandLitComp(op,p1t,p1b,p2.charCodeAt(0));
+      }
       else 
         badFSQL('@compare');
     } else {
@@ -1271,6 +1289,18 @@ function compare(op,p1,p2){
     return '(' +p1+ op + p2+')';
   }
 }
+
+function isPreBound(p1){
+  return isPreBoundString(p1) || isPreBoundNumber(p1) ;
+}
+function isPreBoundString(p1){
+   return p1.indexOf('pb$')==0 ;
+}
+function isPreBoundNumber(p1){
+   return p1.indexOf('pb$')<0 && p1.indexOf('pb')==0 ;
+}
+
+
 function substring(p1,n,m){
   var p1b=bindCol(p1);
   var p1t=typeCol(p1);
@@ -1280,7 +1310,7 @@ function substring(p1,n,m){
     badFSQL('@substring invalid substring range')
   } 
   else {
-    return 'pb$(substr(' + p1b + ','+n+','+m+'))|0';
+    return 'pb$(substr(' + p1b + ','+n+','+m+')|0)';
   }
 }
 function toYear(p1){
