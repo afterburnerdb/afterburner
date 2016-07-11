@@ -49,8 +49,12 @@ function aSchema(){
     if (typeof qtabs == 'undefined'){
       console.log('qtabs is undefined');
     }
-    if ((colname != null) && typeof colname == 'string' && colname.indexOf('pb')==0)
-      return 1;
+    if ((colname != null) && typeof colname == 'string' && colname.indexOf('pb')==0){
+      if (colname.indexOf('pb$')==0)
+        return 2;
+      else 
+        return 1;
+    }
     for (var i=0;i<this.tables.length;i++){
       var ret=this.tables[i].getColTypeByName(colname);
       if (ret > -1){

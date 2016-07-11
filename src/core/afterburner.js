@@ -677,6 +677,8 @@ while(redo)
   var coltypesp=-1;
   var tempsptr=0;
   var temps=env.temps|0;
+  var storedB=env.storedB|0;
+  var malloc_ctr=0;
   var hashBitFilter=env.hashBitFilter|0;
   var h1bb=env.h1bb|0;
   var h2bb=env.h2bb|0;
@@ -750,6 +752,41 @@ while(redo)
       i=(i+1)|0;
     return i|0;
   };
+  function substr(str,n,m){
+    str=str|0;
+    n=n|0;
+    m=m|0;
+    var dst=0;
+    var i=0;
+    dst=malloc((m-n+1)|0)|0; 
+  //  strncpy(dst,str+n,m-n);
+    while(i<(m-n)){
+      mem8[(dst+i)|0]=mem8[(str+n+i)|0]|0;
+      i=(i+1)|0;
+    }
+    mem8[(dst+i)|0]=0;
+    return dst|0;
+  }
+//  function strncpy(dst,src,n){
+//    dst=dst|0;
+//    src=src|0;
+//    m-n
+//    var i=0;
+//  }
+  function malloc(size){
+    size=size|0;
+    var size4b=0;
+    var ret=0;
+    if (size<1) return storedB;
+    size4b=(((((size-1)|0)>>2)+1)|0)<<2;
+    ret=storedB;
+    malloc_ctr=(malloc_ctr+size4b)|0;
+    storedB= (storedB+size4b)|0;
+    return ret|0;
+  }
+  function mallocout(){
+    return malloc_ctr|0;
+  }
   function intDayToYear(day){
     day=day|0;
     var fg=0;
@@ -764,13 +801,15 @@ while(redo)
     return ret |0;
   };
   `+funs.join('\n')+`
-  return {runner:runner}
+  return {runner:runner,
+          mallocout:mallocout}
 });
 
 /*intro:*/
 `+ots+`
 //for (zz=0;zz<100;zz++){
 env={'temps':temps,
+'storedB':storedB,
 'hashBitFilter':hashBitFilter,
 'h1bb':h1bb,
 'h2bb':h2bb,
@@ -783,6 +822,7 @@ env={'temps':temps,
 'hash3BucketSize':hash3BucketSize};
   asmi = new asm(`+windowORglobal+`, env,mem);
   rp=asmi.runner();
+  malloc(asmi.mallocout());
   `+qrunner+`
   `+posts+`
   res.transpose([`+this.orderA+`]);
@@ -856,7 +896,10 @@ function bindCol(colname){
   var ocolname=colname;
   if (parseFloat(colname) == colname) return colname;
   if ((colname != null) && typeof colname == 'string' && colname.indexOf('pb')==0){
-    return colname.substring(2,colname.length);
+    if (colname.indexOf('pb$')==0)
+      return colname.substring(3,colname.length);
+    else 
+      return colname.substring(2,colname.length);
   }
 
   var resolved=resolve(colname);
@@ -1228,7 +1271,18 @@ function compare(op,p1,p2){
     return '(' +p1+ op + p2+')';
   }
 }
-
+function substring(p1,n,m){
+  var p1b=bindCol(p1);
+  var p1t=typeCol(p1);
+  if (p1t!=2){
+    badFSQL('@substring', p1 + 'is not a string')
+  }else if (n>=m){
+    badFSQL('@substring invalid substring range')
+  } 
+  else {
+    return 'pb$(substr(' + p1b + ','+n+','+m+'))|0';
+  }
+}
 function toYear(p1){
   var p1b=bindCol(p1);
   var p1t=typeCol(p1);
