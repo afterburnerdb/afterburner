@@ -12,7 +12,7 @@ return ABi.select()
     avg('l_extendedprice'),
     avg('l_discount'),
     count('*'))
-  .where(leq('l_shipdate',date('1998-09-02')))
+  .where(lte('l_shipdate',date('1998-09-02')))
   .group('l_returnflag','l_linestatus')
   .order([0,1])
 }

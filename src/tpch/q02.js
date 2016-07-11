@@ -29,7 +29,7 @@ function query02(){
     .materialize();
   
   return ABi.select()
-  .from(mincost).join(tin).on("min(ps_supplycost)","ps_supplycost")
+  .from(mincost).join(brass).on("min(ps_supplycost)","ps_supplycost")
   .field( "s_name","s_acctbal", "n_name", "p_partkey", "p_mfgr", "s_address", "s_phone", "s_comment")
   .order([-1,2,0,3])
   .limit(100);
