@@ -44,7 +44,7 @@ function queryResult(tempsptr) {
       this.numrows=this.tempsptr/this.numcols;
       for (c=0;c<this.numcols;c++)
         this.cols.push(malloc(this.numrows<<2));
-      if (!toSort){
+      if (!toSort | toSort.length==0){
         for (var r=0;r<this.numrows;r++){
           for (var c=0;c<this.numcols;c++){
             mem32[(this.cols[c] + (r<<2))>>2]=

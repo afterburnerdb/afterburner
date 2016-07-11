@@ -25,6 +25,8 @@ function Afterburner(){
     this.orderA=[];
     this.limitA=-1;
     this.resA=[];
+    this.als2tab={};
+    this.tab2als={};
     funs=[];
     theGeneratingAB=this;
     return this;
@@ -32,21 +34,23 @@ function Afterburner(){
 //////////////////////////////////////////////////////////////////////////////
 //API
   this.from = function(param){
-    if (daSchema.getTable(param)){
-      this.fromA.push(param);
+    var atab=this.tabAliasif(param);
+    if (daSchema.getTable(atab.tab)){
+      this.fromA.push(atab.als);
       return this;
     }
     else {
-      badFSQL('@from', param +' is not a table')
+      badFSQL('@from', atab.tab +' is not a table')
     }
   }
   this.join = function(param){
-    if (daSchema.getTable(param)){
-      this.joinA.push(param);
+    var atab=this.tabAliasif(param);
+    if (daSchema.getTable(atab.tab)){
+      this.joinA.push(atab.als);
       return this;
     }
     else {
-      badFSQL('@join', param +' is not a table')
+      badFSQL('@join', atab.tab +' is not a table')
     }
   }
   this.ljoin = function(param){
@@ -56,6 +60,19 @@ function Afterburner(){
   this.infrom = function(param){
     this.hasin=1;
     return this.join(param);
+  }
+  this.tabAliasif = function(param){
+    if (param.substring(0,2)=='as'){
+      var alias=param.substring(param.indexOf('~')+1,param.indexOf('}'));
+      param=param.substring(param.indexOf('{')+1,param.indexOf('~'));
+      this.als2tab[alias]=param;
+      this.tab2als[alias]=param;
+      return {tab:param, als:alias}
+    }else{
+      this.als2tab[param]=param
+      this.tab2als[param]=param
+      return {tab:param, als:param}
+    }
   }
   this.on = function(param1, param2){
     this.onA.push(param1);
@@ -70,30 +87,25 @@ function Afterburner(){
     if (param == '*'){
       console.log('select *');
       var wildCard=daSchema.getChildAttributes(this.fromA[0]);
-      console.log('wildCard fromA:'+ wildCard);
       if (this.joinA.length > 0){
         wildCard=wildCard.concat(daSchema.getChildAttributes(this.joinA[0]));
-      console.log('wildCard joinA:'+ wildCard);
       } else{console.log("joinA.length==0")}
       return this.field(wildCard[0], ...wildCard.slice(1));
     }
     var alias=param;
     if (param.substring(0,2)=='as'){
-      console.log('has alias');
       alias=param.substring(param.indexOf('~')+1,param.indexOf('}'));
       param=param.substring(param.indexOf('{')+1,param.indexOf('~'));
-      console.log('alias:'+alias);
-      console.log('param:'+param);
     }
-    if (boundAtt=daSchema.bindCol(param,qc(this))){
-      type= daSchema.getColTypeByName(param,qc(this));
+    if (boundAtt=bindCol(param)){
+      var type= typeCol(param);
       this.attsA.push(param);
-      if (daSchema.getColTypeByName(param,qc(this))!==1)
-        this.fstr.push(`exec:mem32[(temps+(tempsptr<<2))>>2]=`+daSchema.bindCol(param,qc(this))+`;tempsptr= (tempsptr + 1 )|0;::
-                        postexek:mem32[(temps+(tempsptr<<2))>>2]=`+daSchema.bindCol(param,qc(this))+`;tempsptr= (tempsptr + 1 )|0;::`);
+      if (typeCol(param)!==1)
+        this.fstr.push(`exec:mem32[(temps+(tempsptr<<2))>>2]=`+bindCol(param)+`;tempsptr= (tempsptr + 1 )|0;::
+                        postexek:mem32[(temps+(tempsptr<<2))>>2]=`+bindCol(param)+`;tempsptr= (tempsptr + 1 )|0;::`);
       else 
-        this.fstr.push(`exec:memF32[(temps+(tempsptr<<2))>>2]=`+daSchema.bindCol(param,qc(this))+`;tempsptr= (tempsptr + 1 )|0;::
-                        postexek:memF32[(temps+(tempsptr<<2))>>2]=`+daSchema.bindCol(param,qc(this))+`;tempsptr= (tempsptr + 1 )|0;::`);
+        this.fstr.push(`exec:memF32[(temps+(tempsptr<<2))>>2]=`+bindCol(param)+`;tempsptr= (tempsptr + 1 )|0;::
+                        postexek:memF32[(temps+(tempsptr<<2))>>2]=`+bindCol(param)+`;tempsptr= (tempsptr + 1 )|0;::`);
 
       this.resA.push("res.addCol2('"+alias+"',"+type+");");
     } else {
@@ -146,14 +158,14 @@ function Afterburner(){
 //EXPANDS
   this.expandFrom = function(){
   var fromTab=this.fromA[0];
-  var tabLen=daSchema.getTabSizeByName(fromTab);
+  var tabLen=tabSize(fromTab);
   var filter=this.expandFilter();
   return `dec:var trav_`+fromTab+`=-1;:: 
 	 loop: while(1){ trav_`+fromTab+`=trav_`+fromTab+`+1|0; if ((trav_`+fromTab+`|0) >= `+tabLen+`) break; `+filter+`  ::`;
   }
   this.expandJoin = function(){
   var jTab=this.joinA[0];
-  var tabLen=daSchema.getTabSizeByName(jTab);
+  var tabLen=tabSize(jTab);
   var pbfilter=this.expandPreBuildJFilter();
   var ppfilter=this.expandPostProbeJFilter();
   return  `
@@ -164,7 +176,7 @@ function Afterburner(){
    pre:  }::
    dec:var trav_`+jTab+`=-1;::
    pre:trav_`+jTab+`=-1; while(1){trav_`+jTab+`=trav_`+jTab+`+1|0; if((trav_`+jTab+`|0)>=`+tabLen+`) break; `+pbfilter+`;::
-   pre:  hk=((`+daSchema.bindCol(this.onA[1],qc(this))+`) & (hashBitFilter|0))|0;::
+   pre:  hk=((`+bindCol(this.onA[1])+`) & (hashBitFilter|0))|0;::
    pre:  if (obp=mem32[((h1bb+(hk<<2))|0)>>2]|0){::
    pre:    //while(mem32[((bp+(((hash1BucketSize+1)|0)<<2))|0)>>2]|0){::
    pre:      bp= mem32[((obp+(((hash1BucketSize+2)|0)<<2))|0)>>2]|0;::
@@ -192,7 +204,7 @@ function Afterburner(){
    pre:  mem32[bp>>2]=tmp;::
    pre:  mem32[((bp+(tmp<<2))|0)>>2]= trav_`+jTab+`|0;::
    pre:}::
-       prej:hk=`+daSchema.bindCol(this.onA[0],qc(this))+`;::
+       prej:hk=`+bindCol(this.onA[0])+`;::
        prej:currb=-1;::
        prej:curr=0;::
        prej:currb=mem32[((h1bb+(hk<<2))|0)>>2]|0;::
@@ -268,10 +280,10 @@ function Afterburner(){
     daConts="(";
     daHash="((";
     daHashn="(hk=(";
-    for(var i=0;i<this.attsA.length;i++){
-      daConts+=contbind(this.attsA[i]) + "|";
-      daHash+= "("+gbind(this.attsA[i]) + "<<" + (i*7)%11 + ")+";
-      daHashn+= gbindn(this.attsA[i]) + "+"
+    for(var i=0;i<this.groupA.length;i++){
+      daConts+=contbind(this.groupA[i]) + "|";
+      daHash+= "("+gbind(this.groupA[i]) + "<<" + (i*7)%11 + ")+";
+      daHashn+= gbindn(this.groupA[i]) + "+"
     }
     daConts=daConts.substring(0,daConts.length-2);
     daConts+=")|0)";
@@ -323,10 +335,10 @@ function Afterburner(){
     daConts="(";
     daHash="((";
     daHashn="(hk=(";
-    for(var i=0;i<this.attsA.length;i++){
-      daConts+=contbind(this.attsA[i]) + "|";
-      daHash+= "("+gbind(this.attsA[i]) + "<<" + (i*7)%11 + ")+";
-      daHashn+= gbindn(this.attsA[i]) + "+"
+    for(var i=0;i<this.groupA.length;i++){
+      daConts+=contbind(this.groupA[i]) + "|";
+      daHash+= "("+gbind(this.groupA[i]) + "<<" + (i*7)%11 + ")+";
+      daHashn+= gbindn(this.groupA[i]) + "+"
     }
     daConts=daConts.substring(0,daConts.length-2) + ")|0)";
     daHash=daHash.substring(0,daHash.length-1) + "&hashBitFilter)|0)";
@@ -772,6 +784,118 @@ env={'temps':temps,
 }
 //////////////////////////////////////////////////////////////////////////////
 //MISC
+function resolve(colname){
+    var qcontext=qc(this);
+    var tabs=qcontext.tabs.slice(0);
+    var alias;
+    if (typeof colname == 'string'){
+      if (colname.indexOf('.')>-1) {
+        var maybeA= colname.split('.')[0];
+        if (qc().als2tab[maybeA] != 'undefined'){
+          alias=maybeA;
+          tabs=[alias];
+          colname=colname.split('.')[1];
+          tabs=[qcontext.als2tab[alias]]
+         }
+      }
+    }
+    var ret={tabs:tabs , col:colname, als:alias};
+    console.log("@resolve: tabs:"+tabs+" col:"+colname+" alias:"+alias);
+    return ret;
+  }
+function pointCol(colname){
+  var ocolname=colname;
+  var resolved=resolve(colname);
+  return daSchema.getColPByName(resolved.col, resolved.tabs)
+}
+function typeCol(colname){
+  var resolved=resolve(colname);
+  return daSchema.getColTypeByName(resolved.col, resolved.tabs)
+}
+function col2trav(colname){
+  var ret;
+  var resolved=resolve(colname);
+  if (typeof resolved.als !='undefined'){
+    ret=resolved.als;
+  } else{
+    var tabname=daSchema.getParent(colname,qt(this));
+    ret= qc().tab2als[tabname];
+  }
+  return ret;
+}
+function tabSize(tabname){
+  return daSchema.getTabSizeByName(qc().als2tab[tabname]);
+}
+function bindCol(colname){
+  var ocolname=colname;
+  if (parseFloat(colname) == colname) return colname;
+  if ((colname != null) && typeof colname == 'string' && colname.indexOf('pb')==0){
+    return colname.substring(2,colname.length);
+  }
+
+  var resolved=resolve(colname);
+  ctype=typeCol(colname)
+  cptr=pointCol(colname,qt(this))
+  if (ctype==0 || ctype==2 || ctype==3 || ctype==4)
+    return '(mem32[(('+cptr+' +(trav_'+col2trav(colname)+'<<2))|0)>>2]|0)';
+  if (ctype==1)
+    return '+(memF32[(('+cptr+' +(trav_'+col2trav(colname)+'<<2))|0)>>2])';
+  badFSQL("@bindCol","could not bind:" + ocolname);
+}
+
+function obindCol(colname){
+  var bound=bindCol(colname);
+  return bound.replace("trav","otrav");
+}
+
+function contbind(pfield) {
+  console.log("@contbind:"+pfield);
+  var bound= bindCol(pfield);
+  var obound= obindCol(pfield);
+  var type= typeCol(pfield);
+  var travname='trav';
+  if ((type==0) || (type==3) || (type==4))
+    return "(("+obound+"|0)-("+bound+")|0)";
+  else if (type==1){
+    var ppfield= pointCol(pfield);
+    var trav= col2trav(pfield);
+    return "((mem32[("+ppfield+"+ (otrav_"+trav+"<<2)) >>2]|0)-(mem32[("+ppfield+"+ (otrav_"+trav+"<<2)) >>2]|0))"
+  }
+  else if (type==2)
+    return "(mystrcmp("+obound+","+bound+")|0)";
+//  else throw new Error "filter does not support datatype:" + type;
+}
+
+function gbind(pfield) {
+  var ppfield= pointCol(pfield);
+  var type= typeCol(pfield);
+  var trav= col2trav(pfield);
+  var ret='ERROR AT gbind';
+  if ((type==0) || (type==3) || (type==4))
+    ret ="((mem32[("+ppfield+"+ (trav_"+trav+"<<2)) >>2]|0))";
+  else if (type==1)
+    ret ="(((mem32[("+ppfield+"+ (trav_"+trav+"<<2)) >>2]|0))^(((mem32[("+ppfield+"+ (trav_"+trav+"<<2))>>2]|0)>>16)))";
+  else if (type==2)
+    ret ="((hash_str(mem32[("+ppfield+"+ (trav_"+trav+"<<2)) >>2]|0)|0))";
+  return ret;
+//  else throw new Error "filter does not support datatype:" + type;
+}
+
+function gbindn(pfield) {
+  var ppfield= pointCol(pfield);
+  var type= typeCol(pfield);
+  var travname= col2trav(pfield);
+  var ret="ERROR AT gbindn";
+  if ((type==0) || (type==1) || (type==3) || (type==4))
+    ret= "(hash_int(mem32[("+ppfield+"+ (trav_"+travname+"<<2))>>2]),h)";
+  else if (type==2)
+    ret= "(hashn_strp(mem32[("+ppfield+"+ (trav_"+travname+"<<2)) >>2]),h)";
+  return ret;
+//  else throw new Error "filter does not support datatype:" + type;
+}
+
+
+
 function extractfrom(fromtext,what,opt,filt){
   ret="";
   if (!fromtext) return ret;
@@ -792,70 +916,8 @@ function extractfrom(fromtext,what,opt,filt){
     }
     return ret;
   }
-
-    return lines;
+  return lines;
 }
-
-function contbind(pfield) {
-  var bound= daSchema.bindCol(pfield,qc(this));
-  var obound= daSchema.obindCol(pfield,qc(this));
-  var type= daSchema.getColTypeByName(pfield,qc(this));
-  var travname='trav';
-  if ((type==0) || (type==3) || (type==4))
-    return "(("+obound+"|0)-("+bound+")|0)";
-  else if (type==1){
-    var ppfield= daSchema.getColPByName(pfield,qc(this));
-    var tab= daSchema.getParent(pfield,qc(this));
-    return "((mem32[("+ppfield+"+ (otrav_"+tab+"<<2)) >>2]|0)-(mem32[("+ppfield+"+ (otrav_"+tab+"<<2)) >>2]|0))"
-  }
-  else if (type==2)
-    return "(mystrcmp("+obound+","+bound+")|0)";
-//  else throw new Error "filter does not support datatype:" + type;
-}
-
-function gbind_alt(pfield) {
-  var ppfield= daSchema.getColPByName(pfield,qc(this));
-  var type= daSchema.getColTypeByName(pfield,qc(this));
-  var tab= daSchema.getParent(pfield,qc(this));
-  var ret='ERROR AT gbind';
-  if ((type==0) || (type==3) || (type==4))
-    ret ="((mem32[("+ppfield+"+ (trav_"+tab+"<<2)) >>2]|0) & (hashBitFilter|0) )";
-  else if (type==1)
-    ret ="(((mem32[("+ppfield+"+ (trav_"+tab+"<<2)) >>2]|0)      & (hashBitFilter|0))^(((mem32[("+ppfield+"+ (trav_"+tab+"<<2)) >>2]|0)>>12) & (hashBitFilter|0))^(((mem32[("+ppfield+"+ (trav_"+tab+"<<2)) >>2]|0)>>20) & (hashBitFilter|0)))";
-  else if (type==2)
-    ret ="((hash_str(mem32[("+ppfield+"+ (trav_"+tab+"<<2)) >>2]|0)|0) & (hashBitFilter|0) )";
-  console.log('ret:'+ret);
-  return ret;
-//  else throw new Error "filter does not support datatype:" + type;
-}
-function gbind(pfield) {
-  var ppfield= daSchema.getColPByName(pfield,qc(this));
-  var type= daSchema.getColTypeByName(pfield,qc(this));
-  var tab= daSchema.getParent(pfield,qc(this));
-  var ret='ERROR AT gbind';
-  if ((type==0) || (type==3) || (type==4))
-    ret ="((mem32[("+ppfield+"+ (trav_"+tab+"<<2)) >>2]|0))";
-  else if (type==1)
-    ret ="(((mem32[("+ppfield+"+ (trav_"+tab+"<<2)) >>2]|0))^(((mem32[("+ppfield+"+ (trav_"+tab+"<<2))>>2]|0)>>12))^(((mem32[("+ppfield+"+ (trav_"+tab+"<<2))>>2]|0)>>20)))";
-  else if (type==2)
-    ret ="((hash_str(mem32[("+ppfield+"+ (trav_"+tab+"<<2)) >>2]|0)|0))";
-  return ret;
-//  else throw new Error "filter does not support datatype:" + type;
-}
-
-function gbindn(pfield) {
-  var ppfield= daSchema.getColPByName(pfield,qc(this));
-  var type= daSchema.getColTypeByName(pfield,qc(this));
-  var tab= daSchema.getParent(pfield,qc(this));
-  var ret="ERROR AT gbindn";
-  if ((type==0) || (type==1) || (type==3) || (type==4))
-    ret= "(hash_int(mem32[("+ppfield+"+ (trav_"+tab+"<<2))>>2]),h)";
-  else if (type==2)
-    ret= "(hashn_strp(mem32[("+ppfield+"+ (trav_"+tab+"<<2)) >>2]),h)";
-  return ret;
-//  else throw new Error "filter does not support datatype:" + type;
-}
-
 function buildLikeFun(strlit, likeFun){
   for (var i=0;i<strlit.length;i++){
     var currc=strlit.charCodeAt(i)
@@ -897,7 +959,6 @@ function defun(fbody){
   return funname;
 }
 function like_begins(strp,strlit){
-  console.log("@like_begins  strp:" + strp + " strlit:" + strlit);
   var ret="";
   var strlitlen=strlit.length;
   for (var i=0;i<strlitlen;i++){
@@ -907,7 +968,6 @@ function like_begins(strp,strlit){
   return ret.substring(0,ret.length-1);
 }
 function like_ends(strp, strlit){
-  console.log("@like_ends  strp:" + strp + " strlit:" + strlit);
   var ret="((tmpstrlen=(strlen("+strp+"))|0)|1)&";
   var c=0;
   var strlitlen=strlit.length;
@@ -936,11 +996,9 @@ function like_has(strp, strlit){
       i=(i+1)|0;
     }
   }`;
-  console.log('finished like_has');
   return "("+defun(fbody)+"("+strp+")|0)";
 }
 function build_snake(strlit, islast){
-  console.log("@build_snake  strlit:" + strlit + " islast" + islast);
   var strlitlen=strlit.length;
   if (strlit == 0) return "";
   var snake= "";
@@ -959,7 +1017,6 @@ function build_snake(strlit, islast){
     }`;
   }
 function like_haslist(strp, list){
-  console.log("@like_haslist  strp:" + strp + " list" + list);
   if (list.length == 0) return 0;
   var snakes="";
   for (var i=0;i<list.length;i++){
@@ -974,23 +1031,30 @@ function like_haslist(strp, list){
     `+snakes+`
     return 0;
   }`;
-  console.log('finished like_has');
   return "("+defun(fbody)+"("+strp+")|0)";
 }
 function qc(it){
-  if (typeof it !='undefined')
-     it=theGeneratingAB;
-  return it.fromA.concat(it.joinA);
+  //if (typeof it =='undefined')
+  it=theGeneratingAB;
+  var tables=[];
+  for(var i=0;i<it.fromA.length;i++)
+    tables.push(it.als2tab[it.fromA[i]]);
+  for(var i=0;i<it.joinA.length;i++)
+    tables.push(it.als2tab[it.joinA[i]]);
+  return {
+           tabs: tables,
+           als2tab: it.als2tab,
+           tab2als: it.tab2als
+         }
 }
-function badFSQL (where,what){
-  console.log("Bad Fluent SQL at: "+where+ ": " + what);
+function qt(it){
+  return qc(it).tabs;
 }
-
 //////////////////////////////////////////////////////////////////////////////
 //API
 function like(p1,strlit){
   var ret="";
-  var strp=daSchema.bindCol(p1,qc(this));
+  var strp=bindCol(p1);
   var numpct=(strlit.match(/\%/g) || []).length;
   var begins="";
   var ends="";
@@ -999,22 +1063,17 @@ function like(p1,strlit){
   
   var frst_pct=strlit.indexOf('%');
 
-  console.log('@like strlit:' + strlit.substring(last_pct+1));
   if  (frst_pct>0){
-    console.log('@like has begins:' + strlit.substring(0,frst_pct) );
     begins=like_begins(strp,strlit.substring(0,frst_pct));
     strlit=strlit.substring(frst_pct);
   }
 
-  console.log('@like strlit:' + strlit.substring(last_pct+1));
   var last_pct=strlit.lastIndexOf('%');
   if  (last_pct<(strlit.length-1)){
     ends=like_ends(strp,strlit.substring(last_pct+1));
     strlit=strlit.substring(0,last_pct+1);
-    console.log('@like has ends:' + ends);
   }
   
-  console.log('@like rest is:' + strlit );
   var lit_list=strlit.split('%');
   var rest_list=[];
   for (var i=0;i<lit_list.length;i++)
@@ -1025,7 +1084,6 @@ function like(p1,strlit){
   if (begins!= "") ret=begins;
   if (ends!="") ret+= '&'+ ends;
   if (rest!="") ret+= '&'+ rest;
-  console.log("finished like: ret=" + ret)
   if (ret[0]=='&') return ret.substring(1);
   return ret;
 } 
@@ -1110,11 +1168,10 @@ function and(p1,p2, ...rest){
     return '(' + p1 + ')';
 }
 function compare(op,p1,p2){
-  var p1b=daSchema.bindCol(p1,qc(this));
-  var p2b=daSchema.bindCol(p2,qc(this));
-  var p1t=daSchema.getColTypeByName(p1,qc(this));
-  var p2t=daSchema.getColTypeByName(p2,qc(this));
-
+  var p1b=bindCol(p1);
+  var p2b=bindCol(p2);
+  var p1t=typeCol(p1);
+  var p2t=typeCol(p2);
   if (p1b && p2b){
     return '(' +p1b+ op + p2b+')';
   } else if (p1b){
@@ -1147,8 +1204,8 @@ function compare(op,p1,p2){
 }
 
 function toYear(p1){
-  var p1b=daSchema.bindCol(p1,qc(this));
-  var p1t=daSchema.getColTypeByName(p1,qc(this));
+  var p1b=bindCol(p1);
+  var p1t=typeCol(p1);
   if (p1t!=3){
     badFSQL('@toYear', p1 + 'is not a date')
   } else {
@@ -1173,12 +1230,11 @@ function min(p){
   if ((p != null) && typeof p == 'string' && p.indexOf('pb')>-1){
     bound=p.substring(3,str.length);
   } else {
-    var ppfield= daSchema.getColPByName(p,qc(this));
-    bound=daSchema.bindCol(p,qc(this))
+    var ppfield= pointCol(p);
+    bound=bindCol(p)
   }
   var unique=uniqueVarCounter++;
-  var type= daSchema.getColTypeByName(p,qc(this));
-  var tab= daSchema.getParent(p,qc(this));
+  var type= typeCol(p);
   var varname="min"+unique
   return `dec:var `+varname+`=10000000000.1;::
   post:res.addCol2('min(`+p+`)',`+type+`);::
@@ -1193,12 +1249,11 @@ function max(p){
   if ((p != null) && typeof p == 'string' && p.indexOf('pb')>-1){
     bound=p.substring(3,str.length);
   } else {
-    var ppfield= daSchema.getColPByName(p,qc(this));
-    bound=daSchema.bindCol(p,qc(this))
+    var ppfield= pointCol(p);
+    bound=bindCol(p)
   }
   var unique=uniqueVarCounter++;
-  var type= daSchema.getColTypeByName(p,qc(this));
-  var tab= daSchema.getParent(p,qc(this));
+  var type= typeCol(p);
   var varname="max"+unique
   return `dec:var `+varname+`=-10000000000.1;::
   post:res.addCol2('max(`+p+`)',`+type+`);::
@@ -1213,9 +1268,9 @@ function count(p){
   var varname="count"+unique;
   var checknull=""
   if ((theGeneratingAB.hasljoin >0) &  p!="*"){
-    var tab=daSchema.getParent(p,qc(this));
-    if (theGeneratingAB.fromA.indexOf(tab)<0)
-      checknull="if (trav_"+tab+" !=-666) "; // is not NULL
+    var trav=col2trav(p);
+    if (theGeneratingAB.fromA.indexOf(trav)<0)
+      checknull="if (trav_"+trav+" !=-666) "; // is not NULL
   }
   return `dec:var `+varname+`=0;::
   post:res.addCol2('count(`+p+`)',`+type+`);::
@@ -1230,9 +1285,9 @@ function countif(p,cond){
   varname="count"+unique;
   var checknull=""
   if ((theGeneratingAB.hasljoin >0) &  p!="*"){
-    var tab=daSchema.getParent(p,qc(this));
-    if (theGeneratingAB.fromA.indexOf(tab)<0)
-      checknull="if (trav_"+tab+" !=-666) "; // is not NULL
+    var trav=col2trav(p);
+    if (theGeneratingAB.fromA.indexOf(trav)<0)
+      checknull="if (trav_"+trav+" !=-666) "; // is not NULL
   }
   return `dec:var `+varname+`=0;::
   post:res.addCol2('count(`+p+`)',`+type+`);::
@@ -1242,12 +1297,12 @@ function countif(p,cond){
   postexek:mem32[(temps+(tempsptr<<2))>>2]=`+varname+`;tempsptr= (tempsptr + 1 )|0;::`;
 }
 function sum(p){
-  var bound=daSchema.bindCol(p,qc(this));
+  var bound=bindCol(p);
   var unique=uniqueVarCounter++;
-  var type= daSchema.getColTypeByName(p,qc(this));
+  var type= typeCol(p);
   if ((type==0) || (type==3) || (type==4))
     bound=coerceFloat(bound);
-  var tab= daSchema.getParent(p,qc(this));
+  var trav= col2trav(p);
   var varname="sum"+unique
   return `dec:var `+varname+`=0.0;::
   post:res.addCol2('sum(`+p+`)',1);::
@@ -1257,12 +1312,12 @@ function sum(p){
   postexek:memF32[(temps+(tempsptr<<2))>>2]=+(`+varname+`);tempsptr= (tempsptr + 1 )|0;::`;
 }
 function sumif(p,cond){
-  var bound=daSchema.bindCol(p,qc(this));
+  var bound=bindCol(p);
   var unique=uniqueVarCounter++;
-  var type= daSchema.getColTypeByName(p,qc(this));
+  var type= typeCol(p);
   if ((type==0) || (type==3) || (type==4))
     bound=coerceFloat(bound);
-  var tab= daSchema.getParent(p,qc(this));
+  var trav= col2trav(p);
   var varname="sum"+unique
   return `dec:var `+varname+`=0.0;::
   post:res.addCol2('sum(`+p+`)',1);::
@@ -1272,12 +1327,12 @@ function sumif(p,cond){
   postexek:memF32[(temps+(tempsptr<<2))>>2]=+(`+varname+`);tempsptr= (tempsptr + 1 )|0;::`;
 }
 function avg(p){
-  var bound=daSchema.bindCol(p,qc(this));
+  var bound=bindCol(p);
   var unique=uniqueVarCounter++;
-  var type= daSchema.getColTypeByName(p,qc(this));
+  var type= typeCol(p);
   if ((type==0) || (type==3) || (type==4))
     bound=coerceFloat(bound);
-  var tab= daSchema.getParent(p,qc(this));
+  var tab= col2trav(p);
   var varnamesum="avgsum"+unique
   var varnamecount="avgcount"+unique
   return `dec:var `+varnamecount+`=0.0;::
@@ -1325,8 +1380,8 @@ function coerceFloat(p){
   else return p + ".0";
 } 
 function arith(op,p1,p2){
-  var p1b=daSchema.bindCol(p1,qc(this));
-  var p2b=daSchema.bindCol(p2,qc(this));
+  var p1b=bindCol(p1);
+  var p2b=bindCol(p2);
   if (p1b && p2b)
     return 'pb(('+p1b+')' +op +'(' + p2b+'))';
   else if (p1b)
