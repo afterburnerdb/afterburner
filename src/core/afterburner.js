@@ -17,6 +17,7 @@ function Afterburner(){
     this.joinP='';
     this.hasljoin=0;
     this.hasin=0;
+    this.isinFlag=0;
     this.attsA=[];
     this.fstr=[];
     this.aggsA=[];
@@ -81,8 +82,14 @@ function Afterburner(){
     return this;
   }
   this.isin = function(param1,param2){
+    this.isinFlag=1;
     return this.on(param1,param2)
   }
+  this.isnotin = function(param1,param2){
+    this.isinFlag=0;
+    return this.on(param1,param2)
+  }
+
   this.field = function(param, ...rest){
     if (param == '*'){
       console.log('select *');
@@ -224,8 +231,8 @@ function Afterburner(){
        join:    }::
        join:  } else trav_`+jTab+`= -666;//NULL::
        join:  if((!(`+this.joinP+`)) & (ljoin & odidonce))  continue; ::
-       join:   odidonce=1;::
-       join:  `+ppfilter+`;::`; 
+       join:  `+ppfilter+`;::
+       join:   odidonce=1;::`;
   }
 
   this.expandFields = function(){
@@ -427,7 +434,17 @@ function Afterburner(){
    ret=ret+looper+'/*looper*/';
    ret=ret+prejoiner+'/*prejoiner*/';
    ret=ret+joiner+'/*joiner*/';
-   ret=ret+grouper+'}}/*grouper*/';
+
+   if (this.hasin && (this.isinFlag==0)){
+     ret=ret+`} 
+       if (!odidonce){ `+grouper+`}/*grouper*/
+     }`;
+   }
+   else{
+     ret=ret+grouper+`}/*grouper*/
+     }`;
+   }
+
    ret=ret+`
 while(redo)
 {
@@ -496,7 +513,16 @@ while(redo)
 //   ret=ret+filter+'{/*filter*/';
    ret=ret+prejoiner+'/*prejoiner*/';
    ret=ret+joiner+'/*joiner*/';
-   ret=ret+execs+'}/*execs*/}';
+   if (this.hasin && (this.isinFlag==0)){
+     ret=ret+`} 
+       if (!odidonce){ `+execs+`}/*execs*/
+     }`;
+   }
+   else{
+     ret=ret+execs+`}/*execs*/
+     }`;
+   }
+
    if (this.aggsA.length>0)
      ret=ret+postexek+'/*postexek*/';
 //   ret=ret+postexek+'/*postexek*/';
