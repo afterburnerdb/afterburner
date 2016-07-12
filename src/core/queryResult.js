@@ -131,8 +131,7 @@ function queryResult(tempsptr) {
     };
     this.toHTMLTableN = function(num) {
       var table=document.createElement('table');
-//      table.setAttribute('border','1');
-      table.setAttribute('class',"table");
+      table.setAttribute('class',"table table-bordered table-condensed table-nonfluid");
 
       var thead = table.createTHead();
       thead.setAttribute('class',"thead-default");
@@ -143,7 +142,8 @@ function queryResult(tempsptr) {
           th.appendChild(document.createTextNode(this.colnames[i]));
           tr.appendChild(th);
       }
-     thead.appendChild(tr);
+      thead.appendChild(tr);
+      var tbody= table.createTBody();
       for (var i=0;(i<this.numrows && i<num);i++){
         tr = document.createElement('tr');
         for (var ii=0;ii<this.numcols;ii++){
@@ -163,7 +163,7 @@ function queryResult(tempsptr) {
           }
           tr.appendChild(td);
         }
-        table.appendChild(tr);
+        tbody.appendChild(tr);
       }
       return table;
     };

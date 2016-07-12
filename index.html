@@ -1,31 +1,23 @@
-<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="">
-    <meta name="author" content="">
-
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
-<!-- Optional theme -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css" integrity="sha384-fLW2N01lMqjakBkx3l/M9EahuwpSfeNvV63J5ezn3uZzapT0u7EYsXMjQV+0En5r" crossorigin="anonymous">
-<!-- Latest compiled and minified JavaScript -->
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
 
     <title>Afterburner Demo</title>
-    <link href="jumbotron.css" rel="stylesheet">
-    <!--[if lt IE 9]><script src="../../assets/js/ie8-responsive-file-warning.js"></script><![endif]-->
-<!--    <script src="../../assets/js/ie-emulation-modes-warning.js"></script> -->
+
+<!--    <link rel="stylesheet" href="bootstrap/bootstrap.min.css">-->
+<!--    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"> -->
+    <link rel="stylesheet" href="bootstrap/css/bootstrap.min.css"> 
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
     <!--[if lt IE 9]>
-      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
-      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
     <![endif]-->
+
   </head>
   <body>
-
     <nav class="navbar navbar-inverse navbar-fixed-top">
       <div class="container">
         <div class="navbar-header">
@@ -43,57 +35,80 @@
             <li><a href="./demo.html">Demo</a></li>
             <li><a href="https://github.com/lintool/afterburner/">Code (GitHub)</a></li>
           </ul>
-
         </div><!--/.navbar-collapse -->
       </div>
     </nav>
 
-    <!-- Main jumbotron for a primary marketing message or call to action -->
-    <div class="jumbotron">
-      <div class="container">
-<div class="page-header">
-<h1>Afterburner</h1>
-<p class="lead">A proof-of-concept in-browser JavaScript-based Analytical RDBMS</p>
-</div>
-
-<p>Afterburner is a proof-of-concept in-browser relational analytics system that explores the idea of implementing an analytical RDBMS in pure JavaScript so
+ <!--   <div class="jumbotron"> -->
+    <div class="container">
+      <div class="page-header">
+        <h1>Afterburner</h1>
+        <p class="lead">A proof-of-concept in-browser JavaScript-based Analytical RDBMS</p>
+      </div>
+      <p>Afterburner is a proof-of-concept in-browser relational analytics system that explores the idea of implementing an analytical RDBMS in pure JavaScript so
 that it runs completely inside a browser with no external dependencies. 
 Afterburner, generates compiled query plans that exploit typed arrays and asm.js, two relatively recent advances in JavaScript. </p>
-<p>For more details, see:</p>
-<ul>
-<li>Kareem El Gebaly and Jimmy Lin. <a href="http://arxiv.org/abs/1605.04035">Afterburner: The Case for In-Browser Analytics</a> <i>arXiv:1605.04035</i>, May 2016. </li>
-</ul>
-<hr>
-<p>
-In this <a href="./demo.html">demo</a> we have prepared for you two files for the TPC-H tables at 1GB scale.
-<ul>
-<li> <a href=https://drive.google.com/open?id=0B2CdCGGKg6SNNHlFT0VkeG9jY1U>lineitem table</a></li>
-<li> <a href=https://drive.google.com/open?id=0B2CdCGGKg6SNVlNJaloyX05fT1k>orders table</a></li>
-</ul>
-</p>
-<p>
-We have tested Afterburner using the following web browsers:
-<ul>
-  <li><a href https://www.mozilla.org/en-US/firefox/all/>FireFox (64-bit)</a></li>
-  <li><a href http://www.opera.com/download/guide/?ver=12.17>Google Chrome (64-bit)</a></li>
-  <li><a href https://www.google.com/chrome/browser/thankyou.html?platform=win64&statcb=1&extra=betachannel&installdataindex=defaultbrowser>Opera (64-bit)</a></li>
-</p>
-We have tested Afterburner using the following Operating Systems:
-<ul>
-  <li>Linux Ubuntu </li>
-  <li>Windows 10</li>
-</ul>
-
-</p>
-To run this scenario we recomend clients with 6-8 GB of physical memory.
-</div>
-    </div>
+      <p>For more details, see:</p>
+      <ul>
+       <li>Kareem El Gebaly and Jimmy Lin. <a href="http://arxiv.org/abs/1605.04035">Afterburner: The Case for In-Browser Analytics</a> <i>arXiv:1605.04035</i>, May 2016. </li>
+      </ul>
       <hr>
+      <p> In this <a href="./demo.html">demo</a> we have prepared for you two files for the TPC-H tables at 1GB scale.</p>
+      <ul>
+        <li> <a href=https://drive.google.com/open?id=0B2CdCGGKg6SNNHlFT0VkeG9jY1U>lineitem table</a></li>
+        <li> <a href=https://drive.google.com/open?id=0B2CdCGGKg6SNVlNJaloyX05fT1k>orders table</a></li>
+     </ul>
+     <p> We have tested Afterburner using the following web browsers:</p>
+     <ul>
+      <li><a href https://www.mozilla.org/en-US/firefox/all/>FireFox (64-bit)</a></li>
+      <li><a href http://www.opera.com/download/guide/?ver=12.17>Google Chrome (64-bit)</a></li>
+      <li><a href https://www.google.com/chrome/browser/thankyou.html?platform=win64&statcb=1&extra=betachannel&installdataindex=defaultbrowser>Opera (64-bit)</a></li>
+     </ul>
+<!--     <p>We have tested Afterburner using the following Operating Systems:</p>
+     <ul>
+      <li>Mac (OS X)</li>
+      <li>Ubuntu Linux</li>
+      <li>Windows 10</li>
+     </ul>-->
 
-    </div> <!-- /container -->
+     <p>We recomend using clients with 6-8 GB of physical memory.</p>
+    </div>
+<!--    </div> -->
+  </div> <!-- /container -->
 
 
+<!-- Bootstrap core JavaScript
+================================================== -->
+<!-- Placed at the end of the document so the pages load faster -->
+<!-- <script src="bootstrap/jquery.min.js"></script>-->
+  <!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script> -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.2/jquery.min.js"></script>
 
-  </body>
+<script src="bootstrap/js/bootstrap.min.js"></script>
+<!--<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script> -->
+
+<!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+<script src="https://maxcdn.bootstrapcdn.com/js/ie10-viewport-bug-workaround.js"></script>
+
+<script type="text/javascript">
+  $(document).ready(function() {
+    $("body").tooltip({ selector: '[data-toggle=tooltip]' });
+});
+$( ".selector" ).tooltip({ show: { effect: "blind", duration: 1500 } });
+</script>
+   <style type="text/css">
+      body {
+        padding-top: 50px;
+      }
+      .modal {
+        text-align: left;
+      }
+      pre.prettyprint {
+        border: 1px solid #ccc;
+        margin-bottom: 0;
+        padding: 9.5px;
+      }
+    </style>
+
+</body>
 </html>
-
