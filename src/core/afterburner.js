@@ -833,6 +833,8 @@ env={'temps':temps,
       return code + `return res.firstCell()`;
     else if (purpose == 'array')
       return code + `return res.toArray()`;
+    else if (purpose == 'array2')
+      return code + `return res.toArray2()`;
     else if (purpose == 'mat')
       return code + `return res.registerTable()`;
     else 
@@ -840,6 +842,9 @@ env={'temps':temps,
   }
   this.toArray = function(){
     return new Function('ignore', this.toString('array'))();
+  }
+  this.toArray2 = function(){
+    return new Function('ignore', this.toString('array2'))();
   }
   this.eval = function(){
     return new Function('ignore', this.toString('fc'))();

@@ -203,7 +203,8 @@ function queryResult(tempsptr) {
     this.toString= function() {
       return this.toStringN(1/0);
     };
-    this.toArray= function() {
+
+   this.toArray= function() {
       if (inNode){
         require('common.js');
       }
@@ -224,7 +225,32 @@ function queryResult(tempsptr) {
           }
       }
       return ret;
+   };
+   this.toArray2= function(){
+      if (inNode){
+        require('common.js');
+      }
+      var ret=[];
+      for (var i=0;i<this.numrows;i++){
+        for (var ii=0;ii<this.numcols;ii++){
+          if (this.coltypes[ii]==0){
+            ret.push(mem32[(this.cols[ii]+(i<<2))>>2]);
+          } else if (this.coltypes[ii]==1){
+            ret.push(memF32[(this.cols[ii] +(i<<2))>>2]);
+          } else if (this.coltypes[ii]==2){
+            ret.push(ret+strToString(mem32[(this.cols[ii] +(i<<2))>>2]));
+          } else if (this.coltypes[ii]==3){
+            ret.push(int_to_strdate(mem32[(this.cols[ii] + (i<<2))>>2]));
+          } else if (this.coltypes[ii]==4){
+            ret.push(int_to_strchar(mem32[(this.cols[ii] + (i<<2))>>2]));
+          } else{
+            alert("unkown type");
+          }
+        }
+      }
+      return ret;
     };
+
     this.firstCell = function(){
       if (inNode){
         require('common.js');
