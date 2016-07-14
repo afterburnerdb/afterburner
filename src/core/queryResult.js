@@ -238,7 +238,7 @@ function queryResult(tempsptr) {
           } else if (this.coltypes[ii]==1){
             ret.push(memF32[(this.cols[ii] +(i<<2))>>2]);
           } else if (this.coltypes[ii]==2){
-            ret.push(ret+strToString(mem32[(this.cols[ii] +(i<<2))>>2]));
+            ret.push(strToString(mem32[(this.cols[ii] +(i<<2))>>2]));
           } else if (this.coltypes[ii]==3){
             ret.push(int_to_strdate(mem32[(this.cols[ii] + (i<<2))>>2]));
           } else if (this.coltypes[ii]==4){

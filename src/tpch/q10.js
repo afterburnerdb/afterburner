@@ -19,6 +19,6 @@ function query10(){
         "c_acctbal","n_name","c_address","c_phone","c_comment")
     .where(eq("l_returnflag",'R'))
     .group("c_custkey","c_name","c_acctbal","c_phone","n_name","c_address","c_comment")
-    .order(["revenue"])
+    .order(["-revenue"])
     .limit(20);
 }

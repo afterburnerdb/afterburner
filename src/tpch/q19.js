@@ -9,16 +9,16 @@ function query19(){
      gte("l_quantity",1),
      lte("l_quantity",11),
      between("p_size",1,5),
-     isin("l_shipmode",['AIR', 'AIR$REG']),
-     eq("l_shipinstruct",'DELIVER$IN$PERSON'))
+     isin("l_shipmode",['AIR', 'AIR REG']),
+     eq("l_shipinstruct",'DELIVER IN PERSON'))
    ,
      and(eq("p_brand",'Brand#23'),
      isin("p_container",['MED BAG', 'MED BOX', 'MED PKG', 'MED PACK']),
      gte("l_quantity",10),
      lte("l_quantity",20),
      between("p_size",1,10),
-     isin("l_shipmode",['AIR', 'AIR$REG']),
-     eq("l_shipinstruct",'DELIVER$IN$PERSON'))
+     isin("l_shipmode",['AIR', 'AIR REG']),
+     eq("l_shipinstruct",'DELIVER IN PERSON'))
    ,
      and(eq("p_partkey","l_partkey"),
      eq("p_brand",'Brand#34'),
@@ -26,7 +26,7 @@ function query19(){
      gte("l_quantity",20),
      lte("l_quantity",30),
      between("p_size",1,15),
-     isin("l_shipmode",['AIR', 'AIR$REG']),
-     eq("l_shipinstruct",'DELIVER$IN$PERSON'))
+     isin("l_shipmode",['AIR', 'AIR REG']),
+     eq("l_shipinstruct",'DELIVER IN PERSON'))
    ))
 }

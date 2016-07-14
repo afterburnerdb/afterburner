@@ -178,15 +178,15 @@ function aTable(dSrc) {
     this.coltypes=dSrc.coltypes;
 
     if (this.src.parser !== null){
-      console.log('new table from a parser')
+      DEBUG('new table from a parser')
       this.parseTable();
     } else if (this.src.type='query') {
-      console.log('new table from query')
+      DEBUG('new table from query')
       this.colptrs=dSrc.colptrs;
     } else if (this.src.type='monetjsn') {
-      console.log('new table from a monetjsn, **not implemented**')
+      DEBUG('new table from a monetjsn, **not implemented**')
     } else { 
-      console.log("invalid data source type");
+      DEBUG("invalid data source type");
     }
 }
 

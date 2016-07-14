@@ -1,5 +1,5 @@
 
-function query02(){
+function query2(){
   var reg_nat = ABi.select()
     .from("nation").join("region").on("n_regionkey","r_regionkey")
     .where(eq('R_NAME','EUROPE'))
@@ -30,8 +30,8 @@ function query02(){
   
   return ABi.select()
   .from(mincost).join(brass).on("min(ps_supplycost)","ps_supplycost")
-  .field( "s_name","s_acctbal", "n_name", "p_partkey", "p_mfgr", "s_address", "s_phone", "s_comment")
-  .order([-1,2,0,3])
+  .field( "s_acctbal","s_name", "n_name", "p_partkey", "p_mfgr", "s_address", "s_phone", "s_comment")
+  .order(["-s_acctbal","n_name","s_name","p_partkey"])
   .limit(100);
   
 }

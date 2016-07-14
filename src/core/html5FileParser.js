@@ -29,7 +29,7 @@ function html5FileParser(file,funk) {
         _self.readReady=true;
         _self.actualcs=_self.fr.result.byteLength;
         _self.noMoreChunks=(_self.actualcs <_self.CHUNK_SIZE);
-        console.log('file read ready');
+        DEBUG('file read ready');
         funk();
         $("#waitForFile").modal('hide');
 	}

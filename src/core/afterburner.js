@@ -92,11 +92,10 @@ function Afterburner(){
 
   this.field = function(param, ...rest){
     if (param == '*'){
-      console.log('select *');
       var wildCard=daSchema.getChildAttributes(this.fromA[0]);
       if (this.joinA.length > 0){
         wildCard=wildCard.concat(daSchema.getChildAttributes(this.joinA[0]));
-      } else{console.log("joinA.length==0")}
+      } 
       return this.field(wildCard[0], ...wildCard.slice(1));
     }
     var alias=param;
@@ -183,7 +182,7 @@ function Afterburner(){
    pre:  }::
    dec:var trav_`+jTab+`=-1;::
    pre:trav_`+jTab+`=-1; while(1){trav_`+jTab+`=trav_`+jTab+`+1|0; if((trav_`+jTab+`|0)>=`+tabLen+`) break; `+pbfilter+`;::
-   pre:  hk=((`+bindCol(this.onA[1])+`) & (hashBitFilter|0))|0;::
+   pre:  hk=((`+gbind(this.onA[1])+`) & (hashBitFilter|0))|0;::
    pre:  if (obp=mem32[((h1bb+(hk<<2))|0)>>2]|0){::
    pre:    //while(mem32[((bp+(((hash1BucketSize+1)|0)<<2))|0)>>2]|0){::
    pre:      bp= mem32[((obp+(((hash1BucketSize+2)|0)<<2))|0)>>2]|0;::
@@ -211,7 +210,7 @@ function Afterburner(){
    pre:  mem32[bp>>2]=tmp;::
    pre:  mem32[((bp+(tmp<<2))|0)>>2]= trav_`+jTab+`|0;::
    pre:}::
-       prej:hk=`+bindCol(this.onA[0])+`;::
+       prej:hk=((`+gbind(this.onA[0])+`) & (hashBitFilter|0))|0;::
        prej:currb=-1;::
        prej:curr=0;::
        prej:currb=mem32[((h1bb+(hk<<2))|0)>>2]|0;::
@@ -282,7 +281,7 @@ function Afterburner(){
   }
 
   this.expandGroup = function(){
-    console.log('@expandGroup');
+    DEBUG('@expandGroup');
     daTrav=this.fromA[0];
     daConts="(";
     daHash="((";
@@ -408,7 +407,7 @@ function Afterburner(){
     return 'bug';
   }
   this.buildGroupJoin = function(){
-   console.log('@buildGroupJoin');
+   DEBUG('@buildGroupJoin');
    combound="trav_"+this.fromA[0]+"=(mem32[((currb+(curr<<2))|0)>>2]|0);"
    combound+="trav_"+this.joinA[0]+"=(mem32[((currb+(((curr+1)|0)<<2))|0)>>2]|0);"
    ocombound="otrav_"+this.fromA[0]+"=(mem32[((currb+(curr<<2))|0)>>2]|0);"
@@ -489,7 +488,7 @@ while(redo)
     return ret;
   }
   this.buildJoin = function(){
-    console.log('@buildJoin');
+    DEBUG('@buildJoin');
    all=this.expandJoin();
    all=all+this.expandFrom();
 //   all=all+this.expandFilter();
@@ -533,7 +532,7 @@ while(redo)
   }
 
   this.buildGroup = function(){
-    console.log('@buildGroup');
+    DEBUG('@buildGroup');
     combound="trav_"+this.fromA[0]+"=mem32[((currb+(curr<<2))|0)>>2]|0;"
     ocombound="otrav_"+this.fromA[0]+"=(mem32[((currb+(curr<<2))|0)>>2]|0);"
     all=this.expandFrom();
@@ -605,7 +604,7 @@ while(redo)
 
   }
   this.build = function(){
-   console.log('@build');
+   DEBUG('@build');
    all=this.expandFrom();
    all=all+this.expandFilter();
    all=all+this.expandFields();
@@ -716,16 +715,8 @@ while(redo)
   var ljoin=`+this.hasljoin+`;
   var hasin=`+this.hasin+`;
   var odidonce=0;
+  var isintmpstr=0;
   `+core+`
-  function setsize(size){
-    size=size|0;
-    numrows=size;
-  };
-  function prod(value){
-    value=value|0;
-    mem32[(temps+(tempsptr<<2))>>2]=value;
-    tempsptr= (tempsptr + 1 )|0;
-  };
   function hash_str(strp){
     strp=strp|0;
     i=0;
@@ -760,7 +751,7 @@ while(redo)
     var i=0;
     dst=malloc((m-n+1)|0)|0; 
   //  strncpy(dst,str+n,m-n);
-    while(i<(m-n)){
+    while((i|0)<((m-n)|0)){
       mem8[(dst+i)|0]=mem8[(str+n+i)|0]|0;
       i=(i+1)|0;
     }
@@ -777,7 +768,7 @@ while(redo)
     size=size|0;
     var size4b=0;
     var ret=0;
-    if (size<1) return storedB;
+    if ((size|0)<1) return storedB|0;
     size4b=(((((size-1)|0)>>2)+1)|0)<<2;
     ret=storedB;
     malloc_ctr=(malloc_ctr+size4b)|0;
@@ -871,7 +862,6 @@ function resolve(colname){
       }
     }
     var ret={tabs:tabs , col:colname, als:alias};
-    console.log("@resolve: tabs:"+tabs+" col:"+colname+" alias:"+alias);
     return ret;
   }
 function pointCol(colname){
@@ -924,7 +914,6 @@ function obindCol(colname){
 }
 
 function contbind(pfield) {
-  console.log("@contbind:"+pfield);
   var bound= bindCol(pfield);
   var obound= obindCol(pfield);
   var type= typeCol(pfield);
@@ -1163,26 +1152,6 @@ function like(p1,strlit){
   return ret;
 } 
 
-  //else if (numpct ==1){
-  //  if (strlit.charCodeAt(0)==37){
-  //    return like_ends(strp,strlit.substring(1,strlit.length));
-  //  }
-  //  else if (strlit.charCodeAt(strlit.length-1)==37){
-  //    return like_begins(strp,strlit.substring(0,strlit.length-1));
-  //  }
-  //  else{
-  //    return '(' + like_begins(strp,strlit.substring(0,strlit.indexOf('%'))) + "&" + like_ends(strp,strlit.substring(strlit.indexOf('%')+1,strlit.length)) + ')' ;
-  //  }
-  //} else if (numpct ==2){
-  //  if ((strlit.charCodeAt(0)==37) && (strlit.charCodeAt(strlit.length-1)==37)){
-  //    console.log('@like got like_has');
-  //    return like_has(strp,strlit.substring(1,strlit.length-1));
-  //  }
-  //}  else {
-  //  var likeFun=buildLikeFun(strlit,"")
-  //  var fun=defun(likeFun);
-  //  return fun + "(strp)";
-  //}
 
 function not(p1){
   return "(!(" + p1 + "))";
@@ -1213,11 +1182,11 @@ function isin(p1,list){
   if (list.length==0) return "";
   if (list.length==1) return eq(p1,list[0]);
   if (isPreBoundString(p1)){
-   console.log("@isin: prebountstring:"+ p1);
    var p1b=p1.substring(3);
    ret='((isintmpstr='+p1b+')&0)|';
+   return ret+or(eq('pb$((isintmpstr))',list[0]),isin('pb$((isintmpstr))',list.slice(1))) + "";
   }
-  return ret+or(eq('pb$((isintmpstr))',list[0]),isin('pb$((isintmpstr))',list.slice(1))) + "";
+  else return or(eq(p1,list[0]),isin(p1,list.slice(1)));
 }
 function eqlit(p1,p2){
 }
@@ -1253,19 +1222,12 @@ function compare(op,p1,p2){
   var p2b=bindCol(p2);
   var p1t=typeCol(p1);
   var p2t=typeCol(p2);
-  console.log("@compare: p11:"+p1 + "p1t" + p1t);
-  console.log("@compare: p1b:"+p1b + "p1t" + p1t);
-  console.log("@compare: p2t:"+p2 + "p2t" + p2t);
-
 
   if (p1b && p2b && p1t==2 && p2t==2 && op=='=='){
-    console.log("compare two strp's")
     return '(mystrcp(' +p1b+ op + p2b+')|0)';
   } else if (p1b && p2b){
-    console.log("compare two number variables")
     return '(' +p1b+ op + p2b+')';
   } else if (p1b){
-    console.log("compare strp with ?")
     if ((typeof p2) == 'string' && (op == '==')){
       if ((p1t == 2) || isPreBoundString(p1))
         return expandStrLitComp(p1b,p2);
@@ -1498,13 +1460,13 @@ function coerceFloat(p){
   p = p+"";
   if (p.indexOf('.')>-1) return p;
   else if (p.indexOf('mem')>-1) return  "(+(" + p + "|0))";
-  else return p + ".0";
+  else return "(+(" + p + "))";
 } 
 function arith(op,p1,p2){
   var p1b=bindCol(p1);
   var p2b=bindCol(p2);
   if (p1b && p2b)
-    return 'pb(('+p1b+')' +op +'(' + p2b+'))';
+    return 'pb((+('+p1b+'))' +op +' (+(' + p2b+')))';
   else if (p1b)
     return 'pb(('+p1b+')' +op +'(' + coerceFloat(p2)+'))';
   else if (p2b)

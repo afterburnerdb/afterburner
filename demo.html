@@ -90,6 +90,12 @@
       </div>
       <div class="row">
         <div class="col-md-6">
+          <h2>JavaScript</h2>
+		<textarea rows="11" id="TAASM" name="TAASM" class="prettyprint form-control animated" placeholder="" ></textarea>
+		<button type="button" onclick="runASM()" class="btn btn-default" href="#" data-toggle="tooltip" data-placement="bot" title="Run code (Query)">
+                  Run ASM</button>
+       </div>
+        <div class="col-md-6">
           <h2>Fluent SQL</h2>
 		<textarea rows="11" id="TAFluent" name="TAFluent" class="prettyprint form-control animated linenums language-css" placeholder="Type Fluent SQL or use example buttons.."></textarea>
 		<button type="button" onclick="fluentToASM()" class="btn btn-default" href="#" data-toggle="tooltip" data-placement="bot" title="Translate Fluent into JavaScript code">
@@ -103,12 +109,7 @@
 		<button type="button" onclick="resetFluentASMq4()" class="btn btn-default" href="#" data-toggle="tooltip" data-placement="bot" title="Load Fluent SQL for Q4">
                   Q4 Fluent</button>
         </div>
-        <div class="col-md-6">
-          <h2>JavaScript</h2>
-		<textarea rows="11" id="TAASM" name="TAASM" class="prettyprint form-control animated" placeholder="" ></textarea>
-		<button type="button" onclick="runASM()" class="btn btn-default" href="#" data-toggle="tooltip" data-placement="bot" title="Run code (Query)">
-                  Run ASM</button>
-       </div>
+
       </div>
        <div class="row"><div class="col-xs-12" style="height:50px;"></div></div>
        <div class="row">
@@ -148,12 +149,61 @@
 <script src="./src/core/html5FileParser.js"></script>
 <script src="./src/frontend/myJS.js"></script>
 
+<!-- TPC-H -->
+
+<script src="./src/tpch/q01.js"></script>
+<script src="./src/tpch/q02.js"></script>
+<script src="./src/tpch/q03.js"></script>
+<script src="./src/tpch/q04.js"></script>
+<script src="./src/tpch/q05.js"></script>
+<script src="./src/tpch/q06.js"></script>
+<script src="./src/tpch/q07.js"></script>
+<script src="./src/tpch/q08.js"></script>
+<script src="./src/tpch/q09.js"></script>
+<script src="./src/tpch/q10.js"></script>
+<script src="./src/tpch/q11.js"></script>
+<script src="./src/tpch/q12.js"></script>
+<script src="./src/tpch/q13.js"></script>
+<script src="./src/tpch/q14.js"></script>
+<script src="./src/tpch/q15.js"></script>
+<script src="./src/tpch/q16.js"></script>
+<script src="./src/tpch/q17.js"></script>
+<script src="./src/tpch/q18.js"></script>
+<script src="./src/tpch/q19.js"></script>
+<script src="./src/tpch/q20.js"></script>
+<script src="./src/tpch/q21.js"></script>
+<script src="./src/tpch/q22.js"></script>
+
+<script src="./src/tpch/answers/ans1.js"></script>
+<script src="./src/tpch/answers/ans2.js"></script>
+<script src="./src/tpch/answers/ans3.js"></script>
+<script src="./src/tpch/answers/ans4.js"></script>
+<script src="./src/tpch/answers/ans5.js"></script>
+<script src="./src/tpch/answers/ans6.js"></script>
+<script src="./src/tpch/answers/ans7.js"></script>
+<script src="./src/tpch/answers/ans8.js"></script>
+<script src="./src/tpch/answers/ans9.js"></script>
+<script src="./src/tpch/answers/ans10.js"></script>
+<script src="./src/tpch/answers/ans11.js"></script>
+<script src="./src/tpch/answers/ans12.js"></script>
+<script src="./src/tpch/answers/ans13.js"></script>
+<script src="./src/tpch/answers/ans14.js"></script>
+<script src="./src/tpch/answers/ans15.js"></script>
+<script src="./src/tpch/answers/ans16.js"></script>
+<script src="./src/tpch/answers/ans17.js"></script>
+<script src="./src/tpch/answers/ans18.js"></script>
+<script src="./src/tpch/answers/ans19.js"></script>
+<script src="./src/tpch/answers/ans20.js"></script>
+<script src="./src/tpch/answers/ans21.js"></script>
+<script src="./src/tpch/answers/ans22.js"></script>
+
+<script src="./src/tpch/benchmark_tpch.js"></script>
+
 <script>
 function myOnLoad(){
   ABi = new Afterburner();
   document.getElementById("TAASM").value="";
 }
-
 window.onload = function() {
   inNode=false;
   var fileInput = document.getElementById('fileInput');

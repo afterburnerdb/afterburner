@@ -46,9 +46,6 @@ function aSchema(){
     badFSQL("@getParent","could not bind:" + colname);
   }
   this.getColTypeByName = function(colname,qtabs){
-    if (typeof qtabs == 'undefined'){
-      console.log('qtabs is undefined');
-    }
     if ((colname != null) && typeof colname == 'string' && colname.indexOf('pb')==0){
       if (colname.indexOf('pb$')==0)
         return 2;
@@ -80,7 +77,6 @@ function aSchema(){
           return this.tables[i].getColPByName(colname);
   }
   this.getTabSizeByName = function(tabname){
-    console.log("TABNAME:"+tabname);
     tabname=tabname.toLowerCase();
     var table2=daSchema.getTable(tabname);
     if (typeof table2 == 'undefined'){

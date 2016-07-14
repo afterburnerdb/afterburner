@@ -188,7 +188,7 @@ handyColTypes["myview"]=[
 
     if (this.name&&this.numrows&&this.colnames&&this.coltypes){
       this.numcols=this.colnames.length;
-      console.log('found table in handy tables')
+      DEBUG('found table in handy tables')
     }
     else{
       this.name='orders';
@@ -205,7 +205,6 @@ handyColTypes["myview"]=[
     this.qr=qr;
     var ptrcolptrs= malloc(qr.numcols<<2);
     for (var i=0;i<qr.numcols;i++){
-      console.log('src.colptrs[i]:' + src.cols[i]);
       mem32[(ptrcolptrs+(i<<2))>>2]= src.cols[i];
     }
     this.name=qr.name;
