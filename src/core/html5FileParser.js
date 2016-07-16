@@ -10,7 +10,7 @@ function html5FileParser(file,funk) {
     this.file=file;
     this.fr = new FileReader();
     this.delim='|';
-    this.eol='\n';
+    this.eol='\r';
     this.delimCode=this.delim.charCodeAt(0);
     this.eolCode=this.eol.charCodeAt(0);
     this.CHUNK_SIZE = 1024*1024 *1024;
@@ -56,7 +56,9 @@ function html5FileParser(file,funk) {
 
     this.nextcstr =function(resPtr){
       var strSize=0;
+      var tmpchar;
       do{
+         tmpchar=this.buffer[this.bptr+strSize];
          if(this.bptr+strSize >= this.actualcs){
            if (!this.noMoreChunks&& this.nextChunk()){
              this.waitForRead();
@@ -66,13 +68,13 @@ function html5FileParser(file,funk) {
              return -1;
            }
          }
-         else if(this.buffer[this.bptr+strSize] == this.delimCode ){
+         else if(tmpchar == this.delimCode) {
            tmpstrStore8[resPtr+strSize]=0;
            this.bptr=this.bptr+strSize+1;
            return strSize+1;
          }
          else{
-           tmpstrStore8[resPtr+strSize]=this.buffer[this.bptr+strSize];
+           tmpstrStore8[resPtr+strSize]=tmpchar;
            strSize++;
          }
       }while(true);
@@ -80,7 +82,9 @@ function html5FileParser(file,funk) {
 
     this.nextstr =function(){
       var str="";
+      var tmpchar;
       do{
+         tmpchar=this.buffer[this.bptr+str.length];
          if(this.bptr+str.length >= this.actualcs){
            if (!this.noMoreChunks&& this.nextChunk()){
              this.waitForRead();
@@ -90,12 +94,12 @@ function html5FileParser(file,funk) {
              return "";
            }
          }
-         else if(this.buffer[this.bptr+str.length] == this.delimCode ){
+         else if(tmpchar == this.delimCode) {
            this.bptr+=str.length+1;
            return str;
          }
          else{
-           str+=String.fromCharCode(this.buffer[this.bptr+str.length]);
+           str+=String.fromCharCode(tmpchar);
          }
       }while(true);
     };

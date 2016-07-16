@@ -722,8 +722,8 @@ while(redo)
     i=0;
     hash=101;
     for (;(mem8[(strp+i)|0]|0)>0;i=(i+1)|0){
-      hash= ((hash*103)|0)&hashBitFilter;
       hash= (hash + (mem8[(strp+i)|0]|0))|0;
+      hash= ((hash*103)|0)&hashBitFilter;
     }
     return (hash |0);
   };
