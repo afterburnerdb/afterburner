@@ -108,10 +108,10 @@ function Afterburner(){
     this.attsA.push(param);
     if (typeCol(param)!==1)
     this.fstr.push(`exec:mem32[(temps+(tempsptr<<2))>>2]=`+bindCol(param)+`;tempsptr= (tempsptr + 1 )|0;::
-    postexek:mem32[(temps+(tempsptr<<2))>>2]=`+bindCol(param)+`;tempsptr= (tempsptr + 1 )|0;::`);
+    postexek:mem32[(temps+(tempsptr<<2))>>2]=`+obindCol(param)+`;tempsptr= (tempsptr + 1 )|0;::`);
       else 
       this.fstr.push(`exec:memF32[(temps+(tempsptr<<2))>>2]=`+bindCol(param)+`;tempsptr= (tempsptr + 1 )|0;::
-      postexek:memF32[(temps+(tempsptr<<2))>>2]=`+bindCol(param)+`;tempsptr= (tempsptr + 1 )|0;::`);
+      postexek:memF32[(temps+(tempsptr<<2))>>2]=`+obindCol(param)+`;tempsptr= (tempsptr + 1 )|0;::`);
 
       this.resA.push("res.addCol2('"+alias+"',"+type+");");
     } else {
@@ -288,18 +288,19 @@ function Afterburner(){
     daHashn="(hk=(";
     for(var i=0;i<this.groupA.length;i++){
       daConts+=contbind(this.groupA[i]) + "|";
-      daHash+= "("+gbind(this.groupA[i]) + "<<" + (i*7)%11 + ")+";
+      daHash+= "("+gbind(this.groupA[i]) + "<<" + (i*11)%7 + ")+";
       daHashn+= gbindn(this.groupA[i]) + "+"
     }
     daConts=daConts.substring(0,daConts.length-2);
     daConts+=")|0)";
     daHash=daHash.substring(0,daHash.length-1);
-    daHash+="&hashBitFilter)|0)";
+    daHash+=")|0)&hashBitFilter";
     daHashn=daHashn.substring(0,daHashn.length-1);
     daHashn+="))";
 
     return `
       dec:var otrav_`+this.fromA[0]+`=-1;::
+      dec:var ntrav_`+this.fromA[0]+`=-1;::
       pre:i=0;while(1){::
       pre:    mem32[((h2bb+(i<<2))|0)>>2]=0;::
       pre:    i=(i+1)|0;::
@@ -343,16 +344,18 @@ function Afterburner(){
     daHashn="(hk=(";
     for(var i=0;i<this.groupA.length;i++){
       daConts+=contbind(this.groupA[i]) + "|";
-      daHash+= "("+gbind(this.groupA[i]) + "<<" + (i*7)%11 + ")+";
+      daHash+= "("+gbind(this.groupA[i]) + "<<" + (i*11)%7 + ")+";
       daHashn+= gbindn(this.groupA[i]) + "+"
     }
     daConts=daConts.substring(0,daConts.length-2) + ")|0)";
-    daHash=daHash.substring(0,daHash.length-1) + "&hashBitFilter)|0)";
+    daHash=daHash.substring(0,daHash.length-1) + ")|0)&hashBitFilter";
     daHashn=daHashn.substring(0,daHashn.length-1) + "))";
 
     return `
       dec:var otrav_`+this.fromA[0]+`=-1;::
       dec:var otrav_`+this.joinA[0]+`=-1;::
+      dec:var ntrav_`+this.fromA[0]+`=-1;::
+      dec:var ntrav_`+this.joinA[0]+`=-1;::
       pre:i=0;while(1){::
       pre:    mem32[((h2bb+(i<<2))|0)>>2]=0;::
       pre:    i=(i+1)|0;::
@@ -445,14 +448,22 @@ function Afterburner(){
    }
 
    ret=ret+`
-while(redo)
 {
-  redo=0;
+  redo=-1;
   hki=-1;
   while(1){hki=hki+1|0;if ((hki|0)>=(hashBitFilter|0)) break;
-    if(ob=currb=mem32[((h2bb+(hki<<2))|0)>>2]|0){
-      curr=2;col=0;
-      `+ocombound+`
+    if((currb=mem32[((h2bb+(hki<<2))|0)>>2]|0)|(redo>0)){
+      curr=2;producable=0; alarm=0;
+        if (redo>0){
+          hki=redo;
+          otrav_`+this.fromA[0]+`=ntrav_`+this.fromA[0]+`;
+          otrav_`+this.joinA[0]+`=ntrav_`+this.joinA[0]+`;
+          currb=mem32[((h2bb+(hki<<2))|0)>>2];
+	  redo=-1;
+          alarm=1;
+        }else{
+          `+ocombound+`
+	}
       `+preexek+`
       while(currb){ 
         if ((curr|0)>(mem32[currb>>2]|0)){
@@ -465,24 +476,33 @@ while(redo)
         }else{
           `+combound+`
         }
+        if ((trav_`+this.fromA[0]+`|0)<0) {curr=curr+2|0; continue;} 
         if (`+daConts+`){
-          col=1;
-          //redo=1;
-          break;
+          ntrav_`+this.fromA[0]+`=trav_`+this.fromA[0]+`;
+          ntrav_`+this.joinA[0]+`=trav_`+this.joinA[0]+`;
+          if ((redo<0)&(!alarm)){
+            redo=hki;
+            producable=0;
+            break;
+          }
+          redo=hki;
+          curr=curr+2|0;
+          continue;
+        }
+        if (alarm){
+	  mem32[((currb+(curr<<2))|0)>>2]=-1;
+          mem32[((currb+(((curr+1)|0)<<2))|0)>>2]=-1;
         }
         `+execs+`
+        producable=(producable+1)|0;
         curr=curr+2|0;
       }
-      if(col){
-        //todo: handle cols
-      } else {
+      if(producable){
         `+postexek+`      
       }
     }
   }
 }`
-//   ret=ret+execs+'}/*execs*/';
-//    ret=ret+'transpose('+sorter+');';
     ret=ret+limiter+'/*limiter*/';
     ret=ret+"return tempsptr|0;}";
     return ret;
@@ -558,15 +578,21 @@ while(redo)
     ret=ret+filter+'/*filter*/';
     ret=ret+grouper+'}/*grouper*/';
     ret=ret+`
-while(redo)
 {
-  redo=0;
-//  h=primes[nexthcount++];
+  redo=-1;
   hki=-1;
   while(1){hki=hki+1|0;if ((hki|0)>=(hashBitFilter|0)) break;
-    if(ob=currb=mem32[((h2bb+(hki<<2))|0)>>2]|0){
-      curr=1;col=0;
-      `+ocombound+`
+    if((currb=mem32[((h2bb+(hki<<2))|0)>>2]|0)|(redo>0)){
+      curr=1;producable=0; alarm=0;
+        if (redo>0){
+          hki=redo;
+          otrav_`+this.fromA[0]+`=ntrav_`+this.fromA[0]+`;
+          currb=mem32[((h2bb+(hki<<2))|0)>>2];
+	  redo=-1;
+          alarm=1;
+        }else{
+          `+ocombound+`
+	}
       `+preexek+`
       while(currb){ 
         if ((curr|0)>(mem32[currb>>2]|0)){
@@ -579,25 +605,31 @@ while(redo)
         }else{
           `+combound+`
         }
+        if ((trav_`+this.fromA[0]+`|0)<0) {curr=curr+1|0; continue;} 
         if (`+daConts+`){
-          col=1;
-          //redo=1;
-          break;
+          ntrav_`+this.fromA[0]+`=trav_`+this.fromA[0]+`;
+          if ((redo<0)&(!alarm)){
+            redo=hki;
+            producable=0;
+            break;
+          }
+          redo=hki;
+          curr=curr+1|0;
+          continue;
+        }
+        if (alarm){
+	  mem32[((currb+(curr<<2))|0)>>2]=-1;
         }
         `+execs+`
-          curr=curr+1|0;
+        producable=(producable+1)|0;
+        curr=curr+1|0;
       }
-      if(col){
-        //todo: handle cols
-      } else {
+      if(producable){
         `+postexek+`      
       }
     }
   }
 }`
-
- //   ret=ret+execs+'}/*execs*/';
-//    ret=ret+'transpose('+sorter+');';
     ret=ret+limiter+'/*limiter*/';
     ret=ret+"return tempsptr|0;}";
     return ret;
@@ -695,11 +727,11 @@ while(redo)
   var mem8 = new global.Int8Array(mem);
   var memF32 = new global.Float32Array(mem);
   var redo=1;
-  var col=0;
+  var producable=0;
+  var alarm=0;
   var nexthcount=0;
   var h=0;
   var hki=0;
-  var ob=0;
   var currb=0;
   var curr=0;
   var i=0;
