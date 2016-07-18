@@ -452,13 +452,13 @@ function Afterburner(){
   redo=-1;
   hki=-1;
   while(1){hki=hki+1|0;if ((hki|0)>=(hashBitFilter|0)) break;
-    if((currb=mem32[((h2bb+(hki<<2))|0)>>2]|0)|(redo>0)){
+    if((currb=mem32[((h2bb+(hki<<2))|0)>>2]|0)|((redo|0)>0)){
       curr=2;producable=0; alarm=0;
-        if (redo>0){
-          hki=redo;
+        if ((redo|0)>0){
+          hki=redo|0;
           otrav_`+this.fromA[0]+`=ntrav_`+this.fromA[0]+`;
           otrav_`+this.joinA[0]+`=ntrav_`+this.joinA[0]+`;
-          currb=mem32[((h2bb+(hki<<2))|0)>>2];
+          currb=mem32[((h2bb+(hki<<2))|0)>>2]|0;
 	  redo=-1;
           alarm=1;
         }else{
@@ -480,7 +480,7 @@ function Afterburner(){
         if (`+daConts+`){
           ntrav_`+this.fromA[0]+`=trav_`+this.fromA[0]+`;
           ntrav_`+this.joinA[0]+`=trav_`+this.joinA[0]+`;
-          if ((redo<0)&(!alarm)){
+          if (((redo|0)<0)&(!alarm)){
             redo=hki;
             producable=0;
             break;
@@ -582,12 +582,12 @@ function Afterburner(){
   redo=-1;
   hki=-1;
   while(1){hki=hki+1|0;if ((hki|0)>=(hashBitFilter|0)) break;
-    if((currb=mem32[((h2bb+(hki<<2))|0)>>2]|0)|(redo>0)){
+    if((currb=mem32[((h2bb+(hki<<2))|0)>>2]|0)|((redo|0)>0)){
       curr=1;producable=0; alarm=0;
-        if (redo>0){
+        if ((redo|0)>0){
           hki=redo;
           otrav_`+this.fromA[0]+`=ntrav_`+this.fromA[0]+`;
-          currb=mem32[((h2bb+(hki<<2))|0)>>2];
+          currb=mem32[((h2bb+(hki<<2))|0)>>2]|0;
 	  redo=-1;
           alarm=1;
         }else{
@@ -608,7 +608,7 @@ function Afterburner(){
         if ((trav_`+this.fromA[0]+`|0)<0) {curr=curr+1|0; continue;} 
         if (`+daConts+`){
           ntrav_`+this.fromA[0]+`=trav_`+this.fromA[0]+`;
-          if ((redo<0)&(!alarm)){
+          if (((redo|0)<0)&(!alarm)){
             redo=hki;
             producable=0;
             break;
@@ -1258,18 +1258,20 @@ function compare(op,p1,p2){
   if (p1b && p2b && p1t==2 && p2t==2 && op=='=='){
     return '(mystrcp(' +p1b+ op + p2b+')|0)';
   } else if (p1b && p2b){
-    return '(' +p1b+ op + p2b+')';
+    return '(' +coerceFloatIf(p1b)+ op + coerceFloatIf(p2b)+')';
   } else if (p1b){
     if ((typeof p2) == 'string' && (op == '==')){
       if ((p1t == 2) || isPreBoundString(p1))
         return expandStrLitComp(p1b,p2);
       else if (p1t == 4 && p2.length==1){
-        return expandLitComp(op,p1t,p1b,p2.charCodeAt(0));
+        //return expandLitComp(op,p1t,p1b,p2.charCodeAt(0));
+        return expandLitComp(op,1,p1b,p2.charCodeAt(0));
       }
       else 
         badFSQL('@compare');
     } else {
-      return expandLitComp(op,p1t,p1b,p2);  
+      //return expandLitComp(op,p1t,p1b,p2);  
+      return expandLitComp(op,1,p1b,p2);  
     }
   } else if (p2b){
     if ((typeof p1) == 'string' && (op == '==')){
@@ -1281,7 +1283,8 @@ function compare(op,p1,p2){
         badFSQL('@compare');
 
     } else {
-      return expandLitComp(op,p2t,p2b,p1);  
+      //return expandLitComp(op,p2t,p2b,p1);  
+      return expandLitComp(op,1,p2b,p1);  
     }
   }
   else{//todo: eval here 
@@ -1379,7 +1382,7 @@ function count(p){
   if ((theGeneratingAB.hasljoin >0) &  p!="*"){
     var trav=col2trav(p);
     if (theGeneratingAB.fromA.indexOf(trav)<0)
-      checknull="if (trav_"+trav+" !=-666) "; // is not NULL
+      checknull="if ((trav_"+trav+"|0) !=-666) "; // is not NULL
   }
   return `dec:var `+varname+`=0;::
   post:res.addCol2('count(`+p+`)',`+type+`);::
@@ -1396,7 +1399,7 @@ function countif(p,cond){
   if ((theGeneratingAB.hasljoin >0) &  p!="*"){
     var trav=col2trav(p);
     if (theGeneratingAB.fromA.indexOf(trav)<0)
-      checknull="if (trav_"+trav+" !=-666) "; // is not NULL
+      checknull="if ((trav_"+trav+"|0) !=-666) "; // is not NULL
   }
   return `dec:var `+varname+`=0;::
   post:res.addCol2('count(`+p+`)',`+type+`);::
@@ -1476,12 +1479,12 @@ function expandStrLitComp(strp, strlit){
 }
 
 function expandLitComp(op,type,bp,lp){
-  if (type==1){
-    lp= '(+('+lp+'))';
-  } else {
-    lp= '(('+lp+')|0)';
-  }
-  ret= '(' + bp + '' + op + '' + lp + ')';
+//  if (type==1){
+//    lp= '(+('+lp+'))';
+//  } else {
+//    lp= '(('+lp+')|0)';
+//  }
+  ret= '(' + coerceFloatIf(bp) + '' + op + '' +  coerceFloatIf(lp) + ')';
   return ret;
 }
 
@@ -1494,6 +1497,14 @@ function coerceFloat(p){
   else if (p.indexOf('mem')>-1) return  "(+(" + p + "|0))";
   else return "(+(" + p + "))";
 } 
+function coerceFloatIf(p){
+  p = p+"";
+  if (p.indexOf('.')>-1) return p;
+  else if (p.indexOf('(+(')>-1) return p;
+  else if (p.indexOf('+(memF32')>-1) return p;
+  else return "(+(" + p + "|0))";
+} 
+
 function arith(op,p1,p2){
   var p1b=bindCol(p1);
   var p2b=bindCol(p2);

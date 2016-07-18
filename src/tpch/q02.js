@@ -24,13 +24,14 @@ function query2(){
   
   var mincost = ABi.select()
     .from(brass)
-    .field(min('ps_supplycost'),'ps_partkey')
+    .field(min('ps_supplycost'),as('ps_partkey','mc_partkey'))
     .group('ps_partkey')
     .materialize();
   
   return ABi.select()
   .from(mincost).join(brass).on("min(ps_supplycost)","ps_supplycost")
   .field( "s_acctbal","s_name", "n_name", "p_partkey", "p_mfgr", "s_address", "s_phone", "s_comment")
+  .where(eq("mc_partkey","ps_partkey"))
   .order(["-s_acctbal","n_name","s_name","p_partkey"])
   .limit(100);
   

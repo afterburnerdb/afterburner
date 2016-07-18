@@ -17,8 +17,8 @@ function query16(){
   .materialize()
 
   return ABi.select()
-  .from(ps_par)
-  .field("p_brand","p_type","p_size",as(count("*"),"supplier_cnt"))
-  .group("p_brand","p_type","p_size")
-  .order("-supplier_cnt","p_brand","p_type","p_size")
+    .from(ps_par)
+    .field("p_brand","p_type","p_size",as(count("ps_suppkey"),"supplier_cnt"))
+    .group("p_brand","p_type","p_size")
+    .order("-supplier_cnt","p_brand","p_type","p_size")
 }

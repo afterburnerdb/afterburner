@@ -12,7 +12,7 @@ function query20(){
     .where(gte("l_shipdate", date('1994-01-01')),
            lt("l_shipdate", date('1995-01-01')),
   		 eq("l_suppkey","ps_suppkey"))
-    .group("l_partkey")
+    .group("l_partkey","ps_availqty","ps_suppkey")
     .materialize()
     
   sup_nat=ABi.select()
