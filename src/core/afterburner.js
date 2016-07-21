@@ -2,7 +2,7 @@
 var inNode=(typeof window == 'undefined' );
 if(typeof module == 'undefined'){
   var module={};
-}
+}else{ require('./store.js');}
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 var uniqueVarCounter=0;
@@ -931,8 +931,8 @@ function bindCol(colname){
   }
 
   var resolved=resolve(colname);
-  ctype=typeCol(colname)
-  cptr=pointCol(colname,qt(this))
+  var ctype=typeCol(colname)
+  var cptr=pointCol(colname,qt(this))
   if (ctype==0 || ctype==2 || ctype==3 || ctype==4)
     return '(mem32[(('+cptr+' +(trav_'+col2trav(colname)+'<<2))|0)>>2]|0)';
   if (ctype==1)
@@ -1296,14 +1296,20 @@ function isPreBound(p1){
   return isPreBoundString(p1) || isPreBoundNumber(p1) ;
 }
 function isPreBoundString(p1){
-   return p1.indexOf('pb$')==0 ;
+  if (typeof p1 != 'string') return false;
+  return p1.indexOf('pb$')==0 ;
 }
 function isPreBoundNumber(p1){
-   return p1.indexOf('pb$')<0 && p1.indexOf('pb')==0 ;
+  if (typeof p1 != 'string') return false;
+  return p1.indexOf('pb$')<0 && p1.indexOf('pb')==0 ;
 }
 
 
 function substring(p1,n,m){
+  if (inNode){
+    bindCol=require("afterburner.js").bindCol;
+    typeCol=require("afterburner.js").typeCol;
+  }
   var p1b=bindCol(p1);
   var p1t=typeCol(p1);
   if (p1t!=2){
@@ -1543,15 +1549,36 @@ function as(p1,al){
 if(inNode){
   console.log('exporting afterburner');
   module.exports.Afterburner=Afterburner;
-  global.count=count;
-  global.sum=sum;
+  module.exports.bindCol=bindCol;
+  module.exports.typeCol=typeCol;
   global.like=like;
+  global.not=not;
   global.eq=eq;
-  global.lt=lt;
-  global.gte=gte;
+  global.neq=neq;
   global.lte=lte;
+  global.gte=gte;
+  global.lt=lt;
+  global.gt=gt;
   global.between=between;
+  global.isin=isin;
+  global.or=or;
+  global.and=and;
+  global.substring=substring;
+//  global.qc=qc;
+//  global.qt=qt;
+  global.toYear=toYear;
+  global.min=min;
+  global.max=max;
+  global.count=count;
+  global.countif=countif;
+  global.sum=sum;
+  global.sumif=sumif;
+  global.avg=avg;
   global.date=date;
-  global.compare=compare;
+  global.add=add;
+  global.sub=sub;
+  global.mul=mul;
+  global.div=div;
+  global.as=as;
 }else delete module;
 //////////////////////////////////////////////////////////////////////////////

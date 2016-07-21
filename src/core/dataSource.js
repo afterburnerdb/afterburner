@@ -277,7 +277,7 @@ handyColTypes["myview"]=[
   } else if (typeof src.data !== 'undefined'){
     this.fromMonetJSON(src);
   } else {
-    console.log('Unsupported DS type');
+    console.log('Unsupported DS type, typeof DS:'+ typeof DS);
   };
 }
 //////////////////////////////////////////////////////////////////////////////

@@ -1,3 +1,11 @@
+//////////////////////////////////////////////////////////////////////////////
+var inNode=(typeof window == 'undefined' );
+if(typeof module == 'undefined'){
+  module={};
+} else { 
+}
+//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
 
 function query22(){
   min_bal=ABi.select()
@@ -7,7 +15,6 @@ function query22(){
       isin(substring("c_phone",0,2),['13', '31', '23', '29', '30', '18', '17'])
     )
     .eval()
-  
     
   cus_ord=ABi.select()
     .from("customer").infrom("orders").isnotin("c_custkey","o_custkey")
@@ -15,7 +22,6 @@ function query22(){
     .where(gt("c_acctbal",min_bal),
       isin(substring("c_phone",0,2),['13', '31', '23', '29', '30', '18', '17']))
         .materialize()
-  
   
   return ABi.select()
     .from(cus_ord)
@@ -26,3 +32,10 @@ function query22(){
     .order("cntrycode")
 
 }
+
+//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
+if(inNode){
+  global.query22=query22;
+} else delete module;
+//////////////////////////////////////////////////////////////////////////////

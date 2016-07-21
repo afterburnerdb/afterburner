@@ -12,7 +12,7 @@ function aSchema(){
     this.tables.push(table);
      if(inNode)                                        
        printSchema=require('./common.js').printSchema; 
-     printSchema();
+     //printSchema();
   }
   this.toString = function(){
     ret="schema;"

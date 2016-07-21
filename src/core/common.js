@@ -67,6 +67,9 @@ if(inNode){
   global.int_to_strdate=int_to_strdate;
   global.strchar_to_int=strchar_to_int;
   global.int_to_strchar=int_to_strchar;
-
+  global.strToString=strToString;
+  global.DEBUG=DEBUG;
+  global.badFSQL=badFSQL;
+  global.dateToYearLUTab=dateToYearLUTab;
 }else delete module;
 ///////////////////////////////////////////////////////////////////////////////

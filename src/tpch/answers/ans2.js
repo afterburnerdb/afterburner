@@ -1,3 +1,12 @@
+//////////////////////////////////////////////////////////////////////////////
+var inNode=(typeof window == 'undefined' );
+if(typeof module == 'undefined'){
+  module={};
+} else {
+}
+//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
+
 ans2=[
 '9938.53','Supplier#000005359','UNITED KINGDOM','185358','Manufacturer#4','QKuHYh,vZGiwu2FWEJoLDx04','33-429-790-6131','uriously regular requests hag',
 '9937.84','Supplier#000005969','ROMANIA','108438','Manufacturer#1','ANDENSOSmk,miq23Xfb5RWt6dvUcvt6Qa','29-520-692-3537','efully express instructions. regular requests against the slyly fin',
@@ -100,3 +109,9 @@ ans2=[
 '7850.66','Supplier#000001518','UNITED KINGDOM','86501','Manufacturer#1','ONda3YJiHKJOC','33-730-383-3892','ifts haggle fluffily pending pai',
 '7843.52','Supplier#000006683','FRANCE','11680','Manufacturer#4','2Z0JGkiv01Y00oCFwUGfviIbhzCdy','16-464-517-8943',' express, final pinto beans x-ray slyly asymptotes. unusual, unusual',
 ]
+//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
+if(inNode){
+  global.ans2=ans2;
+} else delete module;
+//////////////////////////////////////////////////////////////////////////////

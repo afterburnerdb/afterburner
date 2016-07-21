@@ -4,6 +4,8 @@ if(typeof module == 'undefined'){
   module={};
 } else { 
 }//store
+if (inNode)
+  global.storedB=0;
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 var memmax=(2*1024*1024*1024)-(64*1024*1024);
@@ -52,7 +54,14 @@ function malloctmpstr(size){
 function deletetmpstr(){
   tmpstrStoredB=0;
 }
+
 function malloc(size){
+  if(inNode)
+    return malloc_v8(size);
+  else
+    return malloc_ff(size);
+}
+function malloc_ff(size){
   size=size|0;
   if (size<1) return storedB;
   size4b=((((size-1)/4)|0)+1)*4;
@@ -60,7 +69,14 @@ function malloc(size){
   storedB= (storedB+ size4b)|0;
   return ret|0;
 }
-
+function malloc_v8(size){
+  size=size|0;
+  if (size<1) return global.storedB;
+  size4b=((((size-1)/4)|0)+1)*4;
+  ret=global.storedB;
+  global.storedB= (global.storedB+ size4b)|0;
+  return ret|0;
+}
 function strcpy(strsrc, strdest){
   strsrc=strsrc|0;
   strdest=strdest|0;
@@ -107,8 +123,9 @@ if(inNode){
   module.exports.tmpstrcpy=tmpstrcpy;
   module.exports.tmpstrlen=tmpstrlen;
   module.exports.tmptoStoreStrcpy=tmptoStoreStrcpy; 
-  module.exports.mem32= mem32;
-  module.exports.memF32= memF32;
+//  module.exports.mem8=mem8;
+//  module.exports.mem32=mem32;
+//  module.exports.memF32= memF32;
   module.exports.tmpstrStore8=tmpstrStore8;
   global.hash1BucketSize=hash1BucketSize;
   global.temps=temps;
@@ -122,5 +139,10 @@ if(inNode){
   global.h2bb=h2bb;
   global.h3tb=h3tb;
   global.h3bb=h3bb;
+  global.deletetmpstr=deletetmpstr;
+  global.storedB=storedB;
+  global.mem8=mem8;
+  global.mem32=mem32;
+  global.memF32=memF32;
 } else delete module;
 //////////////////////////////////////////////////////////////////////////////

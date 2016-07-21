@@ -273,6 +273,10 @@ function queryResult(tempsptr) {
       
     }
     this.registerTable = function(){
+      if (inNode){
+        dataSource=require('dataSource.js');
+        aTable=require('aTable.js');
+      }
       var ds = new dataSource(this);
       daSchema.addTable(new aTable(ds));
       return this.name;

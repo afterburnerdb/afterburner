@@ -1,3 +1,11 @@
+//////////////////////////////////////////////////////////////////////////////
+var inNode=(typeof window == 'undefined' );
+if(typeof module == 'undefined'){
+  module={};
+} else {
+}
+//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
 ans10=[
 '57040','Customer#000057040','734235.25','632.87','JAPAN','Eioyzjf4pp','22-895-641-3466','sits. slyly regular requests sleep alongside of the regular inst',
 '143347','Customer#000143347','721002.69','2557.47','EGYPT','1aReFYv,Kw4','14-742-935-3718','ggle carefully enticing requests. final deposits use bold, bold pinto beans. ironic, idle re',
@@ -20,3 +28,9 @@ ans10=[
 '52528','Customer#000052528','556397.35','551.79','ARGENTINA','NFztyTOR10UOJ','11-208-192-3205',' deposits hinder. blithely pending asymptotes breach slyly regular re',
 '23431','Customer#000023431','554269.54','3381.86','ROMANIA','HgiV0phqhaIa9aydNoIlb','29-915-458-2654','nusual, even instructions: furiously stealthy n',
 ]
+//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
+if(inNode){
+  global.ans10=ans10;
+} else delete module;
+//////////////////////////////////////////////////////////////////////////////

@@ -17,14 +17,17 @@ function aTable(dSrc) {
     this.coltypes = [];
 //CREATE
     this.parseTable = function (){
+      if (inNode){
+        require('./store.js');
+      }
         if(typeof malloc=='undefined'){
           malloc=require('./store.js').malloc;
           malloctmpstr=require('./store.js').malloctmpstr;
           tmpstrcpy=require('./store.js').tmpstrcpy;
           tmpstrlen=require('./store.js').tmpstrlen;
           tmptoStoreStrcpy=require('./store.js').tmptoStoreStrcpy;
-          mem32=require('./store.js').mem32;
-          memF32=require('./store.js').memF32;
+//          mem32=require('./store.js').mem32;
+//          memF32=require('./store.js').memF32;
         }
 //
         var colptrs = malloc(this.numcols<<2);
