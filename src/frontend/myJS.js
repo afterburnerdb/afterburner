@@ -11,6 +11,7 @@ if (inNode){
   console.log('Running in Node');
   var aSchema=require('aSchema.js');
   var Afterburner=require('afterburner.js').Afterburner;
+  global.queryResult=require('./src/core/queryResult.js');
   ABi = new Afterburner();
   global.daSchema = new aSchema();
   global.ABi=ABi;

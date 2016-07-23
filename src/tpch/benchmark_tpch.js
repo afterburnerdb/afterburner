@@ -160,7 +160,133 @@ function verify_and_time(){
   }
   return {veri:verifiedA, runt:runtimesMSA};
 }
+function verifyqs(){
+  var verifiedA=[];
+  for (var i=0; i<queries.length; i++){
+    var query=queries[i];
+    var model_answer=answers[i];
+    var verified= verify_query(i,query,model_answer);
+    verifiedA.push(verified);
+  }
+  return verifiedA;
+}
+function start_collecting(){
+   
+  child_process.exec("perf stat -p "+process.pid + " -o tmp -B -e cache-references,cache-misses,cycles,instructions,branches,branch-misses,stalled-cycles-backend,stalled-cycles-frontend,faults,migrations sleep 5");
+ // child_process.exec("sudo perf record -F 99 -p "+process.pid+"  -ag -- sleep 5");
+}
+function end_collecting(qnum){
+  child_process.execSync("sleep 5");
+  var cache_ref=parseInt(child_process.execSync("grep cache-ref tmp | cut -d \\t -f 1")+"");
+  if (isNaN(cache_ref)) cache_ref=0;
+  var cache_misses=parseInt(child_process.execSync("grep cache-misses tmp | cut -d \\t -f 1")+"");
+  if (isNaN(cache_misses)) cache_misses=0;
+  var cycles=parseInt(child_process.execSync("grep cycles.\*GH tmp | cut -d \\t -f 1")+"");
+  if (isNaN(cycles)) cycles=0;
+  var instructions=parseInt(child_process.execSync("grep instructions tmp | cut -d \\t -f 1")+"");
+  if (isNaN(instructions)) instructions=0;
+  var branches=parseInt(child_process.execSync("grep branches tmp | cut -d \\t -f 1")+"");
+  if (isNaN(branches)) branches=0;
+  var branch_misses=parseInt(child_process.execSync("grep branch-misses tmp | cut -d \\t -f 1")+"");
+  if (isNaN(branch_misses)) branches=0;
+  var stalled_cycles_backend=parseInt(child_process.execSync("grep stalled-cycles-backend tmp | cut -d \\t -f 1")+"");
+  if (isNaN(stalled_cycles_backend)) stalled_cycles_backend=0;
+  var stalled_cycles_frontend=parseInt(child_process.execSync("grep stalled-cycles-frontend tmp | cut -d \\t -f 1")+"");
+  if (isNaN(stalled_cycles_frontend)) scf=0;
+  var faults=parseInt(child_process.execSync("grep faults tmp | cut -d \\t -f 1")+"");
+  if (isNaN(faults)) faults=0;
+  var migrations=parseInt(child_process.execSync("grep migrations tmp | cut -d \\t -f 1")+"");
+  if (isNaN(migrations)) migrations=0;
+  child_process.execSync("echo q" + (qnum+1) +":"+cache_ref+","+cache_misses+","+cycles+","+ instructions +","+branches+","+branch_misses+","+stalled_cycles_backend +","+stalled_cycles_frontend+","+faults+","+migrations+" >> perfstats.out");
 
+  child_process.execSync("rm tmp");
+ // child_process.execSync("sudo perf script > q"+(qnum+1)+".cx");
+  
+}
+function timeqs(perf){
+  var timeA=[];
+  for (var i=0; i<queries.length; i++){
+    var query=queries[i];
+    if (perf) start_collecting();
+    if (inNode)
+      t0=process.hrtime();
+    else
+      t0 = window.performance.now();
+    query().materialize();
+    if (inNode)
+      t1=process.hrtime();
+    else
+      t1 = window.performance.now();
+    if (perf) end_collecting(i);
+    if (inNode)
+      timeA.push((((t1[0]-t0[0])*(1000)) + ((t1[1]-t0[1])/(1000*1000))));
+    else 
+      timeA.push(t1-t0);
+  }
+  return timeA;
+}
+function benchmark3(warmup,rounds){
+  if (typeof warmup== 'undefined') warmup =1;
+  if (typeof rounds == 'undefined') rounds=5;
+  var run;
+  var tmpstr="";
+  var verifiedAA=[];
+  var runtimesMSAA=[];
+ // child_process.execSync("sudo echo initsudo");
+  for (var w=0; w<warmup; w++){
+      run=verifyqs();
+      verifiedAA.push(run);
+  }
+  for (var r=0; r<rounds;r++){
+      run=timeqs(true);
+      runtimesMSAA.push(run);
+  }
+  for (var i=0; i<verifiedAA[0].length; i++ ){
+    tmpstr="";
+    for (var ii=0; ii<rounds;ii++){
+      tmpstr+=verifiedAA[ii][i] +",";
+    }
+    console.log("query"+(i+1) + ":" + tmpstr);
+  }
+  for (var i=0; i<verifiedAA[0].length; i++){
+    tmpstr="";
+    for (var ii=0; ii<rounds; ii++){
+      tmpstr+=runtimesMSAA[ii][i] +",";
+    }
+    console.log("query"+(i+1) + ":" + tmpstr);
+  }
+}
+function benchmark2(warmup,rounds){
+  if (typeof warmup== 'undefined') warmup =1;
+  if (typeof rounds == 'undefined') rounds=5;
+  var run;
+  var tmpstr="";
+  var verifiedAA=[];
+  var runtimesMSAA=[];
+
+  for (var w=0; w<warmup; w++){
+      run=verifyqs();
+      verifiedAA.push(run);
+  }
+  for (var r=0; r<rounds;r++){
+      run=timeqs();
+      runtimesMSAA.push(run);
+  }
+  for (var i=0; i<verifiedAA[0].length; i++ ){
+    tmpstr="";
+    for (var ii=0; ii<rounds;ii++){
+      tmpstr+=verifiedAA[ii][i] +",";
+    }
+    console.log("query"+(i+1) + ":" + tmpstr);
+  }
+  for (var i=0; i<verifiedAA[0].length; i++){
+    tmpstr="";
+    for (var ii=0; ii<rounds; ii++){
+      tmpstr+=runtimesMSAA[ii][i] +",";
+    }
+    console.log("query"+(i+1) + ":" + tmpstr);
+  }
+}
 function benchmark(warmup,rounds){
   if (typeof warmup== 'undefined') warmup =1;
   if (typeof rounds == 'undefined') rounds=5;
@@ -170,11 +296,11 @@ function benchmark(warmup,rounds){
   var runtimesMSAA=[];
 
   for (var w=0; w<warmup; w++){
-      verify_and_time();
+      run=verify_and_time();
+      verifiedAA.push(run.veri);
   }
   for (var r=0; r<rounds;r++){
       run=verify_and_time();
-      verifiedAA.push(run.veri);
       runtimesMSAA.push(run.runt);
   }
   for (var i=0; i<verifiedAA[0].length; i++ ){
@@ -197,5 +323,7 @@ function benchmark(warmup,rounds){
 if(inNode){
   console.log('exporting bechmark_tpch');
   global.benchmark=benchmark;
+  global.benchmark2=benchmark2;
+  global.benchmark3=benchmark3;
 } else delete module;
 //////////////////////////////////////////////////////////////////////////////

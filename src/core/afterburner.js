@@ -685,7 +685,7 @@ function Afterburner(){
         console.log("time to run query:"+ (((t1[0]-t0[0])*(1000)) + ((t1[1]-t0[1])/(1000*1000))) +" ms");`
       ots="var t0 = process.hrtime();";
       windowORglobal='global';
-      qrunner="queryResult=require('./src/core/queryResult.js');res = new queryResult(rp);";
+      qrunner="/*queryResult=require('./src/core/queryResult.js');*/res = new queryResult(rp);";
     } else {
       debug=`var t1 = window.performance.now();
         divcons=document.getElementById("divcons");
