@@ -7,13 +7,13 @@ if(typeof module == 'undefined'){
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 
-function query13(){
+function query13(noasm){
   c_orders=ABi.select()
     .from("customer").ljoin("orders").on("c_custkey","o_custkey")
     .field("c_custkey",as(count("o_orderkey"),"c_count"))
     .where(not(like("o_comment",'%special%requests%')))
     .group("c_custkey")
-    .materialize()
+    .materialize(noasm);
 
   return ABi.select()
    .from(c_orders)

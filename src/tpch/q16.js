@@ -7,12 +7,12 @@ if(typeof module == 'undefined'){
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 
-function query16(){
+function query16(noasm){
   bad_sup=ABi.select()
   .from("supplier")
   .field("s_suppkey")
   .where(like("s_comment",'%Customer%Complaints%'))
-  .toArray()  
+  .toArray(noasm)  
 
   ps_par=ABi.select()
   .from("partsupp").join("part").on("ps_partkey","p_partkey")
@@ -23,7 +23,7 @@ function query16(){
 		 not(isin("ps_suppkey",bad_sup))
 		)
   .group("p_brand","p_type","p_size","ps_suppkey")
-  .materialize()
+  .materialize(noasm);
 
   return ABi.select()
     .from(ps_par)

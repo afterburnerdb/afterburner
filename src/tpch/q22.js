@@ -7,21 +7,21 @@ if(typeof module == 'undefined'){
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 
-function query22(){
+function query22(noasm){
   min_bal=ABi.select()
     .from("customer")
     .field(avg("c_acctbal"))
     .where(gt("c_acctbal",0.00),
       isin(substring("c_phone",0,2),['13', '31', '23', '29', '30', '18', '17'])
     )
-    .eval()
+    .eval(noasm)
     
   cus_ord=ABi.select()
     .from("customer").infrom("orders").isnotin("c_custkey","o_custkey")
     .field(as(substring("c_phone",0,2),"cntrycode"),"c_acctbal")
     .where(gt("c_acctbal",min_bal),
       isin(substring("c_phone",0,2),['13', '31', '23', '29', '30', '18', '17']))
-        .materialize()
+        .materialize(noasm)
   
   return ABi.select()
     .from(cus_ord)

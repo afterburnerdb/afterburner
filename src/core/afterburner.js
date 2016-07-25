@@ -665,8 +665,8 @@ function Afterburner(){
   }
 //////////////////////////////////////////////////////////////////////////////
 //TOSTRING
-  this.toVanilla = function(){
-    var ret=this.string();
+  this.toVanilla = function(purpose){
+    var ret=this.toString(purpose);
     return ret.replace('\"use asm\"','');
   }
   this.toAsm = function(){
@@ -863,17 +863,29 @@ env={'temps':temps,
     else 
       return code + debug;
   }
-  this.toArray = function(){
-    return new Function('ignore', this.toString('array'))();
+  this.toArray = function(vanilla){
+    if (vanilla)
+      return new Function('ignore', this.toVanilla('array'))();
+    else 
+      return new Function('ignore', this.toString('array'))();
   }
-  this.toArray2 = function(){
-    return new Function('ignore', this.toString('array2'))();
+  this.toArray2 = function(vanilla){
+    if (vanilla)
+      return new Function('ignore', this.toVanilla('array2'))();
+    else 
+      return new Function('ignore', this.toVanilla('array2'))();
   }
-  this.eval = function(){
-    return new Function('ignore', this.toString('fc'))();
+  this.eval = function(vanilla){
+    if (vanilla)
+      return new Function('ignore', this.toVanilla('fc'))();
+    else 
+      return new Function('ignore', this.toString('fc'))();
   }
-  this.materialize = function(){
-    return new Function('ignore', this.toString('mat'))();
+  this.materialize = function(vanilla){
+    if (vanilla)
+      return new Function('ignore', this.toVanilla('mat'))();
+    else 
+      return new Function('ignore', this.toString('mat'))();
   }
 }
 //////////////////////////////////////////////////////////////////////////////

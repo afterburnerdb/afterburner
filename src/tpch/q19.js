@@ -7,7 +7,7 @@ if(typeof module == 'undefined'){
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 
-function query19(){
+function query19(noasm){
   return ABi.select()
    .from("lineitem").join("part").on("l_partkey","p_partkey")
    .field(sum(mul("l_extendedprice",sub(1,"l_discount"))))

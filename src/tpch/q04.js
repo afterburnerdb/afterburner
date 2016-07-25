@@ -7,13 +7,13 @@ if(typeof module == 'undefined'){
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 
-function query4(){
+function query4(noasm){
   distinct_orders=ABi.select()
     .from("lineitem")
     .field("l_orderkey")
     .where(lt("l_commitdate","l_receiptdate"))
     .group("l_orderkey")
-    .materialize();
+    .materialize(noasm);
   
   return ABi.select()
     .from("orders").join(distinct_orders).on("o_orderkey","l_orderkey")

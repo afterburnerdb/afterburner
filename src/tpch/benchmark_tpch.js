@@ -203,21 +203,21 @@ function end_collecting(qnum){
  // child_process.execSync("sudo perf script > q"+(qnum+1)+".cx");
   
 }
-function timeqs(perf){
+function timeqs(osperf,noasm){
   var timeA=[];
   for (var i=0; i<queries.length; i++){
     var query=queries[i];
-    if (perf) start_collecting();
+    if (osperf) start_collecting();
     if (inNode)
       t0=process.hrtime();
     else
       t0 = window.performance.now();
-    query().materialize();
+    query(noasm).materialize(noasm);
     if (inNode)
       t1=process.hrtime();
     else
       t1 = window.performance.now();
-    if (perf) end_collecting(i);
+    if (osperf) end_collecting(i);
     if (inNode)
       timeA.push((((t1[0]-t0[0])*(1000)) + ((t1[1]-t0[1])/(1000*1000))));
     else 
@@ -225,20 +225,21 @@ function timeqs(perf){
   }
   return timeA;
 }
-function benchmark3(warmup,rounds){
+function benchmark3(warmup,rounds,noasm){
   if (typeof warmup== 'undefined') warmup =1;
   if (typeof rounds == 'undefined') rounds=5;
   var run;
   var tmpstr="";
   var verifiedAA=[];
   var runtimesMSAA=[];
+  var osperf=true;
  // child_process.execSync("sudo echo initsudo");
   for (var w=0; w<warmup; w++){
       run=verifyqs();
       verifiedAA.push(run);
   }
   for (var r=0; r<rounds;r++){
-      run=timeqs(true);
+      run=timeqs(true,noasm);
       runtimesMSAA.push(run);
   }
   for (var i=0; i<verifiedAA[0].length; i++ ){
@@ -256,30 +257,30 @@ function benchmark3(warmup,rounds){
     console.log("query"+(i+1) + ":" + tmpstr);
   }
 }
-function benchmark2(warmup,rounds){
+function benchmark2(warmup,rounds,noasm){
   if (typeof warmup== 'undefined') warmup =1;
   if (typeof rounds == 'undefined') rounds=5;
   var run;
   var tmpstr="";
   var verifiedAA=[];
   var runtimesMSAA=[];
-
+  var osperf=false;
   for (var w=0; w<warmup; w++){
       run=verifyqs();
       verifiedAA.push(run);
   }
   for (var r=0; r<rounds;r++){
-      run=timeqs();
+      run=timeqs(osperf,noasm);
       runtimesMSAA.push(run);
   }
-  for (var i=0; i<verifiedAA[0].length; i++ ){
+  for (var i=0; (typeof  verifiedAA[0] !='undefined')&& i<verifiedAA[0].length; i++ ){
     tmpstr="";
     for (var ii=0; ii<rounds;ii++){
       tmpstr+=verifiedAA[ii][i] +",";
     }
     console.log("query"+(i+1) + ":" + tmpstr);
   }
-  for (var i=0; i<verifiedAA[0].length; i++){
+  for (var i=0; (typeof  runtimesMSAA[0] !='undefined')&&i<runtimesMSAA[0].length; i++){
     tmpstr="";
     for (var ii=0; ii<rounds; ii++){
       tmpstr+=runtimesMSAA[ii][i] +",";
@@ -303,14 +304,14 @@ function benchmark(warmup,rounds){
       run=verify_and_time();
       runtimesMSAA.push(run.runt);
   }
-  for (var i=0; i<verifiedAA[0].length; i++ ){
+  for (var i=0; (typeof  verifiedAA[0] !='undefined')&&i<verifiedAA[0].length; i++ ){
     tmpstr="";
     for (var ii=0; ii<rounds;ii++){
       tmpstr+=verifiedAA[ii][i] +",";
     }
     console.log("query"+(i+1) + ":" + tmpstr);
   }
-  for (var i=0; i<verifiedAA[0].length; i++){
+  for (var i=0; (typeof  runtimesMSAA[0] !='undefined')&&i<runtimesMSAA[0].length; i++){
     tmpstr="";
     for (var ii=0; ii<rounds; ii++){
       tmpstr+=runtimesMSAA[ii][i] +",";

@@ -7,7 +7,7 @@ if(typeof module == 'undefined'){
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 
-function query15(){
+function query15(noasm){
 
   sup_rev=ABi.select()
     .from("lineitem")
@@ -15,12 +15,12 @@ function query15(){
     .where(gte("l_shipdate",date('1996-01-01')),
             lt("l_shipdate",date('1996-04-01')))
     .group("l_suppkey")
-    .materialize()
+    .materialize(noasm);
   
   max_rev=ABi.select()
     .from(sup_rev)
     .field(max("total_revenue"))
-    .eval()
+    .eval(noasm);
     
   return ABi.select()
     .from("supplier").join(sup_rev).on("s_suppkey","supplier_no")
