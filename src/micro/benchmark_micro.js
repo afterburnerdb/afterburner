@@ -17,9 +17,11 @@ function micro1_JSO_(scale,o_totalpriceA){
   }
   return count;
 }
-function micro1_JSO(scale){
-  var o_totalpriceA=ABi.select().from('orders').field('o_totalprice').toArray();
+function micro1_JSO(scale,o_totalpriceA){
+  if (typeof o_totalpriceA == 'undefined')
+    o_totalpriceA=ABi.select().from('orders').field('o_totalprice').toArray();
   var count = 0;
+  var t0,t1;
   handle=Function('scale','o_totalpriceA',micro1_JSO_.toSource().replace(/function.*?\(.*?\)/i,''));
   if (inNode)
     t0= process.hrtime();
@@ -48,6 +50,7 @@ function micro1_TA_(scale, memF32,o_totalpriceOffset){
 function micro1_TA(scale){
   var o_totalpriceOffset= daSchema.getColPByName('o_totalprice','orders');
   var count=0;
+  var t0,t1;
   handle=Function('scale','memF32','o_totalpriceOffset',micro1_TA_.toSource().replace(/function.*?\(.*?\)/i,''));
   if (inNode)
     t0= process.hrtime();
@@ -89,6 +92,7 @@ function micro1_ASM(scale){
   var env={'scale':scale,
            'o_totalpriceOffset':o_totalpriceOffset};
   var asmi = new asm_m1(window, env, mem);
+  var t0,t1;
   if (inNode)
     t0= process.hrtime();
   else
@@ -134,9 +138,12 @@ function micro2_JSO_(scale, o_shippriorityA){
   }
   return count;
 }
-function micro2_JSO(scale){
-  var o_shippriorityA=ABi.select().from('orders').field('o_shippriority').toArray();
+function micro2_JSO(scale,o_shippriorityA){
+  if (typeof o_shippriorityA == 'undefined')
+    o_shippriorityA=ABi.select().from('orders').field('o_shippriority').toArray();
+
   var count = 0;
+  var t0,t1;
   handle=Function('scale','o_shippriorityA',micro2_JSO_.toSource().replace(/function.*?\(.*?\)/i,''));
   if (inNode)
     t0= process.hrtime();
@@ -147,7 +154,6 @@ function micro2_JSO(scale){
     t1= process.hrtime();
   else
     t1= window.performance.now(); 
-  //console.log("count="+count);
   if (inNode)
     return ((((t1[0]-t0[0])*(1000)) + ((t1[1]-t0[1])/(1000*1000))));
   else 
@@ -166,6 +172,7 @@ function micro2_TA(scale){
   var o_shippriorityOffset= daSchema.getColPByName('o_shippriority','orders');
   var count=0;
   handle=Function('scale','mem32','o_shippriorityOffset',micro2_TA_.toSource().replace(/function.*?\(.*?\)/i,''));
+  var t0,t1;
   if (inNode)
     t0= process.hrtime();
   else
@@ -203,6 +210,7 @@ var asm_m2 = (function (global, env, mem){
 function micro2_ASM(scale){
   var o_shippriorityOffset= daSchema.getColPByName('o_shippriority','orders');
   var count=0;
+  var t0,t1;
   var env={'scale':scale,
            'o_shippriorityOffset':o_shippriorityOffset};
   var asmi = new asm_m2(window, env,mem);
@@ -251,9 +259,12 @@ function micro3_JSO_(scale, o_orderpriorityA){
   }
   return count;
 }
-function micro3_JSO(scale){
-  var o_orderpriorityA=ABi.select().from('orders').field('o_orderpriority').toArray();
+
+function micro3_JSO(scale,o_orderpriorityA){
+  if (typeof o_orderpriorityA == 'undefined')
+    o_orderpriorityA=ABi.select().from('orders').field('o_orderpriority').toArray();
   var count = 0;
+  var t0,t1;
   handle=Function('scale','o_orderpriorityA',micro3_JSO_.toSource().replace(/function.*?\(.*?\)/i,''));
   if (inNode)
     t0= process.hrtime();
@@ -284,6 +295,7 @@ function micro3_TA_(scale, mem32, o_orderpriorityOffset){
 function micro3_TA(scale){
   var o_orderpriorityOffset= daSchema.getColPByName('o_orderpriority','orders');
   var count= 0;
+  var t0,t1;
   handle=Function('scale','mem32','o_orderpriorityOffset',micro3_TA_.toSource().replace(/function.*?\(.*?\)/i,''));
   if (inNode)
     t0= process.hrtime();
@@ -324,6 +336,7 @@ var asm_m3 = (function (global, env, mem){
 function micro3_ASM(scale){
   var o_orderpriorityOffset= daSchema.getColPByName('o_orderpriority','orders');
   var count=0;
+  var t0,t1;
   var env={'scale':scale,
            'o_orderpriorityOffset':o_orderpriorityOffset};
   var asmi = new asm_m3(window, env, mem);
@@ -371,6 +384,177 @@ function micro(){
   micro2();
   console.log("///////////MICRO-3///////////");
   micro3();
+}
+function micro1JSO(o_totalpriceA){
+  //o_totalpriceA=ABi.select().from('orders').field('o_totalprice').toArray();
+  var scale=1500000;
+  var t0,t1;
+  if (inNode)
+    t0= process.hrtime();
+  else
+    t0= window.performance.now();
+  for (var i=0;i<500;i++)
+    micro1_JSO(scale,o_totalpriceA);
+  if (inNode)
+    t1= process.hrtime();
+  else
+    t1= window.performance.now(); 
+  if (inNode)
+    return ((((t1[0]-t0[0])*(1000)) + ((t1[1]-t0[1])/(1000*1000))));
+  else 
+    return (t1-t0);
+}
+function micro1TA(){
+  var scale=1500000;
+  var t0,t1;
+  if (inNode)
+    t0= process.hrtime();
+  else
+    t0= window.performance.now();
+  for (var i=0;i<500;i++)
+    micro1_TA(scale);
+  if (inNode)
+    t1= process.hrtime();
+  else
+    t1= window.performance.now(); 
+  if (inNode)
+    return ((((t1[0]-t0[0])*(1000)) + ((t1[1]-t0[1])/(1000*1000))));
+  else 
+    return (t1-t0);
+}
+function micro1ASM(){
+  var scale=1500000;
+  var t0,t1;
+  if (inNode)
+    t0= process.hrtime();
+  else
+    t0= window.performance.now();
+  for (var i=0;i<500;i++)
+    micro1_ASM(scale);
+  if (inNode)
+    t1= process.hrtime();
+  else
+    t1= window.performance.now(); 
+  if (inNode)
+    return ((((t1[0]-t0[0])*(1000)) + ((t1[1]-t0[1])/(1000*1000))));
+  else 
+    return (t1-t0);
+}
+function micro2JSO(o_shippriorityA){
+  //o_shippriorityA=ABi.select().from('orders').field('o_shippriority').toArray();
+  var scale=1500000;
+  var t0,t1;
+  if (inNode)
+    t0= process.hrtime();
+  else
+    t0= window.performance.now();
+  for (var i=0;i<500;i++)
+    micro2_JSO(scale,o_shippriorityA);
+  if (inNode)
+    t1= process.hrtime();
+  else
+    t1= window.performance.now(); 
+  //console.log("count="+count);
+  if (inNode)
+    return ((((t1[0]-t0[0])*(1000)) + ((t1[1]-t0[1])/(1000*1000))));
+  else 
+    return (t1-t0);
+}
+function micro2TA(){
+  var scale=1500000;
+  var t0,t1;
+  if (inNode)
+    t0= process.hrtime();
+  else
+    t0= window.performance.now();
+  for (var i=0;i<500;i++)
+    micro2_TA(scale);
+  if (inNode)
+    t1= process.hrtime();
+  else
+    t1= window.performance.now(); 
+  //console.log("count="+count);
+  if (inNode)
+    return ((((t1[0]-t0[0])*(1000)) + ((t1[1]-t0[1])/(1000*1000))));
+  else 
+    return (t1-t0);
+}
+function micro2ASM(){
+  var scale=1500000;
+  var t0,t1;
+  if (inNode)
+    t0= process.hrtime();
+  else
+    t0= window.performance.now();
+  for (var i=0;i<500;i++)
+    micro2_ASM(scale);
+  if (inNode)
+    t1= process.hrtime();
+  else
+    t1= window.performance.now(); 
+  if (inNode)
+    return ((((t1[0]-t0[0])*(1000)) + ((t1[1]-t0[1])/(1000*1000))));
+  else 
+    return (t1-t0);
+}
+
+function micro3JSO(o_orderpriorityA){
+//  o_orderpriorityA=ABi.select().from('orders').field('o_orderpriority').toArray();
+  var scale=1500000;
+  var t0,t1;
+  if (inNode)
+    t0= process.hrtime();
+  else
+    t0= window.performance.now();
+  for (var i=0;i<500;i++)
+    micro3_JSO(scale,o_orderpriorityA);
+  if (inNode)
+    t1= process.hrtime();
+  else
+    t1= window.performance.now(); 
+  //console.log("count="+count);
+  if (inNode)
+    return ((((t1[0]-t0[0])*(1000)) + ((t1[1]-t0[1])/(1000*1000))));
+  else 
+    return (t1-t0);
+}
+function micro3TA(){
+  var scale=1500000;
+  var t0,t1;
+  if (inNode)
+    t0= process.hrtime();
+  else
+    t0= window.performance.now();
+  for (var i=0;i<500;i++)
+    micro3_TA(scale);
+  if (inNode)
+    t1= process.hrtime();
+  else
+    t1= window.performance.now(); 
+  //console.log("count="+count);
+  if (inNode)
+    return ((((t1[0]-t0[0])*(1000)) + ((t1[1]-t0[1])/(1000*1000))));
+  else 
+    return (t1-t0);
+}
+function micro3ASM(){
+  var scale=1500000;
+  var t0,t1;
+  if (inNode)
+    t0= process.hrtime();
+  else
+    t0= window.performance.now();
+  for (var i=0;i<500;i++)
+    micro3_ASM(scale);
+
+  if (inNode)
+    t1= process.hrtime();
+  else
+    t1= window.performance.now(); 
+  if (inNode)
+    return ((((t1[0]-t0[0])*(1000)) + ((t1[1]-t0[1])/(1000*1000))));
+  else 
+    return (t1-t0);
 }
 ////micro4
 //function micro4_JSO_(scale, o_orderstatusA){

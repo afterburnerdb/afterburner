@@ -138,8 +138,7 @@ function verify_queries(){
 function verify_and_time(){
   var verifiedA=[];
   var runtimesMSA=[];
-  var t0;
-  var t1;
+  var t0,t1;
   for (var i=0; i<queries.length; i++){
     var query=queries[i];
     var model_answer=answers[i];
@@ -205,6 +204,7 @@ function end_collecting(qnum){
 }
 function timeqs(osperf,noasm){
   var timeA=[];
+  var t0,t1;
   for (var i=0; i<queries.length; i++){
     var query=queries[i];
     if (osperf) start_collecting();
@@ -221,6 +221,60 @@ function timeqs(osperf,noasm){
     if (inNode)
       timeA.push((((t1[0]-t0[0])*(1000)) + ((t1[1]-t0[1])/(1000*1000))));
     else 
+      timeA.push(t1-t0);
+  }
+  return timeA;
+}
+function count_calls(osperf,noasm){
+  var timeA=[];
+  var t0,t1;
+  for (var i=0; i<queries.length; i++){
+    var query=queries[i];
+    if (osperf) start_collecting();
+    if (inNode)
+      t0=process.hrtime();
+    else
+      t0 = window.performance.now();
+    fcall_ctr=0;
+    query(noasm).materialize(noasm); 
+    console.log("q:"+i+" fcall_ctr"+fcall_ctr);
+    if (inNode)
+      t1=process.hrtime();
+    else
+      t1 = window.performance.now();
+    if (osperf) end_collecting(i);
+    if (inNode)
+      timeA.push((((t1[0]-t0[0])*(1000)) + ((t1[1]-t0[1])/(1000*1000))));
+    else
+      timeA.push(t1-t0);
+  }
+  return timeA;
+}
+function count_mats(osperf,noasm){
+  var timeA=[];
+  var t0,t1;
+  for (var i=0; i<queries.length; i++){
+    var query=queries[i];
+    if (osperf) start_collecting();
+    if (inNode)
+      t0=process.hrtime();
+    else
+      t0 = window.performance.now();
+    fcall_ctr=0;
+    var mem0= malloc(0);
+    var mattemps=query(noasm);
+    var mem1= malloc(0);
+    mattemps.materialize(noasm);
+    var mem2= malloc(0);
+    console.log("q:"+i+" mem-mats:"+(mem1-mem0)+ " mem-ans:"+ (mem2-mem1));
+    if (inNode)
+      t1=process.hrtime();
+    else
+      t1 = window.performance.now();
+    if (osperf) end_collecting(i);
+    if (inNode)
+      timeA.push((((t1[0]-t0[0])*(1000)) + ((t1[1]-t0[1])/(1000*1000))));
+    else
       timeA.push(t1-t0);
   }
   return timeA;
@@ -257,7 +311,7 @@ function benchmark3(warmup,rounds,noasm){
     console.log("query"+(i+1) + ":" + tmpstr);
   }
 }
-function benchmark2(warmup,rounds,noasm){
+function benchmark(warmup,rounds,noasm){
   if (typeof warmup== 'undefined') warmup =1;
   if (typeof rounds == 'undefined') rounds=5;
   var run;
@@ -288,7 +342,7 @@ function benchmark2(warmup,rounds,noasm){
     console.log("query"+(i+1) + ":" + tmpstr);
   }
 }
-function benchmark(warmup,rounds){
+function benchmark_badone_delete(warmup,rounds){
   if (typeof warmup== 'undefined') warmup =1;
   if (typeof rounds == 'undefined') rounds=5;
   var run;
@@ -634,7 +688,7 @@ function micro3(){
 if(inNode){
   console.log('exporting bechmark_tpch');
   global.benchmark=benchmark;
-  global.benchmark2=benchmark2;
+//  global.benchmark2=benchmark2;
   global.benchmark3=benchmark3;
 } else delete module;
 //////////////////////////////////////////////////////////////////////////////
