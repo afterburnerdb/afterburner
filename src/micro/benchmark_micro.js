@@ -12,14 +12,14 @@ if (inNode){
 function micro1_JSO_(scale,o_totalpriceA){
   var count = 0;
   for (var ii=0;ii<scale;ii++){
-    if (o_totalpriceA[ii] < 1500)
+    if (o_totalpriceA[ii] < 1555.5)
       count= count + 1;
   }
   return count;
 }
 function micro1_JSO(scale,o_totalpriceA){
   if (typeof o_totalpriceA == 'undefined')
-    o_totalpriceA=ABi.select().from('orders').field('o_totalprice').toArray();
+    o_totalpriceA=ABi.select().from('orders10g').field('o_totalprice').toArray();
   var count = 0;
   var t0,t1;
   handle=Function('scale','o_totalpriceA',micro1_JSO_.toSource().replace(/function.*?\(.*?\)/i,''));
@@ -42,13 +42,13 @@ function micro1_TA_(scale, memF32,o_totalpriceOffset){
   var count=0;
   var lastOffset=scale*4;
   for (var ii=0;ii<lastOffset;ii=ii+4){
-    if (memF32[(o_totalpriceOffset + ii)>>2] < 1500)
+    if (memF32[(o_totalpriceOffset + ii)>>2] < 1555.5)
       count= count + 1;
   }
   return count;
 }
 function micro1_TA(scale){
-  var o_totalpriceOffset= daSchema.getColPByName('o_totalprice','orders');
+  var o_totalpriceOffset= daSchema.getColPByName('o_totalprice','orders10g');
   var count=0;
   var t0,t1;
   handle=Function('scale','memF32','o_totalpriceOffset',micro1_TA_.toSource().replace(/function.*?\(.*?\)/i,''));
@@ -78,7 +78,7 @@ var asm_m1 = (function (global, env, mem){
     var sscale=0;
     sscale= scale<<2;
     while ((ii|0)<(sscale|0)){
-      if (+(memF32[((o_totalpriceOffset + ii)|0)>>2]) < 1500.0)
+      if (+(memF32[((o_totalpriceOffset + ii)|0)>>2]) < 1555.5)
         count= (count + 1)|0;
       ii=(ii+4)|0;
     }
@@ -87,7 +87,7 @@ var asm_m1 = (function (global, env, mem){
   return {runner:runner}
 });
 function micro1_ASM(scale){
-  var o_totalpriceOffset= daSchema.getColPByName('o_totalprice','orders');
+  var o_totalpriceOffset= daSchema.getColPByName('o_totalprice','orders10g');
   var count=0;
   var env={'scale':scale,
            'o_totalpriceOffset':o_totalpriceOffset};
@@ -109,12 +109,12 @@ function micro1_ASM(scale){
     return (t1-t0);
 }
 function micro1(){
-  var scale= 1500000;
+  var scale= 15000000;
   var iters=5;
   var runtimesJSOA=[];
   var runtimesTAA=[];
   var runtimesASMA=[];
-  daSchema.getTable('orders').numrows=scale;
+  daSchema.getTable('orders10g').numrows=scale;
   for (var i=0;i<iters;i++){
     micro1_JSO(scale);
     micro1_TA(scale);
@@ -140,7 +140,7 @@ function micro2_JSO_(scale, o_shippriorityA){
 }
 function micro2_JSO(scale,o_shippriorityA){
   if (typeof o_shippriorityA == 'undefined')
-    o_shippriorityA=ABi.select().from('orders').field('o_shippriority').toArray();
+    o_shippriorityA=ABi.select().from('orders10g').field('o_shippriority').toArray();
 
   var count = 0;
   var t0,t1;
@@ -169,7 +169,7 @@ function micro2_TA_(scale, mem32,o_shippriorityOffset){
   return count;
 }
 function micro2_TA(scale){
-  var o_shippriorityOffset= daSchema.getColPByName('o_shippriority','orders');
+  var o_shippriorityOffset= daSchema.getColPByName('o_shippriority','orders10g');
   var count=0;
   handle=Function('scale','mem32','o_shippriorityOffset',micro2_TA_.toSource().replace(/function.*?\(.*?\)/i,''));
   var t0,t1;
@@ -208,7 +208,7 @@ var asm_m2 = (function (global, env, mem){
   return {runner:runner}
 });
 function micro2_ASM(scale){
-  var o_shippriorityOffset= daSchema.getColPByName('o_shippriority','orders');
+  var o_shippriorityOffset= daSchema.getColPByName('o_shippriority','orders10g');
   var count=0;
   var t0,t1;
   var env={'scale':scale,
@@ -230,12 +230,12 @@ function micro2_ASM(scale){
     return (t1-t0);
 }
 function micro2(){
-  var scale= 1500000;
+  var scale= 15000000;
   var iters=5;
   var runtimesJSOA=[];
   var runtimesTAA=[];
   var runtimesASMA=[];
-  daSchema.getTable('orders').numrows=scale;
+  daSchema.getTable('orders10g').numrows=scale;
   for (var i=0;i<iters;i++){
     micro2_JSO(scale);
     micro2_TA(scale);
@@ -262,7 +262,7 @@ function micro3_JSO_(scale, o_orderpriorityA){
 
 function micro3_JSO(scale,o_orderpriorityA){
   if (typeof o_orderpriorityA == 'undefined')
-    o_orderpriorityA=ABi.select().from('orders').field('o_orderpriority').toArray();
+    o_orderpriorityA=ABi.select().from('orders10g').field('o_orderpriority').toArray();
   var count = 0;
   var t0,t1;
   handle=Function('scale','o_orderpriorityA',micro3_JSO_.toSource().replace(/function.*?\(.*?\)/i,''));
@@ -293,7 +293,7 @@ function micro3_TA_(scale, mem32, o_orderpriorityOffset){
   return count;
 }
 function micro3_TA(scale){
-  var o_orderpriorityOffset= daSchema.getColPByName('o_orderpriority','orders');
+  var o_orderpriorityOffset= daSchema.getColPByName('o_orderpriority','orders10g');
   var count= 0;
   var t0,t1;
   handle=Function('scale','mem32','o_orderpriorityOffset',micro3_TA_.toSource().replace(/function.*?\(.*?\)/i,''));
@@ -334,7 +334,7 @@ var asm_m3 = (function (global, env, mem){
   return {runner:runner}
 });
 function micro3_ASM(scale){
-  var o_orderpriorityOffset= daSchema.getColPByName('o_orderpriority','orders');
+  var o_orderpriorityOffset= daSchema.getColPByName('o_orderpriority','orders10g');
   var count=0;
   var t0,t1;
   var env={'scale':scale,
@@ -356,12 +356,12 @@ function micro3_ASM(scale){
     return (t1-t0);
 }
 function micro3(){
-  var scale= 1500000;
+  var scale= 15000000;
   var iters=5;
   var runtimesJSOA=[];
   var runtimesTAA=[];
   var runtimesASMA=[];
-  daSchema.getTable('orders').numrows=scale;
+  daSchema.getTable('orders10g').numrows=scale;
   for (var i=0;i<iters;i++){
     micro3_JSO(scale);
     micro3_TA(scale);
@@ -386,14 +386,14 @@ function micro(){
   micro3();
 }
 function micro1JSO(o_totalpriceA){
-  //o_totalpriceA=ABi.select().from('orders').field('o_totalprice').toArray();
-  var scale=1500000;
+  //o_totalpriceA=ABi.select().from('orders10g').field('o_totalprice').toArray();
+  var scale=15000000;
   var t0,t1;
   if (inNode)
     t0= process.hrtime();
   else
     t0= window.performance.now();
-  for (var i=0;i<500;i++)
+  for (var i=0;i<50;i++)
     micro1_JSO(scale,o_totalpriceA);
   if (inNode)
     t1= process.hrtime();
@@ -405,13 +405,13 @@ function micro1JSO(o_totalpriceA){
     return (t1-t0);
 }
 function micro1TA(){
-  var scale=1500000;
+  var scale=15000000;
   var t0,t1;
   if (inNode)
     t0= process.hrtime();
   else
     t0= window.performance.now();
-  for (var i=0;i<500;i++)
+  for (var i=0;i<50;i++)
     micro1_TA(scale);
   if (inNode)
     t1= process.hrtime();
@@ -429,7 +429,7 @@ function micro1ASM(){
     t0= process.hrtime();
   else
     t0= window.performance.now();
-  for (var i=0;i<500;i++)
+  for (var i=0;i<50;i++)
     micro1_ASM(scale);
   if (inNode)
     t1= process.hrtime();
@@ -441,14 +441,14 @@ function micro1ASM(){
     return (t1-t0);
 }
 function micro2JSO(o_shippriorityA){
-  //o_shippriorityA=ABi.select().from('orders').field('o_shippriority').toArray();
+  //o_shippriorityA=ABi.select().from('orders10g').field('o_shippriority').toArray();
   var scale=1500000;
   var t0,t1;
   if (inNode)
     t0= process.hrtime();
   else
     t0= window.performance.now();
-  for (var i=0;i<500;i++)
+  for (var i=0;i<50;i++)
     micro2_JSO(scale,o_shippriorityA);
   if (inNode)
     t1= process.hrtime();
@@ -467,7 +467,7 @@ function micro2TA(){
     t0= process.hrtime();
   else
     t0= window.performance.now();
-  for (var i=0;i<500;i++)
+  for (var i=0;i<50;i++)
     micro2_TA(scale);
   if (inNode)
     t1= process.hrtime();
@@ -486,7 +486,7 @@ function micro2ASM(){
     t0= process.hrtime();
   else
     t0= window.performance.now();
-  for (var i=0;i<500;i++)
+  for (var i=0;i<50;i++)
     micro2_ASM(scale);
   if (inNode)
     t1= process.hrtime();
@@ -499,14 +499,14 @@ function micro2ASM(){
 }
 
 function micro3JSO(o_orderpriorityA){
-//  o_orderpriorityA=ABi.select().from('orders').field('o_orderpriority').toArray();
+//  o_orderpriorityA=ABi.select().from('orders10g').field('o_orderpriority').toArray();
   var scale=1500000;
   var t0,t1;
   if (inNode)
     t0= process.hrtime();
   else
     t0= window.performance.now();
-  for (var i=0;i<500;i++)
+  for (var i=0;i<50;i++)
     micro3_JSO(scale,o_orderpriorityA);
   if (inNode)
     t1= process.hrtime();
@@ -525,7 +525,7 @@ function micro3TA(){
     t0= process.hrtime();
   else
     t0= window.performance.now();
-  for (var i=0;i<500;i++)
+  for (var i=0;i<50;i++)
     micro3_TA(scale);
   if (inNode)
     t1= process.hrtime();
@@ -544,7 +544,7 @@ function micro3ASM(){
     t0= process.hrtime();
   else
     t0= window.performance.now();
-  for (var i=0;i<500;i++)
+  for (var i=0;i<50;i++)
     micro3_ASM(scale);
 
   if (inNode)
@@ -557,23 +557,23 @@ function micro3ASM(){
     return (t1-t0);
 }
 ////micro4
-//function micro4_JSO_(scale, o_orderstatusA){
+//function micro4_JSO_(scale, o_orders10gtatusA){
 //  var count=0;
 //  for (var ii=0;ii<scale;ii++){
-//    if (o_orderstatusA[ii] == 'F')
+//    if (o_orders10gtatusA[ii] == 'F')
 //      count= count+ 1;
 //  }
 //  return count;
 //}
 //function micro4_JSO(scale){
-//  var o_orderstatusA=ABi.select().from('orders').field('o_orderstatus').toArray();
+//  var o_orders10gtatusA=ABi.select().from('orders').field('o_orderstatus').toArray();
 //  var count = 0;
-//  handle=Function('scale','o_orderstatusA',micro4_JSO_.toSource().replace(/function.*?\(.*?\)/i,''));
+//  handle=Function('scale','o_orders10gtatusA',micro4_JSO_.toSource().replace(/function.*?\(.*?\)/i,''));
 //  if (inNode)
 //    t0= process.hrtime();
 //  else
 //    t0= window.performance.now();
-//  count= handle(scale, o_orderstatusA);
+//  count= handle(scale, o_orders10gtatusA);
 //  if (inNode)
 //    t1= process.hrtime();
 //  else
@@ -584,24 +584,24 @@ function micro3ASM(){
 //  else 
 //    return (t1-t0);
 //}
-//function micro4_TA_(scale, mem32, o_orderstatusOffset){
+//function micro4_TA_(scale, mem32, o_orders10gtatusOffset){
 //  var count=0;
 //  var lastOffset=scale*4;
 //  for (var ii=0;ii<lastOffset;ii=ii+4){
-//    if ( mem32[(o_orderstatusOffset +(ii))>>2]==70)
+//    if ( mem32[(o_orders10gtatusOffset +(ii))>>2]==70)
 //      count= count+ 1;
 //  }
 //  return count;
 //}
 //function micro4_TA(scale){
-//  var o_orderstatusOffset= daSchema.getColPByName('o_orderstatus','orders');
+//  var o_orders10gtatusOffset= daSchema.getColPByName('o_orderstatus','orders');
 //  var count= 0;
-//  handle=Function('scale','mem32','o_orderstatusOffset',micro4_TA_.toSource().replace(/function.*?\(.*?\)/i,''));
+//  handle=Function('scale','mem32','o_orders10gtatusOffset',micro4_TA_.toSource().replace(/function.*?\(.*?\)/i,''));
 //  if (inNode)
 //    t0= process.hrtime();
 //  else
 //    t0= window.performance.now();
-//  count=handle(scale, mem32, o_orderstatusOffset);
+//  count=handle(scale, mem32, o_orders10gtatusOffset);
 //  if (inNode)
 //    t1= process.hrtime();
 //  else
@@ -615,7 +615,7 @@ function micro3ASM(){
 //var asm_m4 = (function (global, env, mem){
 //  "use asm";
 //  var scale=env.scale|0;
-//  var o_orderstatusOffset=env.o_orderstatusOffset|0;
+//  var o_orders10gtatusOffset=env.o_orderstatusOffset|0;
 //  var mem32 = new global.Int32Array(mem);
 //  function runner(){
 //    var count=0;
@@ -623,7 +623,7 @@ function micro3ASM(){
 //    var sscale=0;
 //    sscale= scale<<2;
 //    while ((ii|0)<(sscale|0)){
-//      if ((mem32[((o_orderstatusOffset + ii)|0)>>2]|0) == 70)
+//      if ((mem32[((o_orders10gtatusOffset + ii)|0)>>2]|0) == 70)
 //        count= (count + 1)|0;
 //      ii=(ii+4)|0;
 //    }
@@ -632,10 +632,10 @@ function micro3ASM(){
 //  return {runner:runner}
 //});
 //function micro4_ASM(scale){
-//  var o_orderstatusOffset= daSchema.getColPByName('o_orderstatus','orders');
+//  var o_orders10gtatusOffset= daSchema.getColPByName('o_orderstatus','orders');
 //  var count=0;
 //  var env={'scale':scale,
-//           'o_orderstatusOffset':o_orderstatusOffset};
+//           'o_orders10gtatusOffset':o_orderstatusOffset};
 //  var asmi4 = new asm_m4(window, env, mem);
 //  if (inNode)
 //    t0= process.hrtime();
@@ -658,7 +658,7 @@ function micro3ASM(){
 //  var runtimesJSOA=[];
 //  var runtimesTAA=[];
 //  var runtimesASMA=[];
-//  daSchema.getTable('orders').numrows=scale;
+//  daSchema.getTable('orders10g').numrows=scale;
 ////  for (var i=0;i<iters;i++){
 //    micro4_JSO(scale);
 //    micro4_TA(scale);
