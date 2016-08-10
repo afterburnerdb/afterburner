@@ -326,10 +326,12 @@ var asm_m3 = (function (global, env, mem){
     var sscale=0;
     sscale= scale<<2;
     while ((ii|0)<(sscale|0)){
-      if (((mem32[  (mem32[((o_orderpriorityOffset +ii)|0)>>2]|0)        >>2]|0)==1381313841)&
-          ((mem32[(((mem32[((o_orderpriorityOffset +ii)|0)>>2]|0) + 4)|0)>>2]|0)==1414415687)&
-          ((mem32[(((mem32[((o_orderpriorityOffset +ii)|0)>>2]|0) + 8)|0)>>2]|0)==0         ))
-        count= (count + 1)|0;
+      if ((mem32[  (mem32[((o_orderpriorityOffset +ii)|0)>>2]|0)        >>2]|0)==1381313841){
+        if((mem32[(((mem32[((o_orderpriorityOffset +ii)|0)>>2]|0) + 4)|0)>>2]|0)==1414415687){
+          if((mem32[(((mem32[((o_orderpriorityOffset +ii)|0)>>2]|0) + 8)|0)>>2]|0)==0        )
+            count= (count + 1)|0;
+        }
+      }
       ii=(ii+4)|0;
     }
     return count|0;
