@@ -202,9 +202,17 @@ handyColTypes["myview"]=[
     tabname=fname.substring(0,doti);
     this.name=tabname;
     fname=fname.substring(doti+1,fname.length);
-    this.numrows=parseInt(fname.substring(0,fname.indexOf('.')));
+    var numrowsstrends=fname.indexOf('.');
+    var numrowsstr=fname.substring(0,numrowsstrends);
+    this.numrows=parseInt(numrowsstr);
     this.colnames=handyColNames[tabname];
     this.coltypes=handyColTypes[tabname];
+//      console.log(this.name);
+//      console.log(this.numrows);
+//      console.log(this.colnames);
+//      console.log(this.coltypes);
+//      console.log(handyColNames);
+//      console.log(handyColTypes);
 
     if (this.name&&this.numrows&&this.colnames&&this.coltypes){
       this.numcols=this.colnames.length;
