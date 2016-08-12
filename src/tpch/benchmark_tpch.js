@@ -5,50 +5,50 @@ if(typeof module == 'undefined'){
 } else { 
 }
 if (inNode){
-  require("/u1/kelgebaly/git/afterburner/src/tpch/q01");
-  require("/u1/kelgebaly/git/afterburner/src/tpch/q02");
-  require("/u1/kelgebaly/git/afterburner/src/tpch/q03");
-  require("/u1/kelgebaly/git/afterburner/src/tpch/q04");
-  require("/u1/kelgebaly/git/afterburner/src/tpch/q05");
-  require("/u1/kelgebaly/git/afterburner/src/tpch/q06");
-  require("/u1/kelgebaly/git/afterburner/src/tpch/q07");
-  require("/u1/kelgebaly/git/afterburner/src/tpch/q08");
-  require("/u1/kelgebaly/git/afterburner/src/tpch/q09");
-  require("/u1/kelgebaly/git/afterburner/src/tpch/q10");
-  require("/u1/kelgebaly/git/afterburner/src/tpch/q11");
-  require("/u1/kelgebaly/git/afterburner/src/tpch/q12");
-  require("/u1/kelgebaly/git/afterburner/src/tpch/q13");
-  require("/u1/kelgebaly/git/afterburner/src/tpch/q14");
-  require("/u1/kelgebaly/git/afterburner/src/tpch/q15");
-  require("/u1/kelgebaly/git/afterburner/src/tpch/q16");
-  require("/u1/kelgebaly/git/afterburner/src/tpch/q17");
-  require("/u1/kelgebaly/git/afterburner/src/tpch/q18");
-  require("/u1/kelgebaly/git/afterburner/src/tpch/q19");
-  require("/u1/kelgebaly/git/afterburner/src/tpch/q20");
-  require("/u1/kelgebaly/git/afterburner/src/tpch/q21");
-  require("/u1/kelgebaly/git/afterburner/src/tpch/q22");
-  require("/u1/kelgebaly/git/afterburner/src/tpch/answers/ans1");
-  require("/u1/kelgebaly/git/afterburner/src/tpch/answers/ans2");
-  require("/u1/kelgebaly/git/afterburner/src/tpch/answers/ans3");
-  require("/u1/kelgebaly/git/afterburner/src/tpch/answers/ans4");
-  require("/u1/kelgebaly/git/afterburner/src/tpch/answers/ans5");
-  require("/u1/kelgebaly/git/afterburner/src/tpch/answers/ans6");
-  require("/u1/kelgebaly/git/afterburner/src/tpch/answers/ans7");
-  require("/u1/kelgebaly/git/afterburner/src/tpch/answers/ans8");
-  require("/u1/kelgebaly/git/afterburner/src/tpch/answers/ans9");
-  require("/u1/kelgebaly/git/afterburner/src/tpch/answers/ans10");
-  require("/u1/kelgebaly/git/afterburner/src/tpch/answers/ans11");
-  require("/u1/kelgebaly/git/afterburner/src/tpch/answers/ans12");
-  require("/u1/kelgebaly/git/afterburner/src/tpch/answers/ans13");
-  require("/u1/kelgebaly/git/afterburner/src/tpch/answers/ans14");
-  require("/u1/kelgebaly/git/afterburner/src/tpch/answers/ans15");
-  require("/u1/kelgebaly/git/afterburner/src/tpch/answers/ans16");
-  require("/u1/kelgebaly/git/afterburner/src/tpch/answers/ans17");
-  require("/u1/kelgebaly/git/afterburner/src/tpch/answers/ans18");
-  require("/u1/kelgebaly/git/afterburner/src/tpch/answers/ans19");
-  require("/u1/kelgebaly/git/afterburner/src/tpch/answers/ans20");
-  require("/u1/kelgebaly/git/afterburner/src/tpch/answers/ans21");
-  require("/u1/kelgebaly/git/afterburner/src/tpch/answers/ans22");
+  query1 =require("q01");
+  query2 =require("q02");
+  query3 =require("q03");
+  query4 =require("q04");
+  query5 =require("q05");
+  query6 =require("q06");
+  query7 =require("q07");
+  query8 =require("q08");
+  query9 =require("q09");
+  query10=require("q10");
+  query11=require("q11");
+  query12=require("q12");
+  query13=require("q13");
+  query14=require("q14");
+  query15=require("q15");
+  query16=require("q16");
+  query17=require("q17");
+  query18=require("q18");
+  query19=require("q19");
+  query20=require("q20");
+  query21=require("q21");
+  query22=require("q22");
+  ans1=require("ans1");
+  ans2=require("ans2");
+  ans3=require("ans3");
+  ans4=require("ans4");
+  ans5=require("ans5");
+  ans6=require("ans6");
+  ans7=require("ans7");
+  ans8=require("ans8");
+  ans9=require("ans9");
+  ans10=require("ans10");
+  ans11=require("ans11");
+  ans12=require("ans12");
+  ans13=require("ans13");
+  ans14=require("ans14");
+  ans15=require("ans15");
+  ans16=require("ans16");
+  ans17=require("ans17");
+  ans18=require("ans18");
+  ans19=require("ans19");
+  ans20=require("ans20");
+  ans21=require("ans21");
+  ans22=require("ans22");
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
@@ -279,7 +279,7 @@ function count_mats(osperf,noasm){
   }
   return timeA;
 }
-function benchmark3(warmup,rounds,noasm){
+function benchmark_metrics(warmup,rounds,noasm){
   if (typeof warmup== 'undefined') warmup =1;
   if (typeof rounds == 'undefined') rounds=5;
   var run;
@@ -688,7 +688,6 @@ function micro3(){
 if(inNode){
   console.log('exporting bechmark_tpch');
   global.benchmark=benchmark;
-//  global.benchmark2=benchmark2;
-  global.benchmark3=benchmark3;
+  global.benchmark_metrics=benchmark_metrics;
 } else delete module;
 //////////////////////////////////////////////////////////////////////////////

@@ -4,6 +4,8 @@ if(typeof module == 'undefined'){
   var module={};
 } else { 
 }
+if (inNode){
+}
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 function aTable(dSrc) {
@@ -19,6 +21,8 @@ function aTable(dSrc) {
     this.parseTable = function (){
       if (inNode){
         require('./store.js');
+        if (typeof daSchema== 'undefined')
+          daSchema=require('myJS.js').daSchema
       }
         if(typeof malloc=='undefined'){
           malloc=require('./store.js').malloc;

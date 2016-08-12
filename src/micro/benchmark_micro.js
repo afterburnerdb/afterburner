@@ -11,6 +11,8 @@ if (inNode){
 function timestamp(){
   if (inNode){
     process.hrtime();
+    if (typeof daSchema== 'undefined')
+      daSchema=require('myJS.js').daSchema
     return process.hrtime();
   }
   else{
@@ -624,7 +626,7 @@ function micro3ASM(){
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 if(inNode){
-  console.log('exporting bechmark_tpch');
+  console.log('exporting bechmark_micro');
   global.micro=micro;
   global.micro1=micro1;
   global.micro2=micro2;

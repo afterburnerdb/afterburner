@@ -211,12 +211,18 @@ handyColTypes["myview"]=[
       DEBUG('found table in handy tables')
     }
     else{
-      this.name='orders';
-      this.numrows=1500000;
-      this.colnames=handyColNames[tabname];
-      this.coltypes=handyColTypes[tabname];
-      this.numcols=this.colnames.length;
-      //alert('un able to auto load table:'+ tabname);
+      //this.name='orders';
+      //this.numrows=1500000;
+      //this.colnames=handyColNames[tabname];
+      //this.coltypes=handyColTypes[tabname];
+      //this.numcols=this.colnames.length;
+      console.log(this.name);
+      console.log(this.numrows);
+      console.log(this.colnames);
+      console.log(this.coltypes);
+      console.log(handyColNames);
+      console.log(handyColTypes);
+      alert('un able to auto load table:'+ tabname);
     }
   }
 

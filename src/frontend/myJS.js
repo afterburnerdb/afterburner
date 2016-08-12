@@ -9,9 +9,9 @@ var ptr2srt = ptr2srt |0;
 
 if (inNode){
   console.log('Running in Node');
-  var aSchema=require('aSchema.js');
+  var aSchema=require('aSchema');
   var Afterburner=require('afterburner.js').Afterburner;
-  global.queryResult=require('./src/core/queryResult.js');
+  global.queryResult=require('queryResult.js');
   ABi = new Afterburner();
   global.daSchema = new aSchema();
   global.ABi=ABi;
@@ -378,15 +378,7 @@ function create_order(colname,tabname){
 
 
 
-function mystrcmp(str1, str2){
-  str1=str1|0;
-  str2=str2|0;
-  var i=i|0;
-  while (
-        ( (mem8[(str1+i)|0]==mem8[(str2+i)|0]) && mem8[(str1+i)|0 ] && mem8[(str2+i)|0])
-        ) i=((i+1)|0);
-  return (mem8[(str1+i)|0 ]-mem8[(str2+i)|0 ]);
-}
+
 
 function mystrcmplit( str1 , str2){
   var i= i|0;
@@ -428,3 +420,6 @@ if (inNode){
 }
 }
 
+if(inNode){
+  module.exports.daSchema=daSchema;
+}

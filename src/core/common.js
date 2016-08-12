@@ -6,6 +6,15 @@ if(typeof module == 'undefined'){
 }
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
+function mystrcmp(str1, str2){
+  str1=str1|0;
+  str2=str2|0;
+  var i=i|0;
+  while (
+        ( (mem8[(str1+i)|0]==mem8[(str2+i)|0]) && mem8[(str1+i)|0 ] && mem8[(str2+i)|0])
+        ) i=((i+1)|0);
+  return (mem8[(str1+i)|0 ]-mem8[(str2+i)|0 ]);
+}
 function strdate_to_int(strdate){
   var dateA=strdate.split('-');
   return (new Date(Date.UTC(dateA[0],dateA[1]-1,dateA[2]))).getTime()/(1000*60*60*24)|0;
@@ -63,6 +72,7 @@ function DEBUG (where,what){
 if(inNode){
   console.log('exporting common');
   module.exports.printSchema=printSchema;
+  module.exports.mystrcmp=mystrcmp;
   global.strdate_to_int=strdate_to_int;
   global.int_to_strdate=int_to_strdate;
   global.strchar_to_int=strchar_to_int;

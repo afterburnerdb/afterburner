@@ -63,6 +63,9 @@ function queryResult(tempsptr) {
       }       
     };
     this.sort = function(toSort) {
+        if (inNode){
+          mystrcmp=require('common').mystrcmp;
+        }
         fbody="{return ";
         var orderAB32;
         if(!inNode && navigator.userAgent.toLowerCase().indexOf('firefox') > -1){
@@ -124,6 +127,7 @@ function queryResult(tempsptr) {
                 alert("unknown type @qr.sort type:"+this.coltypes[toSort[a]]+" toSort[a]:"+toSort[a]);
         }
         
+
         qcomp=Function('a','b',fbody + "}");
         orderAB32.sort(qcomp);
 
