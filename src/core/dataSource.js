@@ -185,8 +185,6 @@ handyColTypes["lineitem"]=[
 2,
 2];
 
-
-
 handyColNames["myview"]=[
 "l_orderkey",
 "revenue",
@@ -197,6 +195,32 @@ handyColTypes["myview"]=[
 1,
 3,
 0];
+
+handyColNames["upgrade"]=[
+"id",
+"p",
+"origin",
+"dest",
+"fldate",   
+"flday", 
+"fltime",  
+"status",
+"plane", 
+"bookclass"
+];
+handyColTypes["upgrade"]=[
+0,
+0,
+2,
+2,
+2,
+2,
+2,
+2,
+2,
+2
+];
+
   this.useFnameHints = function(fname){
     doti=fname.indexOf('.');
     tabname=fname.substring(0,doti);
