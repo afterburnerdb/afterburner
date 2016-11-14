@@ -11,6 +11,8 @@ var Afterburner=require('../core/afterburner.js').Afterburner;
 var aTable=require('../core/aTable.js');
 var dataSource=require('../core/dataSource.js');
 var printSchema=require('../core/common.js').printSchema
+var proxyConf = require('./proxyConf');
+console.log(proxyConf);
 ABi = new Afterburner();
 global.daSchema = new aSchema();
 global.ABi=ABi;
@@ -20,11 +22,11 @@ var monetdb = require('monetdb')();
 var express = require('express');
  
 var options = {
-	host     : 'localhost', 
-	port     : 54322, 
-	dbname   : 'my-first-db', 
-	user     : 'monetdb', 
-	password : 'monetdb'
+	host     : proxyConf.monetdb.host, 
+	port     : proxyConf.monetdb.port, 
+	dbname   : proxyConf.monetdb.dbname, 
+	user     : proxyConf.monetdb.user, 
+	password : proxyConf.monetdb.password
 };
 var conn = new monetdb(options);
 conn.connect();
@@ -37,32 +39,40 @@ fs.writeFile("/tmp/fserver.pid", process.pid +"", function(err) {
 
    console.log("Pid file created");
 
+function send_monetdb_query(res,qstr){
+    var conn = new monetdb(options);
+    conn.connect();
+    conn.query(qstr).then(function(result){
+      res.send(result);
+    }).fail(function(result){
+      res.send(result);
+    });
+}
+
 //REST API
 var app = express();
 
-app.get('/getAllTables', function (req, res) {
-   console.log("Got a GET /getTables");
-   res.send('file server serving something carrying mem');
-})
+app.get('/getSchema', function (req, res) {
+   console.log("Got a GET /getSchema");
+   send_monetdb_query(res,"select tables.name,columns.name,columns.type from tables,columns where tables.id=columns.table_id and tables.system=false and tables.type=0");
+});
+
+app.get('/getTableNames', function (req, res) {
+   console.log("Got a GET /getTableNames");
+   send_monetdb_query(res,"select tables.name from tables where tables.system=false and tables.type=0");
+});
+
 
 app.get('/getTables', function (req, res) {
    console.log("Got a GET /getTables");
    res.send('file server serving something carrying mem');
-})
+});
 app.get('/query', function (req, res) {
   if (req.query.fsql){
     console.log('Got query fsql:'+req.query.fsql);
   }
   if (req.query.sql){
     console.log('Got query sql:'+req.query.sql);
-    var conn = new monetdb(options);
-    conn.connect();
-
-    conn.query(req.query.sql).then(function(result){
-      res.send(result);
-    }).fail(function(result){
-      res.send(result);
-    });
   }
 });
 app.get('/pull', function (req, res) {
@@ -93,17 +103,23 @@ app.get('/pull', function (req, res) {
     });
   }
 });
-app.get('/prototype_fluent.html', function (req, res) {
-   res.sendfile('prototype_fluent.html',{root:'../dist'});
+app.get('/demo_be.html', function (req, res) {
+   res.sendfile('demo_be.html',{root:'../../'});
 })
 app.get('/browser-frontend.min.js', function (req, res) {
-   res.sendfile('browser-frontend.min.js',{root:'../dist'});
+   res.sendfile('browser-frontend.min.js',{root:'../../'});
 })
 
-app.get('/', function (req, res) {
-   console.log("Got a GET /");
-   res.send('file server .1');
+app.get(/.*js$/, function (req, res) {
+   res.sendfile(req.originalUrl,{root:'../..'});
 })
+app.get(/.*html$/, function (req, res) {
+   res.sendfile(req.originalUrl,{root:'../..'});
+})
+app.get(/.*bootstrap.*/, function (req, res) {
+   res.sendfile(req.originalUrl,{root:'../..'});
+})
+
 app.use(function(req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");
 //  Access-Control-Allow-Credentials: true
@@ -114,7 +130,7 @@ app.use(function(req, res, next) {
 //  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
   next();
 });
-var server = app.listen(8081, function () {
+var server = app.listen(proxyConf.proxy.webport, function () {
 
   var host = server.address().address
   var port = server.address().port
@@ -128,6 +144,5 @@ var server = app.listen(8081, function () {
 //////////////////////////////////////////////////////////////////////////////
 if(inNode){
   console.log('exporting proxy');
-//  module.exports=proxyClient;
 }else delete module;
 //////////////////////////////////////////////////////////////////////////////

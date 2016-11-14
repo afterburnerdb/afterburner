@@ -17,6 +17,7 @@ function aTable(dSrc) {
     this.colptrs=0;
     this.cols = [];
     this.coltypes = [];
+    this.loc = 'inmem';
 //CREATE
     this.parseTable = function (){
       if (inNode){
@@ -177,6 +178,8 @@ function aTable(dSrc) {
       return this.toStringN(1/0);
     };
 //constructor
+  if (dSrc!=null){
+    
     this.name=dSrc.name;
     this.fname=dSrc.fname;
     this.numrows=dSrc.numrows;
@@ -195,6 +198,9 @@ function aTable(dSrc) {
     } else { 
       DEBUG("invalid data source type");
     }
+  }else{
+    this.loc='backend';
+  }
 }
 
 function broswerFileParse(file) {

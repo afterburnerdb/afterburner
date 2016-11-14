@@ -424,11 +424,12 @@ function micro(scale){
   t1=timestamp(); 
   console.log("totaltime:"+ timediff(t1,t0));
 }
+numruns_cpu_met=500;
 function micro1JSO(o_totalpriceA){
   var t0,t1;
   var scale=15000000;
   t0=timestamp();
-  for (var i=0;i<50;i++)
+  for (var i=0;i<numruns_cpu_met;i++)
     micro1_JSO(scale,o_totalpriceA);
   t1=timestamp(); 
   return timediff(t1,t0);
@@ -437,7 +438,7 @@ function micro1TA(){
   var t0,t1;
   var scale=15000000;
   t0=timestamp();
-  for (var i=0;i<50;i++)
+  for (var i=0;i<numruns_cpu_met;i++)
     micro1_TA(scale);
   t1=timestamp(); 
   return timediff(t1,t0);
@@ -446,7 +447,7 @@ function micro1ASM(){
   var t0,t1;
   var scale=15000000;
   t0=timestamp();
-  for (var i=0;i<50;i++)
+  for (var i=0;i<numruns_cpu_met;i++)
     micro1_ASM(scale);
   t1=timestamp(); 
   return timediff(t1,t0);
@@ -455,7 +456,7 @@ function micro2JSO(o_shippriorityA){
   var t0,t1;
   var scale=15000000;
   t0=timestamp();
-  for (var i=0;i<50;i++)
+  for (var i=0;i<numruns_cpu_met;i++)
     micro2_JSO(scale,o_shippriorityA);
   t1=timestamp(); 
   return timediff(t1,t0);
@@ -464,7 +465,7 @@ function micro2TA(){
   var scale=15000000;
   var t0,t1;
   t0=timestamp();
-  for (var i=0;i<50;i++)
+  for (var i=0;i<numruns_cpu_met;i++)
     micro2_TA(scale);
   t1=timestamp(); 
   return timediff(t1,t0);
@@ -473,7 +474,7 @@ function micro2ASM(){
   var t0,t1;
   var scale=15000000;
   t0=timestamp();
-  for (var i=0;i<50;i++)
+  for (var i=0;i<numruns_cpu_met;i++)
     micro2_ASM(scale);
   t1=timestamp();
   return timediff(t1,t0);
@@ -483,7 +484,7 @@ function micro3JSO(o_orderpriorityA){
   var t0,t1;
   var scale=15000000;
   t0=timestamp();
-  for (var i=0;i<50;i++)
+  for (var i=0;i<numruns_cpu_met;i++)
     micro3_JSO(scale,o_orderpriorityA);
   t1=timestamp(); 
   return timediff(t1,t0);
@@ -492,7 +493,7 @@ function micro3TA(){
   var t0,t1;
   var scale=15000000;
   t0=timestamp();
-  for (var i=0;i<50;i++)
+  for (var i=0;i<numruns_cpu_met;i++)
     micro3_TA(scale);
   t1=timestamp(); 
   return timediff(t1,t0);
@@ -501,7 +502,7 @@ function micro3ASM(){
   var t0,t1;
   var scale=15000000;
   t0=timestamp();
-  for (var i=0;i<50;i++)
+  for (var i=0;i<numruns_cpu_met;i++)
     micro3_ASM(scale);
   t1=timestamp();
   return timediff(t1,t0);
