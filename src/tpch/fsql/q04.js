@@ -7,27 +7,26 @@ if(typeof module == 'undefined'){
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 
-function query1(noasm){
-return ABi.select()
-  .from('lineitem')
-  .field('l_returnflag',
-    'l_linestatus',
-    sum('l_quantity'),
-    sum('l_extendedprice'),
-    sum(mul('l_extendedprice',sub(1.0 , 'l_discount'))),
-    sum(mul(mul('l_extendedprice',sub(1.0 , 'l_discount')), add(1.0 , 'l_tax'))),
-    avg('l_quantity'),
-    avg('l_extendedprice'),
-    avg('l_discount'),
-    count('*'))
-  .where(lte('l_shipdate',date('1998-09-02')))
-  .group('l_returnflag','l_linestatus')
-  .order('l_returnflag','l_linestatus')
+function query4(noasm){
+  return ABi.select()
+    .from("@orders")
+    .field("@o_orderpriority", as(count("@o_orderpriority"),"order_count"))
+    .where(
+      gte("@o_orderdate", "1993-07-01"),
+      lt ("@o_orderdate", "1993-10-01"),
+      exists(ABi.select()
+             .from("@lineitem")
+             .field("@*")
+             .where(eq("@l_orderkey","@o_orderkey"),
+                    lt("@l_commitdate","@l_receiptdate"))
+      )
+    )
+    .group("@o_orderpriority")
+    .order("@o_orderpriority");
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 if(inNode){
-  global.query1=query1;
-  module.exports=query1;
+  module.exports=query4;
 } else delete module;
 //////////////////////////////////////////////////////////////////////////////

@@ -32,6 +32,8 @@ function aSchema(){
     badFSQL("@getPeerAttributes","could not bind:" + colname);
   }
   this.getTable = function(tabname){
+    if(tabname[0]="@")
+      tabname=tabname.substring(1);
     tabname=tabname.toLowerCase();
     for (var i=0;i<this.tables.length;i++)
       if (this.tables[i].name.toLowerCase() == tabname)

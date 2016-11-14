@@ -34,11 +34,17 @@ function Afterburner(){
   }
 //////////////////////////////////////////////////////////////////////////////
 //API
-  this.from = function(param){
+  this.from = function(param, ...rest){
     var atab=this.tabAliasif(param);
-    if (daSchema.getTable(atab.tab)){
-      this.fromA.push(atab.als);
-      return this;
+    var tabi;
+    if (tabi=daSchema.getTable(atab.tab)){
+      if (tabi.loc=='inmem'){
+        this.fromA.push(atab.als);
+        return this;
+      }else if(tabi.loc=='backend'){
+        var sql= new fsql2sql();
+        return sql.select().from(param, ...rest);
+      }
     }
     else {
       badFSQL('@from', atab.tab +' is not a table')
