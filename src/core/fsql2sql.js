@@ -81,8 +81,8 @@ function fsql2sql(){
   this.group = function(param, ...rest){
     param=fixParam(param);
     this.groupA.push(param);
-    if (this.attsA.indexOf(param)<0)
-      this.attsA.push(param);
+//    if (this.attsA.indexOf(param)<0)
+//      this.attsA.push(param);
     if (rest.length>0)
       return this.group(rest[0], ...rest.slice(1));
     else 
@@ -273,6 +273,9 @@ function gt(p1,p2){
   return compare(">",p1,p2);
 }
 function between(p1,p2,p3){
+  p1=fixParam(p1);
+  p2=fixParam(p2);
+  p3=fixParam(p3);
   return p1 + " BETWEEN " + p2 + " AND " + p3;
 }
 function isin(p1,list){
@@ -290,8 +293,20 @@ function gtlit(p1,p2){
 function betweenlit(p1,p2,p3){
 }
 function or(p1,p2, ...rest){
+  if (rest.length>0)
+    return or(p1, or(p2,rest[0], ...rest.slice(1)));
+  else if (p2)
+    return '((' + p1 + ') OR (' +p2 + '))';
+  else
+    return '(' + p1 + ')';
 }
 function and(p1,p2, ...rest){
+  if (rest.length>0)
+    return and(p1, and(p2,rest[0], ...rest.slice(1)));
+  else if (p2)
+    return '((' + p1 + ') AND (' +p2 + '))';
+  else
+    return '(' + p1 + ')';
 }
 function compare(op,p1,p2){
   p1=fixParam(p1);
@@ -307,6 +322,8 @@ function isPreBoundNumber(p1){
 function substring(p1,n,m){
 }
 function toYear(p1){
+  p1=fixParam(p1);
+  return "@EXTRACT(YEAR FROM "+ p1+ ")";
 }
 function field(){
 }
@@ -331,6 +348,8 @@ function sum(p){
   return "@SUM("+p+")";
 }
 function sumif(p,cond){
+  p=fixParam(p);
+  return "@SUM(CASE WHEN ("+cond+") THEN" + p + "ELSE 0 END)"
 }
 function avg(p){
   p=fixParam(p);

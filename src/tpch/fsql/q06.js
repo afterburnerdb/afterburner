@@ -7,26 +7,19 @@ if(typeof module == 'undefined'){
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 
-function query1(noasm){
-return ABi.select()
-  .from('@lineitem')
-  .field('@l_returnflag','@l_linestatus',
-    sum('@l_quantity'),
-    sum('@l_extendedprice'),
-    sum(mul('@l_extendedprice',sub(1.0 , '@l_discount'))),
-    sum(mul(mul('@l_extendedprice',sub(1.0 , '@l_discount')), add(1.0 , '@l_tax'))),
-    avg('@l_quantity'),
-    avg('@l_extendedprice'),
-    avg('@l_discount'),
-    count('@*'))
-  .where(lte('@l_shipdate',date('1998-09-02')))
-  .group('@l_returnflag','@l_linestatus')
-  .order('@l_returnflag','@l_linestatus')
+function query6(){
+  return  ABi.select()
+    .from("@lineitem")
+    .field(as(sum(mul("@l_extendedprice","@l_discount")),"revenue"))
+    .where(gte("@l_shipdate",('1994-01-01')),
+      lt ("@l_shipdate",'1995-01-01'),
+      gte("@l_discount",0.0499999),
+      lte("@l_discount",0.0700001),
+      lt ("@l_quantity",24))
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 if(inNode){
-  global.query1=query1;
-  module.exports=query1;
+  module.exports=query6;
 } else delete module;
 //////////////////////////////////////////////////////////////////////////////
