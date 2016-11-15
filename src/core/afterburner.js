@@ -35,6 +35,10 @@ function Afterburner(){
 //////////////////////////////////////////////////////////////////////////////
 //API
   this.from = function(param, ...rest){
+    if (param instanceof fsql2sql){
+        var sql= new fsql2sql();
+        return sql.select().from(param, ...rest);
+    }
     var atab=this.tabAliasif(param);
     var tabi;
     if (tabi=daSchema.getTable(atab.tab)){

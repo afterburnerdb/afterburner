@@ -1,6 +1,16 @@
+//////////////////////////////////////////////////////////////////////////////
+var inNode=(typeof window == 'undefined' );
+if(typeof module == 'undefined'){
+  var module={};
+}else{ }
+//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
+var uniqueCounter=0;
+//base types: relation, column, cond, litral
 function fsql2sql(){
   this.fromA=[];
   this.joinA=[];
+  this.ljoinA=[];
   this.onA=[];
   this.joinP='';
   this.hasljoin=0;
@@ -11,43 +21,48 @@ function fsql2sql(){
   this.aggsA=[];
   this.whereA=[];
   this.groupA=[];
+  this.havingA=[]
   this.orderA=[];
   this.limitA=-1;
   this.resA=[];
   this.als2tab={};
   this.tab2als={};
+  this.name="STMT"+ uniqueCounter++;
 
-  this.select = function(param){
+  this.select = function(){
     return this;
   }
-  this.from = function(param, ...rest){
-    console.log("from:"+param)
-    if (typeof param == 'string' && param[0]=="@")
-      param=param.substring(1);
-    this.fromA.push(param);
+  this.from = function(rel, ...rest){
+    rel=fixRel(rel);
+    this.fromA.push(rel);
     if (rest.length>0)
       return this.from(rest[0], ...rest.slice(1));
     else 
       return this;
   }
-  this.join = function(param){
-    this.joinA.push(param);
+  this.join = function(rel){
+    this.joinA.push(rel);
     return this;
   }
-  this.ljoin = function(param){
-    this.ljoinA.push(param);
+  this.ljoin = function(rel){
+    rel=fixRel(rel);
+    this.ljoinA.push(rel);
     return this;
   }
-  this.infrom = function(param){
+  this.infrom = function(){
     return this;
   }
-  this.tabAliasif = function(param){
+  this.tabAliasif = function(){
     this.als2tab;
     this.tab2als;
     return this;
   }
-  this.on = function(param1, param2){
-    return this;
+  this.on = function(cond, ...rest){
+    this.onA.push(cond);
+    if (rest.length>0)
+      return this.on(rest[0], ...rest.slice(1));
+    else 
+      return this;
   }
   this.isin = function(param1,param2){
     return this;
@@ -55,55 +70,59 @@ function fsql2sql(){
   this.isnotin = function(param1,param2){
     return this;
   }
-  this.field = function(param, ...rest){
-    console.log("field:"+param);
-    param=fixParam(param);
-    if (param.substring(0,2)=='as'){
-      var alias=param;
-      alias=param.substring(param.indexOf('~')+1,param.indexOf('}'));
-      param=param.substring(param.indexOf('{')+1,param.indexOf('~'));
-      param = param + " AS " + alias;
+  this.field = function(col, ...rest){
+    console.log("field:"+col);
+    col=fixCol(col);
+    if (col.substring(0,2)=='as'){
+      var alias=col;
+      alias=col.substring(col.indexOf('~')+1, col.indexOf('}'));
+      col=col.substring(col.indexOf('{')+1,col.indexOf('~'));
+      col = col + " AS " + alias;
     }
-    this.attsA.push(param);
+    this.attsA.push(col);
     if (rest.length>0)
       return this.field(rest[0], ...rest.slice(1));
     else 
       return this;
   }
-  this.where = function(param, ...rest){
-    //param=fixParam(param);
-    this.whereA.push(param);
+  this.where = function(cond, ...rest){
+    this.whereA.push(cond);
     if (rest.length>0)
       return this.where(rest[0], ...rest.slice(1));
     else 
       return this;
   }
-  this.group = function(param, ...rest){
-    param=fixParam(param);
-    this.groupA.push(param);
-//    if (this.attsA.indexOf(param)<0)
-//      this.attsA.push(param);
+  this.group = function(col, ...rest){
+    col=fixCol(col);
+    this.groupA.push(col);
     if (rest.length>0)
       return this.group(rest[0], ...rest.slice(1));
     else 
       return this;
   }
-  this.order = function(param, ...rest){
-    console.log("order:"+param);
-    if (param[0]== '-')
-      param= param.substring(1) + " DESC";
-    console.log("order:"+param);
-    param=fixParam(param);
-    console.log("order:"+param);
-    this.orderA.push(param);
+  this.having = function(cond, ...rest){
+    this.havingA.push(cond);
+    if (rest.length>0)
+      return this.having(rest[0], ...rest.slice(1));
+    else 
+      return this;
+  }
+  this.order = function(col, ...rest){
+    console.log("order:"+col);
+    if (col[0]== '-')
+      col= col.substring(1) + " DESC";
+    console.log("order:"+col);
+    col=fixCol(col);
+    console.log("order:"+col);
+    this.orderA.push(col);
     if (rest.length>0)
       return this.order(rest[0], ...rest.slice(1));
     else 
       return this;
   }
 
-  this.limit = function(param){
-    this.limitA=param;
+  this.limit = function(lit){
+    this.limitA=lit;
     return this;
   }
   this.expandFrom = function(){
@@ -158,6 +177,10 @@ function fsql2sql(){
     var SELECT_STMT="SELECT " + this.attsA.join(', ');
     var FROM_STMT="FROM " + this.fromA.join(', ');
 
+    var LJOIN_STMT="";
+    if(this.ljoinA.length>0)
+      LJOIN_STMT="LEFT JOIN " + this.ljoinA + " ON " + this.onA.join(' AND ');
+
     var WHERE_STMT="";
     if (this.whereA.length>0)
       WHERE_STMT="WHERE "+ this.whereA.join(' AND ');
@@ -165,6 +188,10 @@ function fsql2sql(){
     var GROUP_STMT="";
     if (this.groupA.length>0)
       GROUP_STMT="GROUP BY "+ this.groupA.join(', ');
+
+    var HAVING_STMT="";
+    if (this.havingA.length>0)
+      HAVING_STMT="HAVING "+ this.havingA.join(' AND ');
 
     var ORDER_STMT="";
     if (this.orderA.length) 
@@ -176,8 +203,10 @@ function fsql2sql(){
 
     var sqlstr= SELECT_STMT + " " +
       FROM_STMT + " " +
+      LJOIN_STMT + " " +
       WHERE_STMT + " " +
       GROUP_STMT + " " +
+      HAVING_STMT + " " +
       ORDER_STMT + " " +
       LIMIT_STMT;
     return sqlstr;
@@ -248,37 +277,45 @@ function qc(it){
 }
 function qt(it){
 }
-function like(p,strlit){
-  p=fixParam(p);
-  return p + " LIKE '" + strlit+"'";
+function like(col,strlit){
+  col=fixCol(col);
+  return col + " LIKE '" + strlit+"'";
 }
-function not(p1){
+function notlike(col,strlit){
+  col=fixCol(col);
+  return col + " NOT LIKE '" + strlit+"'";
 }
-function eq(p1,p2){
-  return compare("=",p1,p2);
+
+function not(cond){
+  return "NOT (" + cond + ")";
 }
-function neq(p1,p2){
-  return compare("<>",p1,p2);
+function eq(col1,col2){
+  return compare("=",col1,col2);
 }
-function lte(p1,p2){
-  return compare("<=",p1,p2);
+function neq(col1,col2){
+  return compare("<>",col1,col2);
 }
-function gte(p1,p2){
-  return compare(">=",p1,p2);
+function lte(col1,col2){
+  return compare("<=",col1,col2);
 }
-function lt(p1,p2){
-  return compare("<",p1,p2);
+function gte(col1,col2){
+  return compare(">=",col1,col2);
 }
-function gt(p1,p2){
-  return compare(">",p1,p2);
+function lt(col1,col2){
+  return compare("<",col1,col2);
 }
-function between(p1,p2,p3){
-  p1=fixParam(p1);
-  p2=fixParam(p2);
-  p3=fixParam(p3);
-  return p1 + " BETWEEN " + p2 + " AND " + p3;
+function gt(col1,col2){
+  return compare(">",col1,col2);
 }
-function isin(p1,list){
+function between(col1,col2,col3){
+  col1=fixCol(col1);
+  col2=fixCol(col2);
+  col3=fixCol(col3);
+  return col1 + " BETWEEN " + col2 + " AND " + col3;
+}
+function isin(col,list){
+  p1=fixCol(col);
+  return p1 + " IN (" + list.map(fixCol).join(",") + ")"
 }
 function eqlit(p1,p2){
 }
@@ -292,26 +329,26 @@ function gtlit(p1,p2){
 }
 function betweenlit(p1,p2,p3){
 }
-function or(p1,p2, ...rest){
+function or(cond1,cond2, ...rest){
   if (rest.length>0)
-    return or(p1, or(p2,rest[0], ...rest.slice(1)));
-  else if (p2)
-    return '((' + p1 + ') OR (' +p2 + '))';
+    return or(cond1, or(cond2,rest[0], ...rest.slice(1)));
+  else if (cond2)
+    return '((' + cond1 + ') OR (' +cond2 + '))';
   else
-    return '(' + p1 + ')';
+    return '(' + cond1 + ')';
 }
-function and(p1,p2, ...rest){
+function and(cond1,cond2, ...rest){
   if (rest.length>0)
-    return and(p1, and(p2,rest[0], ...rest.slice(1)));
-  else if (p2)
-    return '((' + p1 + ') AND (' +p2 + '))';
+    return and(cond1, and(cond2,rest[0], ...rest.slice(1)));
+  else if (cond2)
+    return '((' + cond1 + ') AND (' +cond2 + '))';
   else
-    return '(' + p1 + ')';
+    return '(' + cond1 + ')';
 }
-function compare(op,p1,p2){
-  p1=fixParam(p1);
-  p2=fixParam(p2);
-  return p1 + op + p2;
+function compare(op,col1,col2){
+  col1=fixCol(col1);
+  col2=fixCol(col2);
+  return col1 + op + col2;
 }
 function isPreBound(p1){
 }
@@ -321,56 +358,56 @@ function isPreBoundNumber(p1){
 }
 function substring(p1,n,m){
 }
-function toYear(p1){
-  p1=fixParam(p1);
-  return "@EXTRACT(YEAR FROM "+ p1+ ")";
+function toYear(col){
+  col=fixCol(col);
+  return "@EXTRACT(YEAR FROM "+ col + ")";
 }
 function field(){
 }
 function aggregate(){
 }
-function min(p){
-  p=fixParam(p);
-  return "@MIN("+p+")";
+function min(col){
+  col=fixCol(col);
+  return "@MIN("+col+")";
 }
-function max(p){
-  p=fixParam(p);
-  return "@MAX("+p+")";
+function max(col){
+  col=fixCol(col);
+  return "@MAX("+col+")";
 }
-function count(p){
-  p=fixParam(p);
-  return "@COUNT("+p+")";
+function count(col){
+  col=fixCol(col);
+  return "@COUNT("+col+")";
 }
 function countif(p,cond){
 }
-function sum(p){
-  p=fixParam(p);
-  return "@SUM("+p+")";
+function sum(col){
+  col=fixCol(col);
+  return "@SUM("+col+")";
 }
-function sumif(p,cond){
-  p=fixParam(p);
-  return "@SUM(CASE WHEN ("+cond+") THEN" + p + "ELSE 0 END)"
+function sumif(col,cond){
+  col=fixCol(col);
+  return "@SUM(CASE WHEN ("+cond+") THEN " + col + " ELSE 0 END)"
 }
-function avg(p){
-  p=fixParam(p);
-  return "@AVG("+p+")";
+function avg(col){
+  col=fixCol(col);
+  return "@AVG("+col+")";
 }
 function expandStrLitComp(strp, strlit){
 }
 function expandLitComp(op,type,bp,lp){
 }
-function date(p){
-  p=fixParam(p);
-  return "DATE '" + p1 + "'";
+function date(col){
+  col=fixCol(col);
+  return "DATE " + col;
 }
 function coerceFloat(p){
 }
 function coerceFloatIf(p){
 }
-function arith(op,p1,p2){
-  p1=fixParam(p1);
-  p2=fixParam(p2);
-  return "@("+p1 + op + p2 + ")";
+function arith(op,c1,c2){
+  c1=fixCol(c1);
+  c2=fixCol(c2);
+  return "@("+c1 + op + c2 + ")";
 }
 function add(p1,p2){
   return arith("+",p1,p2);
@@ -387,18 +424,42 @@ function div(p1,p2){
 function as(p1,al){
   return p1 + " AS " + al;
 }
-function exists(param){
-  return 'EXISTS (' + param.toSQL() + ')';
+function exists(relation){
+  return 'EXISTS (' + relation.toSQL() + ')';
 }
-function fixParam(param){
-  if (typeof param == 'string'){
-    if (param[0]=='@')
-      param=param.substring(1)
+//function fixParam(param){
+//  if (typeof param == 'string'){
+//    if (param[0]=='@')
+//      param=param.substring(1)
+//    else 
+//      param="'"+param+"'";
+//
+//  } else if (param instanceof fsql2sql){
+//      param= "(" + param.toSQL() + ") AS tmpParam"+  uniqueCounter++;
+//  }
+//  return param;
+//}
+function fixCol(col){
+  if (typeof col == 'string'){
+    if (col[0]=='@')
+      col=col.substring(1)
     else 
-      param="'"+param+"'";
+      col="'"+col+"'";
 
-  } else if (param instanceof fsql2sql){
-      param= "(" + param.toSQL() + ")";
+  } else if (col instanceof fsql2sql){
+      col= "(" + col.toSQL() + ")";
   }
-  return param;
+  return col;
+}
+function fixRel(rel){
+  if (typeof rel == 'string'){
+    if (rel[0]=='@')
+      rel=rel.substring(1)
+    else 
+      rel="'"+rel+"'";
+
+  } else if (rel instanceof fsql2sql){
+      rel= "(" + rel.toSQL() + ") AS " + rel.name;
+  }
+  return rel;
 }
