@@ -360,7 +360,9 @@ function isPreBoundString(p1){
 }
 function isPreBoundNumber(p1){
 }
-function substring(p1,n,m){
+function substring(col,n,m){
+  col=fixCol(col);
+  return "@SUBSTRING("+col+" FROM "+n+" FOR "+ m+")";
 }
 function toYear(col){
   col=fixCol(col);
@@ -433,8 +435,12 @@ function as(col,al){
   return col + " AS " + al;
 }
 function exists(relation){
-  return 'EXISTS (' + relation.toSQL() + ')';
+  return ' EXISTS (' + relation.toSQL() + ')';
 }
+function notexists(relation){
+  return ' NOT EXISTS (' + relation.toSQL() + ')';
+}
+
 //function fixParam(param){
 //  if (typeof param == 'string'){
 //    if (param[0]=='@')

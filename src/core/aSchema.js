@@ -34,6 +34,8 @@ function aSchema(){
   this.getTable = function(tabname){
     if(tabname[0]="@")
       tabname=tabname.substring(1);
+    if (tabname.indexOf(" ")>0)
+       tabname=tabname.substring(0, tabname.indexOf(" "))
     tabname=tabname.toLowerCase();
     for (var i=0;i<this.tables.length;i++)
       if (this.tables[i].name.toLowerCase() == tabname)
