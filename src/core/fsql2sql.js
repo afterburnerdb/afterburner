@@ -64,12 +64,6 @@ function fsql2sql(){
     else 
       return this;
   }
-  this.isin = function(param1,param2){
-    return this;
-  }
-  this.isnotin = function(param1,param2){
-    return this;
-  }
   this.field = function(col, ...rest){
     console.log("field:"+col);
     col=fixCol(col);
@@ -314,8 +308,18 @@ function between(col1,col2,col3){
   return col1 + " BETWEEN " + col2 + " AND " + col3;
 }
 function isin(col,list){
-  p1=fixCol(col);
-  return p1 + " IN (" + list.map(fixCol).join(",") + ")"
+  col=fixCol(col);
+  if (list instanceof Array)
+    return col + " IN (" + list.map(fixCol).join(",") + ")"
+  else 
+    return col + " IN (" + list.toSQL() + ")"
+}
+function isnotin(col,list){
+  col=fixCol(col);
+  if (list instanceof Array)
+    return col + " NOT IN (" + list.map(fixCol).join(",") + ")"
+  else 
+    return col + " NOT IN (" + list.toSQL() + ")"
 }
 function eqlit(p1,p2){
 }
@@ -378,6 +382,10 @@ function count(col){
   col=fixCol(col);
   return "@COUNT("+col+")";
 }
+function countdistinct(col){
+  col=fixCol(col);
+  return "@COUNT( distinct "+col+")";
+}
 function countif(p,cond){
 }
 function sum(col){
@@ -409,20 +417,20 @@ function arith(op,c1,c2){
   c2=fixCol(c2);
   return "@("+c1 + op + c2 + ")";
 }
-function add(p1,p2){
-  return arith("+",p1,p2);
+function add(col1,col2){
+  return arith("+",col1,col2);
 }
-function sub(p1,p2){
-  return arith("-",p1,p2);
+function sub(col1,col2){
+  return arith("-",col1,col2);
 }
-function mul(p1,p2){
-  return arith("*",p1,p2);
+function mul(col1,col2){
+  return arith("*",col1,col2);
 }
-function div(p1,p2){
-  return arith("/",p1,p2);
+function div(col1,col2){
+  return arith("/",col,col2);
 }
-function as(p1,al){
-  return p1 + " AS " + al;
+function as(col,al){
+  return col + " AS " + al;
 }
 function exists(relation){
   return 'EXISTS (' + relation.toSQL() + ')';
