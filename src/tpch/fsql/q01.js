@@ -7,7 +7,7 @@ if(typeof module == 'undefined'){
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 
-function query1(noasm){
+function query1_fsql(noasm){
 return ABi.select()
   .from('@lineitem')
   .field('@l_returnflag','@l_linestatus',
@@ -19,14 +19,14 @@ return ABi.select()
     avg('@l_extendedprice'),
     avg('@l_discount'),
     count('@*'))
-  .where(lte('@l_shipdate',date('1998-09-02')))
+  .where(lte('@l_shipdate','1998-09-02'))
   .group('@l_returnflag','@l_linestatus')
   .order('@l_returnflag','@l_linestatus')
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 if(inNode){
-  global.query1=query1;
-  module.exports=query1;
+  global.query1_fsql=query1_sql;
+  module.exports=query1_fsql;
 } else delete module;
 //////////////////////////////////////////////////////////////////////////////

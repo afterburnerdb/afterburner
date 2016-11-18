@@ -27,40 +27,40 @@ function proxyClient(HOST,PORT){
    var baseurl="http://"+HOST+":"+PORT+"";
    xhttp.open("GET", baseurl + urlrel , async);
    xhttp.send(null);
-   console.log( ""+baseurl + urlrel );
    if (!async)
      return xhttp.responseText;
    else 
      return 0;
   }
+  this.getJSON= function(urlrel,cBack){
+  //  urlrel=encodeURIComponent(urlrel);
+    var ret=$.ajax({  dataType: "json",  url: urlrel,async:false})
+    return ret;
+  }
   this.execSQL= function(sql){
-    var uri='/query?sql='+sql;
-    console.log(uri);
-    return this.get(uri);
+    var uri='/query?sql='+btoa(sql);
+    var jawsan=this.getJSON(uri);
+//    return jawsan;
+    return jawsan.responseJSON;
   }
   this.execFSQL= function(fsql){
     var uri='/query?fsql='+sql;
-    console.log(uri);
     return this.get(uri);
   }
   this.pullTable= function(tabname){
     var uri='/pull?table='+tabname;
-    console.log(uri);
     return this.get(uri);
   }
   this.pullSQL= function(sql){
     var uri='/pull?sql='+sql;
-    console.log(uri);
     return this.get(uri);
   }
   this.getRemoteSchema= function(){
     var uri='/getSchema';
-    console.log(uri);
     return this.get(uri);
   }
   this.getRemoteTableNames= function(){
     var uri='/getTableNames';
-    console.log(uri);
     return this.get(uri);
   }
   //constructor:

@@ -20,7 +20,7 @@ global.ABi=ABi;
 var fs = require('fs');
 var monetdb = require('monetdb')();
 var express = require('express');
- 
+var atob=require('atob');
 var options = {
 	host     : proxyConf.monetdb.host, 
 	port     : proxyConf.monetdb.port, 
@@ -49,6 +49,16 @@ function send_monetdb_query(res,qstr){
     });
 }
 
+function send_monetdb_query_json(res,qstr){
+    var conn = new monetdb(options);
+    conn.connect();
+    conn.query(qstr).then(function(result){
+      console.log("@send_monetdb_query_json type of result:"+typeof result);
+      res.json(result);
+    }).fail(function(result){
+      res.json(result);
+    });
+}
 //REST API
 var app = express();
 
@@ -73,7 +83,11 @@ app.get('/query', function (req, res) {
   }
   if (req.query.sql){
     console.log('Got query sql:'+req.query.sql);
+    var desql=atob(req.query.sql);
+    console.log('Got query atob(sql):'+desql);
+    send_monetdb_query_json(res,desql);
   }
+  
 });
 app.get('/pull', function (req, res) {
   if (req.query.sql){

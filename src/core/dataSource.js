@@ -305,7 +305,9 @@ handyColTypes["upgrade"]=[
     this.coltypes=qr.coltypes;
   }
   this.fromMonetJSON= function(src){
-    var monetJSONParser= require('./monetJSONParser.js');
+    if (inNode){
+      monetJSONParser= require('./monetJSONParser.js');
+    }
     this.type='monetjsn';
     this.fname=null;
 
@@ -317,10 +319,23 @@ handyColTypes["upgrade"]=[
     this.colnames=Object.keys(src.col);
     this.coltypes=[];
     for (var i=0;i<src.structure.length;i++){
-      console.log('i:'+i);
       if (src.structure[i].type== 'int')
         this.coltypes.push(0);
+      else if (src.structure[i].type== 'bigint')
+        this.coltypes.push(0);
+      else if (src.structure[i].type== 'smallint')
+        this.coltypes.push(0);
+      else if (src.structure[i].type== 'tinyint')
+        this.coltypes.push(0);
+      else if (src.structure[i].type== 'boolean')
+        this.coltypes.push(0);
+      else if (src.structure[i].type== 'wrd')
+        this.coltypes.push(0);
       else if (src.structure[i].type== 'decimal')
+        this.coltypes.push(1);
+      else if (src.structure[i].type== 'real')
+        this.coltypes.push(1);
+      else if (src.structure[i].type== 'double')
         this.coltypes.push(1);
       else if (src.structure[i].type== 'varchar')
         this.coltypes.push(2);
@@ -329,11 +344,14 @@ handyColTypes["upgrade"]=[
       else if (src.structure[i].type== 'char')
         this.coltypes.push(4);
       else {
-        consolue.log('unsupported data types from monetdb:i'+i);
-        consolue.log('unsupported data types from monetdb:' + src.structure[i].type );
+        console.log('unsupported data types from monetdb:i'+i);
+        console.log('unsupported data types from monetdb:' + src.structure[i].type );
       }
     }
+    console.log("@fromMonetJSON: about to create monetJSONParser");
+    console.log("typeof monetJSONParser"+typeof monetJSONParser);
     this.parser=new monetJSONParser(src);
+    console.log('@fromMonetJSON: created parsa'+this.parser);
   }
   this.fromHTML5File= function(file,funk){//firefox browser file                  
       console.log('@fromHTML5File');

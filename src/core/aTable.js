@@ -42,6 +42,7 @@ function aTable(dSrc) {
         var nr=this.numrows;
         for (var i=0;i<this.numcols;i++){
           mem32[(this.colptrs+(i<<2))>>2]= malloc((nr+1)<<2);
+          this.cols[i]=mem32[(this.colptrs+(i<<2))>>2];
         } 
         var strbuff=malloctmpstr(100*1024);
         for (var ii=0;ii<nr;ii++)	{
@@ -155,6 +156,7 @@ function aTable(dSrc) {
           ret=ret+this.colnames[i] + "\t|\t"
       }
       for (var i=0;(i<this.numrows && i<num);i++){
+        ret=ret+"\n"
         for (var ii=0;ii<this.numcols;ii++){
           if (this.coltypes[ii]==0){
             ret=ret+mem32[(this.cols[ii]+(i<<2))>>2]+ "\t|\t";
@@ -176,6 +178,52 @@ function aTable(dSrc) {
 
     this.toString= function() {
       return this.toStringN(1/0);
+    };
+   this.toArray= function() {
+      if (inNode){
+        require('common.js');
+      }
+      var ret=[];
+      for (var i=0;(i<this.numrows);i++){
+          if (this.coltypes[0]==0){
+            ret.push(mem32[(this.cols[0]+(i<<2))>>2]);
+          } else if (this.coltypes[0]==1){
+            ret.push(memF32[(this.cols[0]+(i<<2))>>2]);
+          } else if (this.coltypes[0]==2){
+            ret.push(strToString(mem32[(this.cols[0]+(i<<2))>>2]));
+          } else if (this.coltypes[0]==3){
+            ret.push(int_to_strdate(mem32[(this.cols[0]+(i<<2))>>2]));
+          } else if (this.coltypes[0]==4){
+            ret.push(int_to_strchar(mem32[(this.cols[0]+(i<<2))>>2]));
+          } else{
+            alert("unkown type");
+          }
+      }
+      return ret;
+   };
+   this.toArray2= function(){
+      if (inNode){
+        require('common.js');
+      }
+      var ret=[];
+      for (var i=0;i<this.numrows;i++){
+        for (var ii=0;ii<this.numcols;ii++){
+          if (this.coltypes[ii]==0){
+            ret.push(mem32[(this.cols[ii]+(i<<2))>>2]);
+          } else if (this.coltypes[ii]==1){
+            ret.push(memF32[(this.cols[ii] +(i<<2))>>2]);
+          } else if (this.coltypes[ii]==2){
+            ret.push(strToString(mem32[(this.cols[ii] +(i<<2))>>2]));
+          } else if (this.coltypes[ii]==3){
+            ret.push(int_to_strdate(mem32[(this.cols[ii] + (i<<2))>>2]));
+          } else if (this.coltypes[ii]==4){
+            ret.push(int_to_strchar(mem32[(this.cols[ii] + (i<<2))>>2]));
+          } else{
+            alert("unkown type");
+          }
+        }
+      }
+      return ret;
     };
 //constructor
   if (dSrc!=null){
@@ -307,63 +355,63 @@ function broswerFileParse(file) {
     this.nextChunk();
 }
 
-function nodeFileParse(fname) {
-  this.fname=fname; 
-  this.delim='|';
-  this.eol='\n';
-  this.delimCode=this.delim.charCodeAt(0);
-  this.eolCode=this.eol.charCodeAt(0);
-  this.actualcs=0;
-  this.buffer;
-  this.bptr=0;
-  this.noMoreChunks=false;
-
-  this.nextcstr =function(resPtr){
-    tmpstrStore8=require('./store.js').tmpstrStore8;
-    strSize=0;
-    do{
-      if(this.buffer[this.bptr+strSize] == this.delimCode ){// || this.buffer[this.bptr+strSize] == this.eolCode ){
-        tmpstrStore8[resPtr+strSize]=0;
-        this.bptr=this.bptr+strSize+1;
-        return strSize+1;
-      }else{
-        tmpstrStore8[resPtr+strSize]=this.buffer[this.bptr+strSize];
-        strSize++;
-      }
-    }while(true);
-  };
-
-  this.nextstr =function(){
-    str="";
-    do{
-      if(this.buffer[this.bptr+str.length] == this.delimCode ){// || this.buffer[this.bptr+str.length] == this.eolCode ){
-        this.bptr+=str.length+1;
-        return str;
-      }else{
-        str+=String.fromCharCode(this.buffer[this.bptr+str.length]);
-      }
-    }while(true);
-  };
-
-  this.nextint = function(){
-    str = this.nextstr();
-    return parseInt(str);
-  };
-  this.nextfloat =function(){
-    str = this.nextstr();
-    return parseFloat(str);
-  };
-  this.getFileName =function(){
-    return this.fname;
-  }
-  //Constructor:
-  fs=require('fs');
-  console.log('this.fname='+this.fname);
-  var stats = fs.statSync(this.fname);
-  this.actualcs= stats["size"];
-  console.log('this.actualcs='+this.actualcs);
-  this.buffer=fs.readFileSync(this.fname);
-}
+//function nodeFileParse(fname) {
+//  this.fname=fname; 
+//  this.delim='|';
+//  this.eol='\n';
+//  this.delimCode=this.delim.charCodeAt(0);
+//  this.eolCode=this.eol.charCodeAt(0);
+//  this.actualcs=0;
+//  this.buffer;
+//  this.bptr=0;
+//  this.noMoreChunks=false;
+//
+//  this.nextcstr =function(resPtr){
+//    tmpstrStore8=require('./store.js').tmpstrStore8;
+//    strSize=0;
+//    do{
+//      if(this.buffer[this.bptr+strSize] == this.delimCode ){// || this.buffer[this.bptr+strSize] == this.eolCode ){
+//        tmpstrStore8[resPtr+strSize]=0;
+//        this.bptr=this.bptr+strSize+1;
+//        return strSize+1;
+//      }else{
+//        tmpstrStore8[resPtr+strSize]=this.buffer[this.bptr+strSize];
+//        strSize++;
+//      }
+//    }while(true);
+//  };
+//
+//  this.nextstr =function(){
+//    str="";
+//    do{
+//      if(this.buffer[this.bptr+str.length] == this.delimCode ){// || this.buffer[this.bptr+str.length] == this.eolCode ){
+//        this.bptr+=str.length+1;
+//        return str;
+//      }else{
+//        str+=String.fromCharCode(this.buffer[this.bptr+str.length]);
+//      }
+//    }while(true);
+//  };
+//
+//  this.nextint = function(){
+//    str = this.nextstr();
+//    return parseInt(str);
+//  };
+//  this.nextfloat =function(){
+//    str = this.nextstr();
+//    return parseFloat(str);
+//  };
+//  this.getFileName =function(){
+//    return this.fname;
+//  }
+//  //Constructor:
+//  fs=require('fs');
+//  console.log('this.fname='+this.fname);
+//  var stats = fs.statSync(this.fname);
+//  this.actualcs= stats["size"];
+//  console.log('this.actualcs='+this.actualcs);
+//  this.buffer=fs.readFileSync(this.fname);
+//}
 //////////////////////Convenience:
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////

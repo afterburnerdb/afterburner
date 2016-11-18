@@ -27,6 +27,30 @@ if (inNode){
   query20=require("q20");
   query21=require("q21");
   query22=require("q22");
+
+  query1_fsql =require("./fsql/q01");
+  query2_fsql =require("./fsql/q02");
+  query3_fsql =require("./fsql/q03");
+  query4_fsql =require("./fsql/q04");
+  query5_fsql =require("./fsql/q05");
+  query6_fsql =require("./fsql/q06");
+  query7_fsql =require("./fsql/q07");
+  query8_fsql =require("./fsql/q08");
+  query9_fsql =require("./fsql/q09");
+  query10_fsql=require("./fsql/q10");
+  query11_fsql=require("./fsql/q11");
+  query12_fsql=require("./fsql/q12");
+  query13_fsql=require("./fsql/q13");
+  query14_fsql=require("./fsql/q14");
+  query15_fsql=require("./fsql/q15");
+  query16_fsql=require("./fsql/q16");
+  query17_fsql=require("./fsql/q17");
+  query18_fsql=require("./fsql/q18");
+  query19_fsql=require("./fsql/q19");
+  query20_fsql=require("./fsql/q20");
+  query21_fsql=require("./fsql/q21");
+  query22_fsql=require("./fsql/q22");
+
   ans1=require("ans1");
   ans2=require("ans2");
   ans3=require("ans3");
@@ -76,7 +100,29 @@ query20,
 query21,
 query22
 ]
-
+queries_fsql=[query1_fsql,
+query2_fsql,
+query3_fsql,
+query4_fsql,
+query5_fsql,
+query6_fsql,
+query7_fsql,
+query8_fsql,
+query9_fsql,
+query10_fsql,
+query11_fsql,
+query12_fsql,
+query13_fsql,
+query14_fsql,
+query15_fsql,
+query16_fsql,
+query17_fsql,
+query18_fsql,
+query19_fsql,
+query20_fsql,
+query21_fsql,
+query22_fsql
+]
 answers=[ans1,
 ans2,
 ans3,
@@ -108,8 +154,8 @@ function equalcell(name,num,c1,c2){
   return false;
 }
 
-function verify_query(qnum,q,ma){
-  var mya= q().toArray2();
+function verify_query(qnum,q,ma,noasm){
+  var mya= q(noasm).toArray2();
   var name=(qnum+1);
   if (mya.length != ma.length){
     return false;
@@ -124,47 +170,51 @@ function verify_query(qnum,q,ma){
   return true;
 }
 
-function verify_queries(){
-  var verifiedA=[];
-  for (var i=0; i<queries.length; i++){
-    var query=queries[i];
-    var model_answer=answers[i];
-    var verified= verify_query(i,query,model_answer);
-    verifiedA.push(verified);
-  }
-  return verifiedA;
-}
+//function verify_queries(){
+//  var verifiedA=[];
+//  for (var i=0; i<queries.length; i++){
+//    var query=queries[i];
+//    var model_answer=answers[i];
+//    var verified= verify_query(i,query,model_answer);
+//    verifiedA.push(verified);
+//  }
+//  return verifiedA;
+//}
 
-function verify_and_time(){
+//function verify_and_time(){
+//  var verifiedA=[];
+//  var runtimesMSA=[];
+//  var t0,t1;
+//  for (var i=0; i<queries.length; i++){
+//    var query=queries[i];
+//    var model_answer=answers[i];
+//    if (inNode)
+//      t0=process.hrtime();
+//    else
+//      t0 = window.performance.now();
+//    var verified= verify_query(i,query,model_answer);
+//    if (inNode)
+//      t1=process.hrtime();
+//    else
+//      t1 = window.performance.now();
+//    verifiedA.push(verified);
+//    if (inNode)
+//      runtimesMSA.push((((t1[0]-t0[0])*(1000)) + ((t1[1]-t0[1])/(1000*1000))));
+//    else 
+//      runtimesMSA.push(t1-t0);
+//  }
+//  return {veri:verifiedA, runt:runtimesMSA};
+//}
+function verifyqs(noasm,backend){
   var verifiedA=[];
-  var runtimesMSA=[];
-  var t0,t1;
   for (var i=0; i<queries.length; i++){
-    var query=queries[i];
-    var model_answer=answers[i];
-    if (inNode)
-      t0=process.hrtime();
-    else
-      t0 = window.performance.now();
-    var verified= verify_query(i,query,model_answer);
-    if (inNode)
-      t1=process.hrtime();
-    else
-      t1 = window.performance.now();
-    verifiedA.push(verified);
-    if (inNode)
-      runtimesMSA.push((((t1[0]-t0[0])*(1000)) + ((t1[1]-t0[1])/(1000*1000))));
+    var query;
+    if (backend)
+      query=queries_fsql[i];
     else 
-      runtimesMSA.push(t1-t0);
-  }
-  return {veri:verifiedA, runt:runtimesMSA};
-}
-function verifyqs(){
-  var verifiedA=[];
-  for (var i=0; i<queries.length; i++){
-    var query=queries[i];
+      query=queries[i]
     var model_answer=answers[i];
-    var verified= verify_query(i,query,model_answer);
+    var verified= verify_query(i,query,model_answer,noasm);
     verifiedA.push(verified);
   }
   return verifiedA;
@@ -202,11 +252,15 @@ function end_collecting(qnum){
  // child_process.execSync("sudo perf script > q"+(qnum+1)+".cx");
   
 }
-function timeqs(osperf,noasm){
+function timeqs(osperf,noasm,backend){
   var timeA=[];
   var t0,t1;
   for (var i=0; i<queries.length; i++){
-    var query=queries[i];
+    var query;
+    if (backend)
+      query=queries_fsql[i];
+    else 
+      query=queries[i]
     if (osperf) start_collecting();
     if (inNode)
       t0=process.hrtime();
@@ -311,20 +365,21 @@ function benchmark_metrics(warmup,rounds,noasm){
     console.log("query"+(i+1) + ":" + tmpstr);
   }
 }
-function benchmark(warmup,rounds,noasm){
+function benchmark(warmup,rounds,noasm,backend){
   if (typeof warmup== 'undefined') warmup =1;
   if (typeof rounds == 'undefined') rounds=5;
+  if (typeof backend == 'undefined') backend=false;
   var run;
   var tmpstr="";
   var verifiedAA=[];
   var runtimesMSAA=[];
   var osperf=false;
   for (var w=0; w<warmup; w++){
-      run=verifyqs();
+      run=verifyqs(noasm,backend);
       verifiedAA.push(run);
   }
   for (var r=0; r<rounds;r++){
-      run=timeqs(osperf,noasm);
+      run=timeqs(osperf,noasm,backend);
       runtimesMSAA.push(run);
   }
   for (var i=0; (typeof  verifiedAA[0] !='undefined')&& i<verifiedAA[0].length; i++ ){
@@ -342,37 +397,37 @@ function benchmark(warmup,rounds,noasm){
     console.log("query"+(i+1) + ":" + tmpstr);
   }
 }
-function benchmark_badone_delete(warmup,rounds){
-  if (typeof warmup== 'undefined') warmup =1;
-  if (typeof rounds == 'undefined') rounds=5;
-  var run;
-  var tmpstr="";
-  var verifiedAA=[];
-  var runtimesMSAA=[];
-
-  for (var w=0; w<warmup; w++){
-      run=verify_and_time();
-      verifiedAA.push(run.veri);
-  }
-  for (var r=0; r<rounds;r++){
-      run=verify_and_time();
-      runtimesMSAA.push(run.runt);
-  }
-  for (var i=0; (typeof  verifiedAA[0] !='undefined')&&i<verifiedAA[0].length; i++ ){
-    tmpstr="";
-    for (var ii=0; ii<rounds;ii++){
-      tmpstr+=verifiedAA[ii][i] +",";
-    }
-    console.log("query"+(i+1) + ":" + tmpstr);
-  }
-  for (var i=0; (typeof  runtimesMSAA[0] !='undefined')&&i<runtimesMSAA[0].length; i++){
-    tmpstr="";
-    for (var ii=0; ii<rounds; ii++){
-      tmpstr+=runtimesMSAA[ii][i] +",";
-    }
-    console.log("query"+(i+1) + ":" + tmpstr);
-  }
-}
+//function benchmark_badone_delete(warmup,rounds){
+//  if (typeof warmup== 'undefined') warmup =1;
+//  if (typeof rounds == 'undefined') rounds=5;
+//  var run;
+//  var tmpstr="";
+//  var verifiedAA=[];
+//  var runtimesMSAA=[];
+//
+//  for (var w=0; w<warmup; w++){
+//      run=verify_and_time();
+//      verifiedAA.push(run.veri);
+//  }
+//  for (var r=0; r<rounds;r++){
+//      run=verify_and_time();
+//      runtimesMSAA.push(run.runt);
+//  }
+//  for (var i=0; (typeof  verifiedAA[0] !='undefined')&&i<verifiedAA[0].length; i++ ){
+//    tmpstr="";
+//    for (var ii=0; ii<rounds;ii++){
+//      tmpstr+=verifiedAA[ii][i] +",";
+//    }
+//    console.log("query"+(i+1) + ":" + tmpstr);
+//  }
+//  for (var i=0; (typeof  runtimesMSAA[0] !='undefined')&&i<runtimesMSAA[0].length; i++){
+//    tmpstr="";
+//    for (var ii=0; ii<rounds; ii++){
+//      tmpstr+=runtimesMSAA[ii][i] +",";
+//    }
+//    console.log("query"+(i+1) + ":" + tmpstr);
+//  }
+//}
 //micro1
 /*
 function micro1_JSO(scale, iters){

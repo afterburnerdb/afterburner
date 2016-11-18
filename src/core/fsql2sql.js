@@ -28,7 +28,7 @@ function fsql2sql(){
   this.als2tab={};
   this.tab2als={};
   this.name="STMT"+ uniqueCounter++;
-
+  this.resultant=null;
   this.select = function(){
     return this;
   }
@@ -65,7 +65,6 @@ function fsql2sql(){
       return this;
   }
   this.field = function(col, ...rest){
-    console.log("field:"+col);
     col=fixCol(col);
     if (col.substring(0,2)=='as'){
       var alias=col;
@@ -102,12 +101,9 @@ function fsql2sql(){
       return this;
   }
   this.order = function(col, ...rest){
-    console.log("order:"+col);
     if (col[0]== '-')
       col= col.substring(1) + " DESC";
-    console.log("order:"+col);
     col=fixCol(col);
-    console.log("order:"+col);
     this.orderA.push(col);
     if (rest.length>0)
       return this.order(rest[0], ...rest.slice(1));
@@ -205,7 +201,28 @@ function fsql2sql(){
       LIMIT_STMT;
     return sqlstr;
   }
-  console.log("new fsql2sql()");
+  this.toArray = function(vanilla){
+    this.materialize();
+    return this.resultant.toArray();
+  }
+  this.toArray2 = function(vanilla){
+    this.materialize();
+    return this.resultant.toArray2();
+  }
+  this.eval = function(vanilla){
+    this.materialize();
+    return this.resultant.eval();
+  }
+  this.materialize = function(){
+    if (this.resultant)
+     return this.resultant;
+    var jawsan=pci.execSQL(this.toSQL());
+    var ds= new dataSource(jawsan);
+    var tab=new aTable(ds);
+ //   daSchema.addTable(tab);
+    this.resultant=tab;
+    return tab;
+  }
 }
 function hash_str(strp){
 }
@@ -221,14 +238,7 @@ function mallocout(){
 }
 function intDayToYear(day){
 }
-this.toArray = function(vanilla){
-}
-this.toArray2 = function(vanilla){
-}
-this.eval = function(vanilla){
-}
-this.materialize = function(vanilla){
-}
+
 function resolve(colname){
 }
 function pointCol(colname){

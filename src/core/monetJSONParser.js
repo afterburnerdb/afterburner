@@ -15,7 +15,8 @@ function monetJSONParser(pjsn) {
   this.pin=0;
   this.numcols=pjsn.cols;
   this.jsn=pjsn;
-  var tmpstrStore8=require('./store.js').tmpstrStore8;
+  if(inNode)
+    tmpstrStore8=require('./store.js').tmpstrStore8;
   this.next = function(){
     var ret=this.jsn.data[(this.pin/this.numcols)|0][this.pin%this.numcols];
     this.pin++;

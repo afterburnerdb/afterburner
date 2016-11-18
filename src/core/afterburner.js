@@ -883,7 +883,7 @@ env={'temps':temps,
     if (vanilla)
       return new Function('ignore', this.toVanilla('array2'))();
     else 
-      return new Function('ignore', this.toVanilla('array2'))();
+      return new Function('ignore', this.toString('array2'))();
   }
   this.eval = function(vanilla){
     if (vanilla)

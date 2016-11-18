@@ -65,7 +65,7 @@ function badFSQL (where,what){
 //  console.log("Bad Fluent SQL at: "+where+ ": " + what);
 }
 function DEBUG (where,what){
-//  console.log("Bad Fluent SQL at: "+where+ ": " + what);
+  console.log(where+ ": " + what);
 }
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
