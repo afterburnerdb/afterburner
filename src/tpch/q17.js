@@ -10,21 +10,21 @@ if(typeof module == 'undefined'){
 function query17(noasm){
   avg_q=ABi.select()
     .from("lineitem")
-    .field("l_partkey",as(avg("l_quantity"),"avg_q"))
+    .field("l_partkey",_as(_avg("l_quantity"),"avg_q"))
     .group("l_partkey")
     .materialize(noasm)
   
   par_line=ABi.select()
     .from("lineitem").join("part").on("l_partkey","p_partkey")
     .field("l_extendedprice","l_quantity","p_partkey")
-    .where(eq("p_brand",'Brand#23'),
-           eq("p_container",'MED BOX'))
+    .where(_eq("p_brand",'Brand#23'),
+           _eq("p_container",'MED BOX'))
   	.materialize(noasm)
   
   return ABi.select()
     .from(par_line).join(avg_q).on("p_partkey","l_partkey")
-    .field(as(sum(div("l_extendedprice",7.0)),"avg_yearly"))
-    .where(lt("l_quantity",mul("avg_q",0.2)))
+    .field(_as(_sum(_div("l_extendedprice",7.0)),"avg_yearly"))
+    .where(_lt("l_quantity",_mul("avg_q",0.2)))
 }
 
 //////////////////////////////////////////////////////////////////////////////

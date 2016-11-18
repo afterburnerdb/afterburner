@@ -10,7 +10,7 @@ if(typeof module == 'undefined'){
 function query2(noasm){
   var reg_nat = ABi.select()
     .from("nation").join("region").on("n_regionkey","r_regionkey")
-    .where(eq('R_NAME','EUROPE'))
+    .where(_eq('R_NAME','EUROPE'))
     .field('n_nationkey',"n_name")
     .materialize(noasm);
   
@@ -26,21 +26,21 @@ function query2(noasm){
   
   var brass = ABi.select()
     .from("part").join(sup_psup).on("p_partkey","ps_partkey")
-    .where(eq('p_size',15), like('p_type','%BRASS'))
+    .where(_eq('p_size',15), _like('p_type','%BRASS'))
     .field('ps_partkey','ps_supplycost','s_acctbal',"s_name","n_name", "p_partkey", "p_mfgr","s_address","s_phone","s_comment")
     .materialize(noasm);
   
   var mincost = ABi.select()
     .from(brass)
-    .field(min('ps_supplycost'),as('ps_partkey','mc_partkey'))
+    .field(_min('ps_supplycost'),_as('ps_partkey','mc_partkey'))
     .group('ps_partkey')
     .materialize(noasm);
   
   return ABi.select()
   .from(mincost).join(brass).on("min(ps_supplycost)","ps_supplycost")
-  .field( "s_acctbal","s_name", "n_name", "p_partkey", "p_mfgr", "s_address", "s_phone", "s_comment")
-  .where(eq("mc_partkey","ps_partkey"))
-  .order(["-s_acctbal","n_name","s_name","p_partkey"])
+  .field("s_acctbal","s_name", "n_name", "p_partkey", "p_mfgr", "s_address", "s_phone", "s_comment")
+  .where(_eq("mc_partkey","ps_partkey"))
+  .order("-s_acctbal","n_name","s_name","p_partkey")
   .limit(100);
   
 }

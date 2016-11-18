@@ -29,6 +29,8 @@ function fsql2sql(){
   this.tab2als={};
   this.name="STMT"+ uniqueCounter++;
   this.resultant=null;
+  this.openA=[];
+////
   this.select = function(){
     return this;
   }
@@ -201,6 +203,13 @@ function fsql2sql(){
       LIMIT_STMT;
     return sqlstr;
   }
+  this.open = function(col, ...rest){
+    this.openA.push(col);
+    if (rest.length>0)
+      return this.open(rest[0], ...rest.slice(1));
+    else 
+      return this;
+  }
   this.toArray = function(vanilla){
     this.materialize();
     return this.resultant.toArray();
@@ -224,63 +233,8 @@ function fsql2sql(){
     return tab;
   }
 }
-function hash_str(strp){
-}
-function mystrcmp(str1, str2){
-}
-function strlen(str){
-}
-function substr(str,n,m){
-}
-function malloc(size){
-}
-function mallocout(){
-}
-function intDayToYear(day){
-}
 
-function resolve(colname){
-}
-function pointCol(colname){
-}
-function typeCol(colname){
-}
-function col2trav(colname){
-}
-function tabSize(tabname){
-}
-function bindCol(colname){
-}
-function obindCol(colname){
-}
-function contbind(pfield){
-}
-function gbind(pfield){
-}
-function gbindn(pfield){
-}
-function extractfrom(fromtext,what,opt,filt){
-}
-function buildLikeFun(strlit, likeFun){
-}
-function buildLikeFun_pct(strlit, likeFun){
-}
-function defun(fbody){
-}
-function like_begins(strp,strlit){
-}
-function like_ends(strp, strlit){
-}
-function like_has(strp, strlit){
-}
-function build_snake(strlit, islast){
-}
-function like_haslist(strp, list){
-}
-function qc(it){
-}
-function qt(it){
-}
+//API
 function like(col,strlit){
   col=fixCol(col);
   return col + " LIKE '" + strlit+"'";
@@ -364,12 +318,6 @@ function compare(op,col1,col2){
   col2=fixCol(col2);
   return col1 + op + col2;
 }
-function isPreBound(p1){
-}
-function isPreBoundString(p1){
-}
-function isPreBoundNumber(p1){
-}
 function substring(col,n,m){
   col=fixCol(col);
   return "@SUBSTRING("+col+" FROM "+n+" FOR "+ m+")";
@@ -377,10 +325,6 @@ function substring(col,n,m){
 function toYear(col){
   col=fixCol(col);
   return "@EXTRACT(YEAR FROM "+ col + ")";
-}
-function field(){
-}
-function aggregate(){
 }
 function min(col){
   col=fixCol(col);
@@ -412,17 +356,9 @@ function avg(col){
   col=fixCol(col);
   return "@AVG("+col+")";
 }
-function expandStrLitComp(strp, strlit){
-}
-function expandLitComp(op,type,bp,lp){
-}
 function date(col){
   col=fixCol(col);
   return "DATE " + col;
-}
-function coerceFloat(p){
-}
-function coerceFloatIf(p){
 }
 function arith(op,c1,c2){
   c1=fixCol(c1);
@@ -451,18 +387,6 @@ function notexists(relation){
   return ' NOT EXISTS (' + relation.toSQL() + ')';
 }
 
-//function fixParam(param){
-//  if (typeof param == 'string'){
-//    if (param[0]=='@')
-//      param=param.substring(1)
-//    else 
-//      param="'"+param+"'";
-//
-//  } else if (param instanceof fsql2sql){
-//      param= "(" + param.toSQL() + ") AS tmpParam"+  uniqueCounter++;
-//  }
-//  return param;
-//}
 function fixCol(col){
   if (typeof col == 'string'){
     if (col[0]=='@')

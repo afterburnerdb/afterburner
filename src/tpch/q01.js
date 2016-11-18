@@ -12,15 +12,15 @@ return ABi.select()
   .from('lineitem')
   .field('l_returnflag',
     'l_linestatus',
-    sum('l_quantity'),
-    sum('l_extendedprice'),
-    sum(mul('l_extendedprice',sub(1.0 , 'l_discount'))),
-    sum(mul(mul('l_extendedprice',sub(1.0 , 'l_discount')), add(1.0 , 'l_tax'))),
-    avg('l_quantity'),
-    avg('l_extendedprice'),
-    avg('l_discount'),
-    count('*'))
-  .where(lte('l_shipdate',date('1998-09-02')))
+    _sum('l_quantity'),
+    _sum('l_extendedprice'),
+    _sum(_mul('l_extendedprice',_sub(1.0 , 'l_discount'))),
+    _sum(_mul(_mul('l_extendedprice',_sub(1.0 , 'l_discount')), _add(1.0 , 'l_tax'))),
+    _avg('l_quantity'),
+    _avg('l_extendedprice'),
+    _avg('l_discount'),
+    _count('*'))
+  .where(_lte('l_shipdate',_date('1998-09-02')))
   .group('l_returnflag','l_linestatus')
   .order('l_returnflag','l_linestatus')
 }

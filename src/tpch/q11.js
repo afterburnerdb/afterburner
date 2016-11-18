@@ -11,24 +11,24 @@ function query11(noasm){
   sup_nat=ABi.select()
     .from("supplier").join("nation").on("s_nationkey","n_nationkey")
     .field("s_suppkey")
-    .where(eq("n_name",'GERMANY'))
+    .where(_eq("n_name",'GERMANY'))
     .materialize(noasm);
 
   ps_sup=ABi.select()
     .from("partsupp").join(sup_nat).on("ps_suppkey","s_suppkey")
-    .field("ps_partkey",as(sum(mul("ps_supplycost","ps_availqty")),"value"))
+    .field("ps_partkey",_as(_sum(_mul("ps_supplycost","ps_availqty")),"value"))
     .group("ps_partkey")
     .materialize(noasm);
 
   thresh=ABi.select()
     .from(ps_sup)
-    .field(sum("value")).eval(noasm);
+    .field(_sum("value")).eval(noasm);
 
   return ABi.select()
     .from(ps_sup)
     .field("ps_partkey","value")
-    .where(gt("value",thresh*0.0001))
-    .order(["-value"]);
+    .where(_gt("value",thresh*0.0001))
+    .order("-value");
 }
 
 //////////////////////////////////////////////////////////////////////////////

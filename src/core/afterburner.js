@@ -88,7 +88,7 @@ function Afterburner(){
   this.on = function(param1, param2){
     this.onA.push(param1);
     this.onA.push(param2);
-    this.joinP=eq(param1,param2);
+    this.joinP=_eq(param1,param2);
     return this;
   }
   this.isin = function(param1,param2){
@@ -988,15 +988,14 @@ function gbind(pfield) {
   var ppfield= pointCol(pfield);
   var type= typeCol(pfield);
   var trav= col2trav(pfield);
-  var ret='ERROR AT gbind';
+  
   if ((type==0) || (type==3) || (type==4))
-    ret ="((mem32[("+ppfield+"+ (trav_"+trav+"<<2)) >>2]|0))";
+    return "((mem32[("+ppfield+"+ (trav_"+trav+"<<2)) >>2]|0))";
   else if (type==1)
-    ret ="(((mem32[("+ppfield+"+ (trav_"+trav+"<<2)) >>2]|0))^(((mem32[("+ppfield+"+ (trav_"+trav+"<<2))>>2]|0)>>16)))";
+    return "(((mem32[("+ppfield+"+ (trav_"+trav+"<<2)) >>2]|0))^(((mem32[("+ppfield+"+ (trav_"+trav+"<<2))>>2]|0)>>16)))";
   else if (type==2)
-    ret ="((hash_str(mem32[("+ppfield+"+ (trav_"+trav+"<<2)) >>2]|0)|0))";
-  return ret;
-//  else throw new Error "filter does not support datatype:" + type;
+    return "((hash_str(mem32[("+ppfield+"+ (trav_"+trav+"<<2)) >>2]|0)|0))";
+  console.log("ERROR AT gbind: pfield:"+pfield+" ppfield:"+ppfield+" type:"+type+" trav:"+trav);
 }
 
 function gbindn(pfield) {
@@ -1168,16 +1167,62 @@ function qc(it){
 function qt(it){
   return qc(it).tabs;
 }
+function isPreBound(p1){
+  return isPreBoundString(p1) || isPreBoundNumber(p1) ;
+}
+function isPreBoundString(p1){
+  if (typeof p1 != 'string') return false;
+  return p1.indexOf('pb$')==0 ;
+}
+function isPreBoundNumber(p1){
+  if (typeof p1 != 'string') return false;
+  return p1.indexOf('pb$')<0 && p1.indexOf('pb')==0 ;
+}
+function expandStrLitComp(strp, strlit){
+  quartets=Math.ceil((strlit.length+1)/4);
+  ret="";
+  c=0;
+  for (var i=0;i<quartets;i++){
+    if((c==strlit.length)){
+        ret+='((mem8[(('+strp+' + ('+i+'<<2))|0)]|0)==0)&';
+    }
+    else{
+    intval=(strlit.charCodeAt(c++)||0)+
+           ((strlit.charCodeAt(c++)||0)<<8)+
+           ((strlit.charCodeAt(c++)||0)<<16)+
+           ((strlit.charCodeAt(c++)||0)<<24);
+        ret+='((mem32[(('+strp+' + ('+i+'<<2))|0)>>2]|0)==('+intval+'|0))&';
+    }
+  }
+  return ret.substring(0,ret.length-1);
+}
+function expandLitComp(op,type,bp,lp){
+  ret= '(' + coerceFloatIf(bp) + '' + op + '' +  coerceFloatIf(lp) + ')';
+  return ret;
+}
+function coerceFloat(p){
+  p = p+"";
+  if (p.indexOf('.')>-1) return p;
+  else if (p.indexOf('mem')>-1) return  "(+(" + p + "|0))";
+  else return "(+(" + p + "))";
+} 
+function coerceFloatIf(p){
+  p = p+"";
+  if (p.indexOf('.')>-1) return p;
+  else if (p.indexOf('(+(')>-1) return p;
+  else if (p.indexOf('+(memF32')>-1) return p;
+  else return "(+(" + p + "|0))";
+}
 //////////////////////////////////////////////////////////////////////////////
 //API
-function like(p1,strlit){
+function _like(p1,strlit){
   var ret="";
   var strp=bindCol(p1);
   var numpct=(strlit.match(/\%/g) || []).length;
   var begins="";
   var ends="";
 
-  if (numpct ==0) return eq(p1,strlit);
+  if (numpct ==0) return _eq(p1,strlit);
   
   var frst_pct=strlit.indexOf('%');
 
@@ -1206,72 +1251,70 @@ function like(p1,strlit){
   return ret;
 } 
 
-
-function not(p1){
+function _not(p1){
   return "(!(" + p1 + "))";
 }
-function eq(p1,p2){
-  return compare('==',p1,p2);
+function _eq(p1,p2){
+  return _compare('==',p1,p2);
 }
-function neq(p1,p2){
-  return not(compare('==',p1,p2));
+function _neq(p1,p2){
+  return _not(_compare('==',p1,p2));
 }
-function lte(p1,p2){
-  return compare('<=',p1,p2);
+function _lte(p1,p2){
+  return _compare('<=',p1,p2);
 }
-function gte(p1,p2){
-  return compare('>=',p1,p2);
+function _gte(p1,p2){
+  return _compare('>=',p1,p2);
 }
-function lt(p1,p2){
-  return compare('<',p1,p2);
+function _lt(p1,p2){
+  return _compare('<',p1,p2);
 }
-function gt(p1,p2){
-  return compare('>',p1,p2);
+function _gt(p1,p2){
+  return _compare('>',p1,p2);
 }
-function between(p1,p2,p3){
-  return '('+ gte(p1,p2) + '&' + lte(p1,p3) + ')';
+function _between(p1,p2,p3){
+  return '('+ _gte(p1,p2) + '&' + _lte(p1,p3) + ')';
 }
-function isin(p1,list){
+function _isin(p1,list){
   var ret="";
   if (list.length==0) return "";
-  if (list.length==1) return eq(p1,list[0]);
+  if (list.length==1) return _eq(p1,list[0]);
   if (isPreBoundString(p1)){
    var p1b=p1.substring(3);
    ret='((isintmpstr='+p1b+')&0)|';
-   return ret+or(eq('pb$((isintmpstr))',list[0]),isin('pb$((isintmpstr))',list.slice(1))) + "";
+   return ret+_or(_eq('pb$((isintmpstr))',list[0]),_isin('pb$((isintmpstr))',list.slice(1))) + "";
   }
-  else return or(eq(p1,list[0]),isin(p1,list.slice(1)));
+  else return _or(_eq(p1,list[0]),_isin(p1,list.slice(1)));
 }
-function eqlit(p1,p2){
+function _eqlit(p1,p2){
 }
-function ltelit(p1,p2){
+function _ltelit(p1,p2){
 }
-function gtelit(p1,p2){
+function _gtelit(p1,p2){
 }
-function ltlit(p1,p2){
+function _ltlit(p1,p2){
 }
-function gtlit(p1,p2){
+function _gtlit(p1,p2){
 }
-function betweenlit(p1,p2,p3){
+function _betweenlit(p1,p2,p3){
 }
-function or(p1,p2, ...rest){
+function _or(p1,p2, ...rest){
   if (rest.length>0)
-    return or(p1, or(p2,rest[0], ...rest.slice(1)));
+    return _or(p1, _or(p2,rest[0], ...rest.slice(1)));
   else if (p2)
     return '((' + p1 + ')|(' +p2 + '))';
   else
     return '(' + p1 + ')';
-
 }
-function and(p1,p2, ...rest){
+function _and(p1,p2, ...rest){
   if (rest.length>0)
-    return and(p1, and(p2,rest[0], ...rest.slice(1)));
+    return _and(p1, _and(p2,rest[0], ...rest.slice(1)));
   else if (p2)
     return '((' + p1 + ')&(' +p2 + '))';
   else
     return '(' + p1 + ')';
 }
-function compare(op,p1,p2){
+function _compare(op,p1,p2){
   var p1b=bindCol(p1);
   var p2b=bindCol(p2);
   var p1t=typeCol(p1);
@@ -1286,13 +1329,11 @@ function compare(op,p1,p2){
       if ((p1t == 2) || isPreBoundString(p1))
         return expandStrLitComp(p1b,p2);
       else if (p1t == 4 && p2.length==1){
-        //return expandLitComp(op,p1t,p1b,p2.charCodeAt(0));
         return expandLitComp(op,1,p1b,p2.charCodeAt(0));
       }
       else 
-        badFSQL('@compare');
+        badFSQL('@_compare');
     } else {
-      //return expandLitComp(op,p1t,p1b,p2);  
       return expandLitComp(op,1,p1b,p2);  
     }
   } else if (p2b){
@@ -1302,7 +1343,7 @@ function compare(op,p1,p2){
       else if (p2t == 4 && p1.length==1)
         return expandLitComp(op,p2t,p2b,p1.charCodeAt(0));
       else 
-        badFSQL('@compare');
+        badFSQL('@_compare');
 
     } else {
       //return expandLitComp(op,p2t,p2b,p1);  
@@ -1314,20 +1355,8 @@ function compare(op,p1,p2){
   }
 }
 
-function isPreBound(p1){
-  return isPreBoundString(p1) || isPreBoundNumber(p1) ;
-}
-function isPreBoundString(p1){
-  if (typeof p1 != 'string') return false;
-  return p1.indexOf('pb$')==0 ;
-}
-function isPreBoundNumber(p1){
-  if (typeof p1 != 'string') return false;
-  return p1.indexOf('pb$')<0 && p1.indexOf('pb')==0 ;
-}
 
-
-function substring(p1,n,m){
+function _substring(p1,n,m){
   if (inNode){
     bindCol=require("afterburner.js").bindCol;
     typeCol=require("afterburner.js").typeCol;
@@ -1335,37 +1364,24 @@ function substring(p1,n,m){
   var p1b=bindCol(p1);
   var p1t=typeCol(p1);
   if (p1t!=2){
-    badFSQL('@substring', p1 + 'is not a string')
+    badFSQL('@_substring', p1 + 'is not a string')
   }else if (n>=m){
-    badFSQL('@substring invalid substring range')
+    badFSQL('@_substring invalid substring range')
   } 
   else {
     return 'pb$(substr(' + p1b + ','+n+','+m+')|0)';
   }
 }
-function toYear(p1){
+function _toYear(p1){
   var p1b=bindCol(p1);
   var p1t=typeCol(p1);
   if (p1t!=3){
-    badFSQL('@toYear', p1 + 'is not a date')
+    badFSQL('@_toYear', p1 + 'is not a date')
   } else {
     return 'pb(+(intDayToYear(' + p1b + ')|0))';
   }
 }
-function field(){
-  this.type='';
-  this.att='';
-  this.aggsh_str;
-  this.attribute = function (){
-  }
-  this.aggregate = function (){
-  }
-}
-function aggregate(){
-  this.type='';
-}
-///////////////////////////////////////////////////////////
-function min(p){
+function _min(p){
   var bound="";
   if ((p != null) && typeof p == 'string' && p.indexOf('pb')>-1){
     bound=p.substring(3,str.length);
@@ -1384,7 +1400,7 @@ function min(p){
   postexek:memF32[(temps+(tempsptr<<2))>>2]=`+varname+`;tempsptr= (tempsptr + 1 )|0;::`;
   
 }
-function max(p){
+function _max(p){
   var bound="";
   if ((p != null) && typeof p == 'string' && p.indexOf('pb')>-1){
     bound=p.substring(3,str.length);
@@ -1402,7 +1418,7 @@ function max(p){
   execg:if (`+varname+` < (`+bound+`)) {`+varname+` = `+bound+`;}::
   postexek:memF32[(temps+(tempsptr<<2))>>2]=`+varname+`;tempsptr= (tempsptr + 1 )|0;::`;
 }
-function count(p){
+function _count(p){
   unique=uniqueVarCounter++;
   var type = 0;
   var varname="count"+unique;
@@ -1419,7 +1435,7 @@ function count(p){
   execg:`+checknull+varname+`=`+varname+`+1|0;::
   postexek:mem32[(temps+(tempsptr<<2))>>2]=`+varname+`;tempsptr= (tempsptr + 1 )|0;::`;
 }
-function countif(p,cond){
+function _countif(p,cond){
   unique=uniqueVarCounter++;
   type = 0;
   varname="count"+unique;
@@ -1436,7 +1452,7 @@ function countif(p,cond){
   execg:if(`+cond+`)`+checknull+varname+`=`+varname+`+1|0;::
   postexek:mem32[(temps+(tempsptr<<2))>>2]=`+varname+`;tempsptr= (tempsptr + 1 )|0;::`;
 }
-function sum(p){
+function _sum(p){
   var bound=bindCol(p);
   var unique=uniqueVarCounter++;
   var type= typeCol(p);
@@ -1451,7 +1467,7 @@ function sum(p){
   execg:`+varname+`=`+varname+`+(`+bound+`);::
   postexek:memF32[(temps+(tempsptr<<2))>>2]=+(`+varname+`);tempsptr= (tempsptr + 1 )|0;::`;
 }
-function sumif(p,cond){
+function _sumif(p,cond){
   var bound=bindCol(p);
   var unique=uniqueVarCounter++;
   var type= typeCol(p);
@@ -1466,7 +1482,7 @@ function sumif(p,cond){
   execg:if(`+cond+`)`+varname+`=`+varname+`+(`+bound+`);::
   postexek:memF32[(temps+(tempsptr<<2))>>2]=+(`+varname+`);tempsptr= (tempsptr + 1 )|0;::`;
 }
-function avg(p){
+function _avg(p){
   var bound=bindCol(p);
   var unique=uniqueVarCounter++;
   var type= typeCol(p);
@@ -1486,54 +1502,10 @@ function avg(p){
   execg:`+varnamecount+`=`+varnamecount+`+1.0;::
   postexek:memF32[(temps+(tempsptr<<2))>>2]=+(+(` +  varnamesum  + `)/ +(` + varnamecount + `));tempsptr= (tempsptr + 1 )|0;::`;
 }
-///////////////////////////////////////////////////////////
-function expandStrLitComp(strp, strlit){
-  quartets=Math.ceil((strlit.length+1)/4);
-  ret="";
-  c=0;
-  for (var i=0;i<quartets;i++){
-    if((c==strlit.length)){
-        ret+='((mem8[(('+strp+' + ('+i+'<<2))|0)]|0)==0)&';
-    }
-    else{
-    intval=(strlit.charCodeAt(c++)||0)+
-           ((strlit.charCodeAt(c++)||0)<<8)+
-           ((strlit.charCodeAt(c++)||0)<<16)+
-           ((strlit.charCodeAt(c++)||0)<<24);
-        ret+='((mem32[(('+strp+' + ('+i+'<<2))|0)>>2]|0)==('+intval+'|0))&';
-    }
-  }
-  return ret.substring(0,ret.length-1);
-}
-
-function expandLitComp(op,type,bp,lp){
-//  if (type==1){
-//    lp= '(+('+lp+'))';
-//  } else {
-//    lp= '(('+lp+')|0)';
-//  }
-  ret= '(' + coerceFloatIf(bp) + '' + op + '' +  coerceFloatIf(lp) + ')';
-  return ret;
-}
-
-function date(p1){
+function _date(p1){
   return strdate_to_int(p1);
 }
-function coerceFloat(p){
-  p = p+"";
-  if (p.indexOf('.')>-1) return p;
-  else if (p.indexOf('mem')>-1) return  "(+(" + p + "|0))";
-  else return "(+(" + p + "))";
-} 
-function coerceFloatIf(p){
-  p = p+"";
-  if (p.indexOf('.')>-1) return p;
-  else if (p.indexOf('(+(')>-1) return p;
-  else if (p.indexOf('+(memF32')>-1) return p;
-  else return "(+(" + p + "|0))";
-} 
-
-function arith(op,p1,p2){
+function _arith(op,p1,p2){
   var p1b=bindCol(p1);
   var p2b=bindCol(p2);
   if (p1b && p2b)
@@ -1544,21 +1516,20 @@ function arith(op,p1,p2){
     return 'pb(('+coerceFloat(p1) +')' +op +'(' + p2b+'))';
   else 
     return 'pb(('+coerceFloat(p1)+')' +op +'(' + coerceFloat(p2)+'))';
-
 }
-function add(p1,p2){
-  return arith('+',p1,p2);
+function _add(p1,p2){
+  return _arith('+',p1,p2);
 }
-function sub(p1,p2){
-  return arith('-',p1,p2);
+function _sub(p1,p2){
+  return _arith('-',p1,p2);
 }
-function mul(p1,p2){
-  return arith('*',p1,p2);
+function _mul(p1,p2){
+  return _arith('*',p1,p2);
 }
-function div(p1,p2){
-  return arith('/',p1,p2);
+function _div(p1,p2){
+  return _arith('/',p1,p2);
 }
-function as(p1,al){
+function _as(p1,al){
   var oNameI=p1.indexOf("'",p1.indexOf("addCol2",0));
   if (oNameI>-1){
     var oNamelI=p1.indexOf("'",oNameI+1);
@@ -1573,34 +1544,32 @@ if(inNode){
   module.exports.Afterburner=Afterburner;
   module.exports.bindCol=bindCol;
   module.exports.typeCol=typeCol;
-  global.like=like;
-  global.not=not;
-  global.eq=eq;
-  global.neq=neq;
-  global.lte=lte;
-  global.gte=gte;
-  global.lt=lt;
-  global.gt=gt;
-  global.between=between;
-  global.isin=isin;
-  global.or=or;
-  global.and=and;
-  global.substring=substring;
-//  global.qc=qc;
-//  global.qt=qt;
-  global.toYear=toYear;
-  global.min=min;
-  global.max=max;
-  global.count=count;
-  global.countif=countif;
-  global.sum=sum;
-  global.sumif=sumif;
-  global.avg=avg;
-  global.date=date;
-  global.add=add;
-  global.sub=sub;
-  global.mul=mul;
-  global.div=div;
-  global.as=as;
+  global._like=_like;
+  global._not=_not;
+  global._eq=_eq;
+  global._neq=_neq;
+  global._lte=_lte;
+  global._gte=_gte;
+  global._lt=_lt;
+  global._gt=_gt;
+  global._between=_between;
+  global._isin=_isin;
+  global._or=_or;
+  global._and=_and;
+  global._substring=_substring;
+  global._toYear=_toYear;
+  global._min=_min;
+  global._max=_max;
+  global._count=_count;
+  global._countif=_countif;
+  global._sum=_sum;
+  global._sumif=_sumif;
+  global._avg=_avg;
+  global._date=_date;
+  global._add=_add;
+  global._sub=_sub;
+  global._mul=_mul;
+  global._div=_div;
+  global._as=_as;
 }else delete module;
-//////////////////////////////////////////////////////////////////////////////
+/_/////////////////////////////////////////////////////////////////////////////
