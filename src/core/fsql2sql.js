@@ -439,7 +439,7 @@ function mul(col1,col2){
   return arith("*",col1,col2);
 }
 function div(col1,col2){
-  return arith("/",col,col2);
+  return arith("/",col1,col2);
 }
 function as(col,al){
   return col + " AS " + al;

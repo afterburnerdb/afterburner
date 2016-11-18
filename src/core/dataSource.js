@@ -348,10 +348,7 @@ handyColTypes["upgrade"]=[
         console.log('unsupported data types from monetdb:' + src.structure[i].type );
       }
     }
-    console.log("@fromMonetJSON: about to create monetJSONParser");
-    console.log("typeof monetJSONParser"+typeof monetJSONParser);
     this.parser=new monetJSONParser(src);
-    console.log('@fromMonetJSON: created parsa'+this.parser);
   }
   this.fromHTML5File= function(file,funk){//firefox browser file                  
       console.log('@fromHTML5File');

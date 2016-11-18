@@ -20,8 +20,8 @@ function query8_fsql(noasm){
                eq("@s_nationkey","@n2.n_nationkey"),
                between("@o_orderdate",'1995-01-01','1996-12-31'),
                eq("@p_type",'ECONOMY ANODIZED STEEL'))
-	.field(as(toYear("@o_orderdate"),"o_year"),div(sumif(mul("@l_extendedprice", sub(1,"@l_discount")),eq("@n2.n_name",'BRAZIL')),
-	sum(mul("@l_extendedprice", sub(1,"@l_discount"))),'mkt_share'))
+	.field(as(toYear("@o_orderdate"),"o_year"),as(div(sumif(mul("@l_extendedprice", sub(1,"@l_discount")),eq("@n2.n_name",'BRAZIL')),
+	sum(mul("@l_extendedprice", sub(1,"@l_discount"))),'mkt_share')))
 	.group('@o_year')
 	.order('@o_year');
 }

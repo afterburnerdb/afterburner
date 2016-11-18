@@ -32,16 +32,20 @@ function proxyClient(HOST,PORT){
    else 
      return 0;
   }
-  this.getJSON= function(urlrel,cBack){
-  //  urlrel=encodeURIComponent(urlrel);
-    var ret=$.ajax({  dataType: "json",  url: urlrel,async:false})
+  this.getJSON= function(uri,cBack){
+//    uri=encodeURIComponent(uri);
+//    uri= uri.replace('+','%2B');
+    var ret=$.ajax({  dataType: "json",  url: uri,async:false})
     return ret;
   }
   this.execSQL= function(sql){
-    var uri='/query?sql='+btoa(sql);
-    var jawsan=this.getJSON(uri);
-//    return jawsan;
-    return jawsan.responseJSON;
+    var uri='/query?sql='+encodeURIComponent(sql);
+//    uri=encodeURIComponent(uri);
+    uri= uri.replace('+','%2B');
+
+//    var uri='/query?sql='+sql;
+    var web_resp=this.getJSON(uri);
+    return web_resp.responseJSON;
   }
   this.execFSQL= function(fsql){
     var uri='/query?fsql='+sql;

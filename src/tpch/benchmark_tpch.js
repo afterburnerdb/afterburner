@@ -207,6 +207,10 @@ function verify_query(qnum,q,ma,noasm){
 //}
 function verifyqs(noasm,backend){
   var verifiedA=[];
+  if (backend)
+    console.log("verifying q's_fsql");
+  else 
+    console.log("verifying q's noasm:"+noasm);
   for (var i=0; i<queries.length; i++){
     var query;
     if (backend)
