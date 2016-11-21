@@ -63,6 +63,13 @@ function proxyClient(HOST,PORT){
     var uri='/getSchema';
     return this.get(uri);
   }
+  this.dropBE_MAVS=function(){
+    drop_mavs=this.execSQL("SELECT 'DROP TABLE ' || tables.name  || ';'  FROM tables WHERE tables.name LIKE 'stmt%';");
+    for (var i=0; i<drop_mavs.data.length;i++){
+      console.log(drop_mavs.data[i][0]);
+      this.execSQL(drop_mavs.data[i][0]);
+    }
+  }
   this.getRemoteTableNames= function(){
     var uri='/getTableNames';
     return this.get(uri);
@@ -71,6 +78,8 @@ function proxyClient(HOST,PORT){
   this.HOST=(HOST!=='undefined')?'127.0.0.1':HOST;
   this.PORT=(PORT!=='undefined')?'8081':PORT;
   console.log('proxy connection exists.. pulling schema from backend');
+  this.dropBE_MAVS();
+  //pull/reg table names
   var be_tables_str=this.getRemoteTableNames();
   var be_tables_jsn=JSON.parse(be_tables_str);
   var be_tables=be_tables_jsn.data;
@@ -81,6 +90,7 @@ function proxyClient(HOST,PORT){
     newTable.name=be_tables[i][0];
     daSchema.addTable(newTable);
   }
+
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////

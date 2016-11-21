@@ -7,25 +7,26 @@ if(typeof module == 'undefined'){
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 
-function query10_fsql(noasm){
+function mav5(){
   return select()
-    .from("@customer","@orders","@lineitem","@nation")
-    .field("@c_custkey","@c_name",
-      as(sum(mul("@l_extendedprice",sub(1,"@l_discount"))), "revenue"),
-        "@c_acctbal","@n_name","@c_address","@c_phone","@c_comment")
+    .open("@o_orderdate")
+    .from("@customer","@orders","@lineitem","@supplier","@nation","@region")
     .where(eq("@c_custkey","@o_custkey"),
            eq("@l_orderkey","@o_orderkey"),
-           gte("@o_orderdate",'1993-10-01'),
-           lt("@o_orderdate",'1994-01-01'),
-           eq("@l_returnflag",'R'),
-           eq("@c_nationkey","@n_nationkey"))
-    .group("@c_custkey","@c_name","@c_acctbal","@c_phone","@n_name","@c_address","@c_comment")
-    .order("-@revenue")
-    .limit(20);
+           eq("@l_suppkey","@s_suppkey"),
+           eq("@c_nationkey","@s_nationkey"),
+           eq("@s_nationkey","@n_nationkey"),
+           eq("@n_regionkey","@r_regionkey"),
+           eq("@r_name",'ASIA'),
+           gte("@o_orderdate",'1994-01-01'),
+           lt("@o_orderdate",'1995-01-01'))
+    .field("@n_name",as(sum(mul("@l_extendedprice", sub(1,"@l_discount"))),"revenue"))
+    .group("@n_name")
+    .order("-@revenue");
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 if(inNode){
-  module.exports=query10_fsql;
+  module.exports=mav5;
 } else delete module;
 //////////////////////////////////////////////////////////////////////////////

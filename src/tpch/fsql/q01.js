@@ -7,8 +7,8 @@ if(typeof module == 'undefined'){
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 
-function query1_fsql(noasm){
-return ABi.select()
+function query1_fsql(execwhere){
+return select(execwhere)
   .from('@lineitem')
   .field('@l_returnflag','@l_linestatus',
     sum('@l_quantity'),

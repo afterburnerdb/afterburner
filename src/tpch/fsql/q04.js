@@ -8,19 +8,17 @@ if(typeof module == 'undefined'){
 //////////////////////////////////////////////////////////////////////////////
 
 function query4_fsql(noasm){
-  return ABi.select()
-    .from("@orders")
-    .field("@o_orderpriority", as(count("@o_orderpriority"),"order_count"))
-    .where(
-      gte("@o_orderdate", "1993-07-01"),
-      lt ("@o_orderdate", "1993-10-01"),
-      exists(ABi.select()
+  var subq=select()
              .from("@lineitem")
              .field("@*")
              .where(eq("@l_orderkey","@o_orderkey"),
-                    lt("@l_commitdate","@l_receiptdate"))
-      )
-    )
+                    lt("@l_commitdate","@l_receiptdate"));
+  return ABi.select()
+    .from("@orders")
+    .field("@o_orderpriority", as(count("@o_orderpriority"),"order_count"))
+    .where(gte("@o_orderdate", "1993-07-01"),
+           lt("@o_orderdate", "1993-10-01"),
+           exists(subq))
     .group("@o_orderpriority")
     .order("@o_orderpriority");
 }

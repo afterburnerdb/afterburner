@@ -8,19 +8,19 @@ if(typeof module == 'undefined'){
 //////////////////////////////////////////////////////////////////////////////
 
 function query13_fsql(noasm){
+  var subq=select()
+            .from("@customer")
+            .ljoin("@orders")
+              .on(eq("@c_custkey","@o_custkey"),
+                  notlike("@o_comment",'%special%requests%'))
+            .field("@c_custkey",as(count("@o_orderkey"),"c_count"))
+            .group("@c_custkey")
+
   return ABi.select()
-   .from(
-    ABi.select()
-    .from("@customer")
-    .ljoin("@orders")
-      .on(eq("@c_custkey","@o_custkey"),
-          notlike("@o_comment",'%special%requests%'))
-    .field("@c_custkey",as(count("@o_orderkey"),"c_count"))
-    .group("@c_custkey")
-    )
-   .field("@c_count",as(count("@*"),"custdist"))
-   .group("@c_count")
-   .order("-@custdist","-@c_count")
+            .from(subq)
+            .field("@c_count",as(count("@*"),"custdist"))
+            .group("@c_count")
+            .order("-@custdist","-@c_count")
 }
 
 //////////////////////////////////////////////////////////////////////////////

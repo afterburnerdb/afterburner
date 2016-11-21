@@ -13,6 +13,7 @@ if (inNode){
   var Afterburner=require('afterburner.js').Afterburner;
   global.queryResult=require('queryResult.js');
   ABi = new Afterburner();
+  FSi = new fsql2sql();
   global.daSchema = new aSchema();
   global.ABi=ABi;
   printSchema=require('common.js').printSchema;

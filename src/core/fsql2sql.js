@@ -6,6 +6,7 @@ if(typeof module == 'undefined'){
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 var uniqueCounter=0;
+var theGeneratingFS;
 //base types: relation, column, cond, litral
 function fsql2sql(){
   this.fromA=[];
@@ -30,11 +31,30 @@ function fsql2sql(){
   this.name="STMT"+ uniqueCounter++;
   this.resultant=null;
   this.openA=[];
-////
-  this.select = function(){
+  this.hasAVG=false;
+  this.fromMAV=false;
+  ////
+
+  this.select = function(hint){
+    theGeneratingFS=this;
+    if (hint=='frominmem')
+      return ABi.select()
+    if (hint=='frommav'){
+      this.fromMAV=true;
+      return this;
+    }
     return this;
   }
+  this.open = function(col, ...rest){
+    col=fixCol(col);
+    this.openA.push(col);
+    if (rest.length>0)
+      return this.open(rest[0], ...rest.slice(1));
+    else 
+      return this;
+  }
   this.from = function(rel, ...rest){
+    this.inheretIf(rel)
     rel=fixRel(rel);
     this.fromA.push(rel);
     if (rest.length>0)
@@ -43,13 +63,23 @@ function fsql2sql(){
       return this;
   }
   this.join = function(rel){
+    this.inheretIf(rel);
     this.joinA.push(rel);
     return this;
   }
   this.ljoin = function(rel){
+    this.inheretIf(rel);
     rel=fixRel(rel);
     this.ljoinA.push(rel);
     return this;
+  }
+  this.inheretIf = function(isitsubq, ...rest){
+    if (isitsubq instanceof fsql2sql)
+      this.openA=this.openA.concat(isitsubq.openA);
+    if (rest.length>0)
+      return this.inheretIf(rest[0], ...rest.slice(1));
+    else 
+      return this;
   }
   this.infrom = function(){
     return this;
@@ -67,6 +97,12 @@ function fsql2sql(){
       return this;
   }
   this.field = function(col, ...rest){
+    if (col.indexOf("@AVG")>-1){
+      this.hasAVG=true;
+      if (this.openA.length>0)
+        col=col.replace("@AVG","@SUM")
+    }
+    this.inheretIf(col);
     col=fixCol(col);
     if (col.substring(0,2)=='as'){
       var alias=col;
@@ -74,6 +110,7 @@ function fsql2sql(){
       col=col.substring(col.indexOf('{')+1,col.indexOf('~'));
       col = col + " AS " + alias;
     }
+
     this.attsA.push(col);
     if (rest.length>0)
       return this.field(rest[0], ...rest.slice(1));
@@ -81,7 +118,14 @@ function fsql2sql(){
       return this;
   }
   this.where = function(cond, ...rest){
-    this.whereA.push(cond);
+    var opened=false;
+    for (var i=0;i<this.openA.length;i++){
+      if ((cond.indexOf(this.openA[i]) >-1)
+           && (cond.indexOf('SELECT')<0))
+        opened=true;
+    }
+    if (!opened) 
+      this.whereA.push(cond);
     if (rest.length>0)
       return this.where(rest[0], ...rest.slice(1));
     else 
@@ -166,6 +210,8 @@ function fsql2sql(){
     return this.toSQL();
   }
   this.toSQL = function(){
+    if (this.openA.length>0)
+      return this.toOpenSQL();
     var SELECT_STMT="SELECT " + this.attsA.join(', ');
     var FROM_STMT="FROM " + this.fromA.join(', ');
 
@@ -203,12 +249,49 @@ function fsql2sql(){
       LIMIT_STMT;
     return sqlstr;
   }
-  this.open = function(col, ...rest){
-    this.openA.push(col);
-    if (rest.length>0)
-      return this.open(rest[0], ...rest.slice(1));
-    else 
-      return this;
+  this.ensureOpenness= function(){
+    for (var i=0;i<this.openA.length;i++){
+      if (this.attsA.join('').indexOf(this.openA[i]) < 0){
+        this.field("@"+this.openA[i]);
+        if (this.groupA.join('').indexOf(this.openA[i]) < 0)
+          this.group("@"+this.openA[i]);
+      }
+//      if ((this.whereA.join('').indexOf(this.openA[i]) > -1)
+//           && (cond.indexOf('SELECT') <0))
+//        console.log("ERROR!!! BAD OPENNESS! Handle when handling WHERE");
+    }
+    if (this.hasAVG)
+      this.field(as(count("@*"),"dacount"));
+  }
+  this.toOpenSQL = function(){
+    this.ensureOpenness();
+    var SELECT_STMT="SELECT " + this.attsA.join(', ');
+    var FROM_STMT="FROM " + this.fromA.join(', ');
+
+    var LJOIN_STMT="";
+    if(this.ljoinA.length>0)
+      LJOIN_STMT="LEFT JOIN " + this.ljoinA + " ON " + this.onA.join(' AND ');
+
+    var WHERE_STMT="";
+    if (this.whereA.length>0)
+      WHERE_STMT="WHERE "+ this.whereA.join(' AND ');
+
+    var GROUP_STMT="";
+    if (this.groupA.length>0)
+      GROUP_STMT="GROUP BY "+ this.groupA.join(', ');
+
+    var HAVING_STMT="";
+    if (this.havingA.length>0)
+      HAVING_STMT="HAVING "+ this.havingA.join(' AND ');
+
+    var sqlstr= SELECT_STMT + " " +
+      FROM_STMT + " " +
+      LJOIN_STMT + " " +
+      WHERE_STMT + " " +
+      GROUP_STMT + " " +
+      HAVING_STMT;
+
+    return sqlstr;
   }
   this.toArray = function(vanilla){
     this.materialize();
@@ -228,13 +311,29 @@ function fsql2sql(){
     var jawsan=pci.execSQL(this.toSQL());
     var ds= new dataSource(jawsan);
     var tab=new aTable(ds);
+    if (this.openA.length>0)
+      tab.MAVdef(this);
  //   daSchema.addTable(tab);
     this.resultant=tab;
     return tab;
   }
+  this.materialize_be = function(){
+    var mav_def="CREATE TABLE "+ this.name + " AS " + this.toSQL() + " WITH DATA;";
+    console.log(mav_def);
+    var be_response=pci.execSQL(mav_def);
+    console.log("be_response:"+be_response);
+    newTable= new aTable(null);
+    newTable.name=this.name;
+    daSchema.addTable(newTable);
+    return this.name;
+  }
 }
 
 //API
+function select(param, ...rest){
+  var newi= new fsql2sql();
+  return newi.select(param, ...rest);
+}
 function like(col,strlit){
   col=fixCol(col);
   return col + " LIKE '" + strlit+"'";
@@ -266,24 +365,31 @@ function gt(col1,col2){
   return compare(">",col1,col2);
 }
 function between(col1,col2,col3){
+  theGeneratingFS.inheretIf(col1,col2,col3);
   col1=fixCol(col1);
   col2=fixCol(col2);
   col3=fixCol(col3);
   return col1 + " BETWEEN " + col2 + " AND " + col3;
 }
 function isin(col,list){
+  theGeneratingFS.inheretIf(col);
   col=fixCol(col);
   if (list instanceof Array)
     return col + " IN (" + list.map(fixCol).join(",") + ")"
-  else 
+  else {
+    theGeneratingFS.inheretIf(list);
     return col + " IN (" + list.toSQL() + ")"
+  }
 }
 function isnotin(col,list){
+  theGeneratingFS.inheretIf(col);
   col=fixCol(col);
   if (list instanceof Array)
     return col + " NOT IN (" + list.map(fixCol).join(",") + ")"
-  else 
+  else {
+    theGeneratingFS.inheretIf(list);
     return col + " NOT IN (" + list.toSQL() + ")"
+  }
 }
 function eqlit(p1,p2){
 }
@@ -314,15 +420,18 @@ function and(cond1,cond2, ...rest){
     return '(' + cond1 + ')';
 }
 function compare(op,col1,col2){
+  theGeneratingFS.inheretIf(col1,col2);
   col1=fixCol(col1);
   col2=fixCol(col2);
   return col1 + op + col2;
 }
 function substring(col,n,m){
+  theGeneratingFS.inheretIf(col);
   col=fixCol(col);
   return "@SUBSTRING("+col+" FROM "+n+" FOR "+ m+")";
 }
 function toYear(col){
+  theGeneratingFS.inheretIf(col);
   col=fixCol(col);
   return "@EXTRACT(YEAR FROM "+ col + ")";
 }
@@ -352,15 +461,19 @@ function sumif(col,cond){
   col=fixCol(col);
   return "@SUM(CASE WHEN ("+cond+") THEN " + col + " ELSE 0 END)"
 }
+
 function avg(col){
   col=fixCol(col);
   return "@AVG("+col+")";
+
 }
+
 function date(col){
   col=fixCol(col);
   return "DATE " + col;
 }
 function arith(op,c1,c2){
+  theGeneratingFS.inheretIf(c1,c2);
   c1=fixCol(c1);
   c2=fixCol(c2);
   return "@("+c1 + op + c2 + ")";
@@ -405,9 +518,8 @@ function fixRel(rel){
       rel=rel.substring(1)
     else 
       rel="'"+rel+"'";
-
   } else if (rel instanceof fsql2sql){
-      rel= "(" + rel.toSQL() + ") AS " + rel.name;
+    rel= "(" + rel.toSQL() + ") AS " + rel.name;
   }
   return rel;
 }

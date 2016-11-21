@@ -8,7 +8,7 @@ if(typeof module == 'undefined'){
 //////////////////////////////////////////////////////////////////////////////
 
 function query9_fsql(noasm){
-  return ABi.select()
+  return select()
    .from("@part","@supplier","@lineitem","@partsupp","@orders","@nation")
    .field(as("@n_name","nation"),as(toYear("@o_orderdate"),"o_year"),
           as(sum(sub(mul("@l_extendedprice", sub(1 , "@l_discount")),mul("@ps_supplycost","@l_quantity"))),"sum_profit"))

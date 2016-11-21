@@ -150,6 +150,7 @@
 <script src="./src/core/html5FileParser.js"></script>
 <script src="./src/core/monetJSONParser.js"></script>
 <script src="./src/frontend/myJS.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.2/jquery.min.js"></script>
 <script src="./src/proxy/proxyConf.js"></script>
 <script src="./src/proxy/proxyClient.js"></script>
 <script src="./src/lib/explanation.js"></script>
@@ -202,6 +203,19 @@
 <script src="./src/tpch/fsql/q21.js"></script>
 <script src="./src/tpch/fsql/q22.js"></script>
 
+<script src="./src/tpch/opendatesscen/mav01.js"></script>
+<script src="./src/tpch/opendatesscen/mav03.js"></script>
+<script src="./src/tpch/opendatesscen/mav04.js"></script>
+<script src="./src/tpch/opendatesscen/mav05.js"></script>
+<script src="./src/tpch/opendatesscen/mav06.js"></script>
+<script src="./src/tpch/opendatesscen/mav07.js"></script>
+<script src="./src/tpch/opendatesscen/mav08.js"></script>
+<script src="./src/tpch/opendatesscen/mav10.js"></script>
+<script src="./src/tpch/opendatesscen/mav12.js"></script>
+<script src="./src/tpch/opendatesscen/mav14.js"></script>
+<script src="./src/tpch/opendatesscen/mav15.js"></script>
+<script src="./src/tpch/opendatesscen/mav20.js"></script>
+
 <script src="./src/tpch/answers/ans1.js"></script>
 <script src="./src/tpch/answers/ans2.js"></script>
 <script src="./src/tpch/answers/ans3.js"></script>
@@ -226,13 +240,13 @@
 <script src="./src/tpch/answers/ans22.js"></script>
 
 <script src="./src/tpch/benchmark_tpch.js"></script>
+<script src="./src/tpch/opendatesscen/benchmark_opendatescen.js"></script>
 <script src="./src/micro/benchmark_micro.js"></script>
-
-
   
 <script>
 function myOnLoad(){
   ABi = new Afterburner();
+  FSi = new fsql2sql();
   document.getElementById("TAASM").value="";
 }
 window.onload = function() {
@@ -315,7 +329,6 @@ function fluentToASM(){
 <!-- Placed at the end of the document so the pages load faster -->
 <!-- <script src="bootstrap/jquery.min.js"></script>-->
   <!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script> -->
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.2/jquery.min.js"></script>
 
 <!-- <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script> -->
 <script src="bootstrap/js/bootstrap.min.js"></script>

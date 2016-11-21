@@ -18,6 +18,8 @@ function aTable(dSrc) {
     this.cols = [];
     this.coltypes = [];
     this.loc = 'inmem';
+    this.isMAV = false;
+    this.MAVdef=null;
 //CREATE
     this.parseTable = function (){
       if (inNode){
@@ -86,6 +88,10 @@ function aTable(dSrc) {
     this.setsize = function(size){
       this.numrows=size;
     };
+    this.setMAVdef = function(MAVdef){
+      this.isMAV=true;
+      this.MAVdef=MAVdef;
+    }
 //FUNC
   this.getColNames = function(){
     var ret=this.name+",";

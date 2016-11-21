@@ -7,23 +7,20 @@ if(typeof module == 'undefined'){
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 
-function query3_fsql(noasm){
-  return select()
-   .from("@customer","@orders","@lineitem")
-   .where(eq("@c_mktsegment", 'BUILDING'),
-          eq("@c_custkey", "@o_custkey"),
-          eq("@l_orderkey", "@o_orderkey"),
-          lt("@o_orderdate",'1995-03-15'),
-          gt("@l_shipdate", '1995-03-15')
-         )
-   .field("@l_orderkey", as(sum( mul("@l_extendedprice", sub(1,"@l_discount"))),"revenue"),"@o_orderdate","@o_shippriority")
-   .group("@l_orderkey", "@o_orderdate", "@o_shippriority")
-   .order("-@revenue","@o_orderdate")
-   .limit(10)
+function mav6(){
+  return  select()
+    .open("@l_shipdate")
+    .from("@lineitem")
+    .field(as(sum(mul("@l_extendedprice","@l_discount")),"revenue"))
+    .where(gte("@l_shipdate",('1994-01-01')),
+      lt ("@l_shipdate",'1995-01-01'),
+      gte("@l_discount",0.0499999),
+      lte("@l_discount",0.0700001),
+      lt ("@l_quantity",24))
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 if(inNode){
-  module.exports=query3_fsql;
+  module.exports=mav6;
 } else delete module;
 //////////////////////////////////////////////////////////////////////////////

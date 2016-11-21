@@ -7,23 +7,20 @@ if(typeof module == 'undefined'){
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 
-function query3_fsql(noasm){
+function mav14(){
+
   return select()
-   .from("@customer","@orders","@lineitem")
-   .where(eq("@c_mktsegment", 'BUILDING'),
-          eq("@c_custkey", "@o_custkey"),
-          eq("@l_orderkey", "@o_orderkey"),
-          lt("@o_orderdate",'1995-03-15'),
-          gt("@l_shipdate", '1995-03-15')
-         )
-   .field("@l_orderkey", as(sum( mul("@l_extendedprice", sub(1,"@l_discount"))),"revenue"),"@o_orderdate","@o_shippriority")
-   .group("@l_orderkey", "@o_orderdate", "@o_shippriority")
-   .order("-@revenue","@o_orderdate")
-   .limit(10)
+  .open("@l_shipdate")
+  .from("@lineitem","@part")
+  .field(as(mul(100.00,div(sumif(mul("@l_extendedprice", sub(1,"@l_discount")),like("@p_type", 'PROMO%')), 
+         sum(mul("@l_extendedprice", sub(1,"@l_discount"))))),"promo_revenue"))
+  .where(eq("@l_partkey","@p_partkey"),
+         gte("@l_shipdate", '1995-09-01'),
+         lt("@l_shipdate", '1995-10-01'));
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 if(inNode){
-  module.exports=query3_fsql;
+  module.exports=mav14;
 } else delete module;
 //////////////////////////////////////////////////////////////////////////////

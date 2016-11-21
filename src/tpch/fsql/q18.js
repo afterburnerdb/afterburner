@@ -8,16 +8,17 @@ if(typeof module == 'undefined'){
 //////////////////////////////////////////////////////////////////////////////
 
 function query18_fsql(noasm){
-  return ABi.select()
+  var subq=select()
+             .from("@lineitem")
+             .field("@l_orderkey")
+             .group("@l_orderkey")
+             .having(gt(sum("@l_quantity"),300))
+  return select()
     .from("@customer","@orders","@lineitem")
     .field("@c_name","@c_custkey","@o_orderkey","@o_orderdate","@o_totalprice",sum("@l_quantity"))
     .where(eq("@c_custkey","@o_custkey"),
            eq("@o_orderkey","@l_orderkey"),
-           isin("@o_orderkey",ABi.select()
-                                 .from("@lineitem")
-                                 .field("@l_orderkey")
-                                 .group("@l_orderkey")
-                                 .having(gt(sum("@l_quantity"),300))))
+           isin("@o_orderkey",subq))
     .group("@c_name","@c_custkey","@o_orderkey","@o_orderdate","@o_totalprice")
     .order("-@o_totalprice","@o_orderdate")
     .limit(100)

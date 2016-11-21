@@ -9,7 +9,7 @@ if(typeof module == 'undefined'){
 
 function query14_fsql(noasm){
 
-  return ABi.select()
+  return select()
   .from("@lineitem","@part")
   .field(as(mul(100.00,div(sumif(mul("@l_extendedprice", sub(1,"@l_discount")),like("@p_type", 'PROMO%')), 
          sum(mul("@l_extendedprice", sub(1,"@l_discount"))))),"promo_revenue"))
