@@ -8,6 +8,46 @@ if(typeof module == 'undefined'){
 var uniqueCounter=0;
 var theGeneratingFS;
 //base types: relation, column, cond, litral
+/*****
+//////
+Query Types:
+A: Closed query
+B: Open Query
+C: Closed query against mav
+
+Materialization:
+I: Materialize @BE -> create a BE table based on SQL Query, return table name
+II: Materialize @FE -> run SQL @BE, pull data as a new AB table, return table name
+
+Against:
+i: against mav@BE
+ii: against mav@FE
+
+///////
+case  -> spit, exec, store,returns, how to run?
+I*A   -> SQL , BE  , BE   ,tablename, select()...materialize_be()
+I*B   -> SQL , BE  , BE   , , bemav=select().open(..)...materialize_be()
+I*Ci  -> SQL , BE  , BE   , , select(bemav)....materialize_be()
+I*Cii -> Not supported!   , , select(femav)....materialize_be() <- should throw an error!
+
+II*A  -> SQL , BE  , FE   , ,  select()...[materialize_fe()|toArray()|eval()|toArray2()|materialize()]
+II*B  -> SQL , BE  , FE   , ,  femav=select().open(..)...materialize_fe()
+II*Ci -> SQL , BE  , FE   , ,  select(bemav)....[materialize_fe()|toArray()|eval()|toArray2()|materialize()]
+II*Cii-> ABi , FE  , FE   , ,  select(femav)....[materialize_fe()|toArray()|eval()|toArray2()|materialize()]
+
+///////
+Human version:
+I * A -> fsql2sql, generates closed SQL, execSQL into BE table, scenario supported (maybe useful for experiments)!
+I * B -> fsql2sql, generates mav definition in closed SQL, execSQL into BE table, mav@BE used to accelerate against queries running @BE (I * C)..
+I * C -> fsql2sql, (case against mav@BE) generates closed SQL, runs in against BE mav into BE tables, senario supported (but why?)! .. 
+                   (case against mav@FE) scenario not supported!
+II * A -> fsql2sql, generates colsed SQL, execSQL and pull results, associates with run query @BE..
+II * B -> fsql2sql, generates mav definition in closed SQL, execSQL and pull result, FE materializion used to accelerate quries running against @FE (II * C)..
+II * C -> fsql2sql, (case against mav@BE) generates closed SQL to run against BE mav, then pull results into FE table 
+                    (case against mav@FE) generates closed ABi to run against FE mav..
+///////
+******/
+
 function fsql2sql(){
   this.fromA=[];
   this.joinA=[];
@@ -26,26 +66,45 @@ function fsql2sql(){
   this.orderA=[];
   this.limitA=-1;
   this.resA=[];
-  this.als2tab={};
-  this.tab2als={};
+//  this.als2tab={};
+//  this.tab2als={};
   this.name="STMT"+ uniqueCounter++;
-  this.resultant=null;
   this.openA=[];
   this.hasAVG=false;
-  this.fromMAV=false;
+  this.against;
+  this.againstbe;
+  this.againstfe;
+  this.femat;
+  this.bemat;
+  this.ABI;
   ////
-
-  this.select = function(hint){
+  this.select = function(against){
     theGeneratingFS=this;
-    if (hint=='frominmem')
-      return ABi.select()
-    if (hint=='frommav'){
-      this.fromMAV=true;
-      return this;
+    if (against instanceof fsql2sql){
+      this.against=against.clone();
+      if (typeof against.femat != 'undefined'){
+        console.log("This query is against fronend mav name:"+against.femat.name);
+        this.againstfe=true;
+        this.ABI=new Afterburner();
+        this.ABI.select().from(against.femat.name);
+      }
+      else if (typeof against.bemat != 'undefined'){
+        console.log("This query is against backend mav name:"+against.bemat.name);
+        this.againstbe=true;
+        this.fromA.push(against.bemat.name);
+      }
+      else 
+        console.log("ERROR!!! what type of mav is this ??");
+    } else {
+      console.log("This query is against base relations!!");
     }
     return this;
   }
   this.open = function(col, ...rest){
+    if(this.against){
+      console.log("Does not support opened col against a mav");
+      return;
+    }
     col=fixCol(col);
     this.openA.push(col);
     if (rest.length>0)
@@ -54,6 +113,14 @@ function fsql2sql(){
       return this;
   }
   this.from = function(rel, ...rest){
+    if(typeof this.against != 'undefined'){
+      if (this.against.antiFrom(rel)){
+        return this;
+      }
+      else{
+        return;
+      }
+    }
     this.inheretIf(rel)
     rel=fixRel(rel);
     this.fromA.push(rel);
@@ -61,6 +128,16 @@ function fsql2sql(){
       return this.from(rest[0], ...rest.slice(1));
     else 
       return this;
+  }
+  this.antiFrom = function(rel){
+    rel=fixRel(rel);
+    var pos=this.fromA.indexOf(rel);
+    if (pos<0)
+      return false;
+    else{
+      this.fromA.splice(pos,1);
+      return true;
+    }
   }
   this.join = function(rel){
     this.inheretIf(rel);
@@ -85,8 +162,8 @@ function fsql2sql(){
     return this;
   }
   this.tabAliasif = function(){
-    this.als2tab;
-    this.tab2als;
+//    this.als2tab;
+//    this.tab2als;
     return this;
   }
   this.on = function(cond, ...rest){
@@ -100,7 +177,11 @@ function fsql2sql(){
     if (col.indexOf("@AVG")>-1){
       this.hasAVG=true;
       if (this.openA.length>0)
-        col=col.replace("@AVG","@SUM")
+        col=col.replace("@AVG","@SUM");
+      else if (this.againstbe)
+        col=div(col.replace("@AVG","@SUM"),sum('@dacount'));
+      else if (this.againstfe)
+        console.log("YOU SHOULD NOT BE HERE!!!");
     }
     this.inheretIf(col);
     col=fixCol(col);
@@ -110,8 +191,16 @@ function fsql2sql(){
       col=col.substring(col.indexOf('{')+1,col.indexOf('~'));
       col = col + " AS " + alias;
     }
-
-    this.attsA.push(col);
+    if (this.openA.length>0){
+      if(this.attsA.indexOf(col)<0)
+        this.attsA.push(col);
+    } else if (this.againstfe){
+       console.log("@fsql2sql.field running against fe:"+col);
+       this.ABI.field(col);
+    } else {
+       console.log("@fsql2sql.field {everybody else}:"+col);
+       this.attsA.push(col);
+    }
     if (rest.length>0)
       return this.field(rest[0], ...rest.slice(1));
     else 
@@ -124,8 +213,12 @@ function fsql2sql(){
            && (cond.indexOf('SELECT')<0))
         opened=true;
     }
-    if (!opened) 
-      this.whereA.push(cond);
+    if (!opened){
+      if (this.againstfe) 
+        this.ABI.where(cond);
+      else 
+        this.whereA.push(cond);
+    }
     if (rest.length>0)
       return this.where(rest[0], ...rest.slice(1));
     else 
@@ -133,7 +226,14 @@ function fsql2sql(){
   }
   this.group = function(col, ...rest){
     col=fixCol(col);
-    this.groupA.push(col);
+    if (this.againstfe){
+      console.log("@fsql2sql.group running against fe:"+col);
+      this.ABI.group(col);
+    }
+    else{
+      console.log("@fsql2sql.group {everybody else}:"+col);
+      this.groupA.push(col);
+    }
     if (rest.length>0)
       return this.group(rest[0], ...rest.slice(1));
     else 
@@ -150,7 +250,10 @@ function fsql2sql(){
     if (col[0]== '-')
       col= col.substring(1) + " DESC";
     col=fixCol(col);
-    this.orderA.push(col);
+    if (this.againstfe) 
+      this.ABI.order(col);
+    else
+      this.orderA.push(col);
     if (rest.length>0)
       return this.order(rest[0], ...rest.slice(1));
     else 
@@ -158,7 +261,10 @@ function fsql2sql(){
   }
 
   this.limit = function(lit){
-    this.limitA=lit;
+    if (this.againstfe) 
+      this.ABI.limit(lit);
+    else
+      this.limitA=lit;
     return this;
   }
   this.expandFrom = function(){
@@ -207,9 +313,14 @@ function fsql2sql(){
     return this;
   }
   this.toString = function(purpose){
-    return this.toSQL();
+    if (this.againstfe) 
+      return this.ABI.toString();
+    else
+      return this.toSQL();
   }
   this.toSQL = function(){
+    if (this.againstfe)
+      return "ABI";
     if (this.openA.length>0)
       return this.toOpenSQL();
     var SELECT_STMT="SELECT " + this.attsA.join(', ');
@@ -260,6 +371,10 @@ function fsql2sql(){
 //           && (cond.indexOf('SELECT') <0))
 //        console.log("ERROR!!! BAD OPENNESS! Handle when handling WHERE");
     }
+    for (var i=0;i<this.attsA.length;i++){
+      if (this.attsA[i].indexOf('AS') <0)
+        this.attsA[i]=this.attsA[i] + " AS \""+ this.attsA[i]+"\"";
+    }
     if (this.hasAVG)
       this.field(as(count("@*"),"dacount"));
   }
@@ -294,38 +409,99 @@ function fsql2sql(){
     return sqlstr;
   }
   this.toArray = function(vanilla){
+    if (this.againstfe)
+      return this.ABI.toArray();
     this.materialize();
-    return this.resultant.toArray();
+    return this.femat.toArray();
   }
   this.toArray2 = function(vanilla){
+    if (this.againstfe)
+      return this.ABI.toArray2();
     this.materialize();
-    return this.resultant.toArray2();
+    return this.femat.toArray2();
   }
   this.eval = function(vanilla){
+    if (this.againstfe)
+      return this.ABI.eval();
     this.materialize();
-    return this.resultant.eval();
+    return this.femat.eval();
   }
   this.materialize = function(){
-    if (this.resultant)
-     return this.resultant;
+    if (this.femat)
+     return this.femat;
+    if (this.bemat)
+     return this.bemat;
+    if (this.againstfe){
+      this.femat=this.ABI.materialize();
+      return this;
+    }
     var jawsan=pci.execSQL(this.toSQL());
     var ds= new dataSource(jawsan);
     var tab=new aTable(ds);
     if (this.openA.length>0)
-      tab.MAVdef(this);
- //   daSchema.addTable(tab);
-    this.resultant=tab;
-    return tab;
+      tab.setMAVdef(this);
+    this.femat=tab;
+    return this;
   }
   this.materialize_be = function(){
+    if (this.againstfe){
+      console.log("SORRY THIS IS NOT SUPPORTED !!! <<PLUS WHY?>>");
+      return ;
+    }
+    if (this.bemat)
+      return this;
     var mav_def="CREATE TABLE "+ this.name + " AS " + this.toSQL() + " WITH DATA;";
     console.log(mav_def);
     var be_response=pci.execSQL(mav_def);
     console.log("be_response:"+be_response);
     newTable= new aTable(null);
     newTable.name=this.name;
+    newTable.setMAVdef(this);
     daSchema.addTable(newTable);
-    return this.name;
+    this.bemat=newTable;
+    return this;
+  }
+  this.materialize_fe = function(){
+    if (this.femat)
+      return this;
+    if (this.againstfe){
+      this.femat=this.ABI.materialize();
+      return this;
+    }
+    return this.materialize();
+  }
+
+  this.clone = function(){
+    var newi= new fsql2sql();
+    newi.fromA=this.fromA.slice();
+    newi.joinA=this.joinA.slice();
+    newi.ljoinA=this.ljoinA.slice();
+    newi.on=this.on;
+    newi.joinP=this.joinP;
+    newi.hasljoin=this.hasljoin;
+    newi.hasin=this.hasin;
+    newi.isinFlag=this.isinFlag;
+    newi.attsA=this.attsA.slice();
+    newi.fstr=this.fstr;
+    newi.aggsA=this.aggsA.slice();
+    newi.whereA=this.whereA.slice();
+    newi.groupA=this.groupA.slice();
+    newi.havingA=this.havingA.slice();
+    newi.orderA=this.orderA.slice();
+    newi.limitA=this.limitA;
+    newi.resA=this.resA.slice();
+    newi.als2tab=this.als2tab;
+    newi.tab2als=this.tab2als;
+    newi.name=this.name;
+    newi.openA=this.openA.slice();
+    newi.hasAVG=this.hasAVG;
+    newi.against=this.against;
+    newi.againstbe=this.againstbe;
+    newi.againstfe=this.againstfe;
+    newi.femat=this.femat;
+    newi.bemat=this.bemat;
+    newi.ABI=this.ABI;
+    return newi;
   }
 }
 
@@ -336,32 +512,62 @@ function select(param, ...rest){
 }
 function like(col,strlit){
   col=fixCol(col);
+  if (theGeneratingFS.againstfe){
+    return _like(col,strlit);
+  }
   return col + " LIKE '" + strlit+"'";
 }
 function notlike(col,strlit){
   col=fixCol(col);
+  if (theGeneratingFS.againstfe){
+    return _notlike(col,strlit);
+  }
+
   return col + " NOT LIKE '" + strlit+"'";
 }
 
 function not(cond){
+  if (theGeneratingFS.againstfe){
+    return _not(cond);
+  }
+
   return "NOT (" + cond + ")";
 }
 function eq(col1,col2){
+  if (theGeneratingFS.againstfe){
+    return _eq(col1,col2);
+  }
   return compare("=",col1,col2);
 }
 function neq(col1,col2){
+  if (theGeneratingFS.againstfe){
+    return _neq(col1,col2);
+  }
   return compare("<>",col1,col2);
 }
 function lte(col1,col2){
+  if (theGeneratingFS.againstfe){
+    return _lte(col1,col2);
+  }
   return compare("<=",col1,col2);
 }
 function gte(col1,col2){
+  if (theGeneratingFS.againstfe){
+    return _gte(col1,col2);
+  }
   return compare(">=",col1,col2);
 }
 function lt(col1,col2){
+  if (theGeneratingFS.againstfe){
+    return _lt(col1,col2);
+  }
+
   return compare("<",col1,col2);
 }
 function gt(col1,col2){
+  if (theGeneratingFS.againstfe){
+    return _gt(col1,col2);
+  }
   return compare(">",col1,col2);
 }
 function between(col1,col2,col3){
@@ -369,11 +575,20 @@ function between(col1,col2,col3){
   col1=fixCol(col1);
   col2=fixCol(col2);
   col3=fixCol(col3);
+
+  if (theGeneratingFS.againstfe){
+    return _between(col1,col2,col3);
+  }
   return col1 + " BETWEEN " + col2 + " AND " + col3;
 }
 function isin(col,list){
   theGeneratingFS.inheretIf(col);
   col=fixCol(col);
+
+  if (theGeneratingFS.againstfe){
+    return _isin(col,list);
+  }
+
   if (list instanceof Array)
     return col + " IN (" + list.map(fixCol).join(",") + ")"
   else {
@@ -384,6 +599,11 @@ function isin(col,list){
 function isnotin(col,list){
   theGeneratingFS.inheretIf(col);
   col=fixCol(col);
+
+  if (theGeneratingFS.againstfe){
+    return _isnotin(col,list);
+  }
+
   if (list instanceof Array)
     return col + " NOT IN (" + list.map(fixCol).join(",") + ")"
   else {
@@ -404,6 +624,9 @@ function gtlit(p1,p2){
 function betweenlit(p1,p2,p3){
 }
 function or(cond1,cond2, ...rest){
+  if (theGeneratingFS.againstfe){
+    return _or(cond1,cond2, ...rest)
+  }
   if (rest.length>0)
     return or(cond1, or(cond2,rest[0], ...rest.slice(1)));
   else if (cond2)
@@ -412,6 +635,10 @@ function or(cond1,cond2, ...rest){
     return '(' + cond1 + ')';
 }
 function and(cond1,cond2, ...rest){
+  if (theGeneratingFS.againstfe){
+    return _and(cond1,cond2, ...rest);
+  }
+
   if (rest.length>0)
     return and(cond1, and(cond2,rest[0], ...rest.slice(1)));
   else if (cond2)
@@ -428,15 +655,27 @@ function compare(op,col1,col2){
 function substring(col,n,m){
   theGeneratingFS.inheretIf(col);
   col=fixCol(col);
+  if (theGeneratingFS.againstfe){
+    return _substring(col,n,m);
+  }
   return "@SUBSTRING("+col+" FROM "+n+" FOR "+ m+")";
 }
 function toYear(col){
   theGeneratingFS.inheretIf(col);
   col=fixCol(col);
+
+  if (theGeneratingFS.againstfe){
+    return _toYear(col);
+  }
+
   return "@EXTRACT(YEAR FROM "+ col + ")";
 }
 function min(col){
   col=fixCol(col);
+  if (theGeneratingFS.againstfe){
+    return _min(col);
+  }
+
   return "@MIN("+col+")";
 }
 function max(col){
@@ -455,6 +694,8 @@ function countif(p,cond){
 }
 function sum(col){
   col=fixCol(col);
+  if (typeof theGeneratingFS.against != 'undefined')
+    return "@SUM(\"SUM("+col+")\")";
   return "@SUM("+col+")";
 }
 function sumif(col,cond){
@@ -464,13 +705,23 @@ function sumif(col,cond){
 
 function avg(col){
   col=fixCol(col);
+  theGeneratingFS.hasAVG=true;
+  if (theGeneratingFS.openA.length>0){
+    if (theGeneratingFS.attsA.indexOf("SUM("+col+")")<0);
+      return "@SUM("+col+")";
+  }
+  else if (typeof theGeneratingFS.against != 'undefined')
+    return div(sum("@"+col),"@SUM(dacount)");
   return "@AVG("+col+")";
 
 }
 
 function date(col){
   col=fixCol(col);
-  return "DATE " + col;
+  if (theGeneratingFS.againstfe){
+    return _substring(col,n,m);
+  }
+  return col;
 }
 function arith(op,c1,c2){
   theGeneratingFS.inheretIf(c1,c2);
