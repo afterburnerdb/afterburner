@@ -18,8 +18,8 @@ function mav5(){
            eq("@s_nationkey","@n_nationkey"),
            eq("@n_regionkey","@r_regionkey"),
            eq("@r_name",'ASIA'),
-           gte("@o_orderdate",'1994-01-01'),
-           lt("@o_orderdate",'1995-01-01'))
+           gte("@o_orderdate",date('1994-01-01')),
+           lt("@o_orderdate",date('1995-01-01')))
     .field("@n_name",as(sum(mul("@l_extendedprice", sub(1,"@l_discount"))),"revenue"))
     .group("@n_name")
     .order("-@revenue");

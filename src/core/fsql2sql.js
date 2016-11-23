@@ -195,10 +195,10 @@ function fsql2sql(){
       if(this.attsA.indexOf(col)<0)
         this.attsA.push(col);
     } else if (this.againstfe){
-       console.log("@fsql2sql.field running against fe:"+col);
+//      console.log("@fsql2sql.field running against fe:"+col);
        this.ABI.field(col);
     } else {
-       console.log("@fsql2sql.field {everybody else}:"+col);
+//      console.log("@fsql2sql.field {everybody else}:"+col);
        this.attsA.push(col);
     }
     if (rest.length>0)
@@ -227,11 +227,11 @@ function fsql2sql(){
   this.group = function(col, ...rest){
     col=fixCol(col);
     if (this.againstfe){
-      console.log("@fsql2sql.group running against fe:"+col);
+//      console.log("@fsql2sql.group running against fe:"+col);
       this.ABI.group(col);
     }
     else{
-      console.log("@fsql2sql.group {everybody else}:"+col);
+//      console.log("@fsql2sql.group {everybody else}:"+col);
       this.groupA.push(col);
     }
     if (rest.length>0)
@@ -534,40 +534,21 @@ function not(cond){
   return "NOT (" + cond + ")";
 }
 function eq(col1,col2){
-  if (theGeneratingFS.againstfe){
-    return _eq(col1,col2);
-  }
   return compare("=",col1,col2);
 }
 function neq(col1,col2){
-  if (theGeneratingFS.againstfe){
-    return _neq(col1,col2);
-  }
   return compare("<>",col1,col2);
 }
 function lte(col1,col2){
-  if (theGeneratingFS.againstfe){
-    return _lte(col1,col2);
-  }
   return compare("<=",col1,col2);
 }
 function gte(col1,col2){
-  if (theGeneratingFS.againstfe){
-    return _gte(col1,col2);
-  }
   return compare(">=",col1,col2);
 }
 function lt(col1,col2){
-  if (theGeneratingFS.againstfe){
-    return _lt(col1,col2);
-  }
-
   return compare("<",col1,col2);
 }
 function gt(col1,col2){
-  if (theGeneratingFS.againstfe){
-    return _gt(col1,col2);
-  }
   return compare(">",col1,col2);
 }
 function between(col1,col2,col3){
@@ -650,6 +631,11 @@ function compare(op,col1,col2){
   theGeneratingFS.inheretIf(col1,col2);
   col1=fixCol(col1);
   col2=fixCol(col2);
+
+  if (theGeneratingFS.againstfe){
+    return _compare(op,col1,col2);
+  }
+
   return col1 + op + col2;
 }
 function substring(col,n,m){
@@ -675,27 +661,41 @@ function min(col){
   if (theGeneratingFS.againstfe){
     return _min(col);
   }
-
   return "@MIN("+col+")";
 }
 function max(col){
   col=fixCol(col);
+  if (theGeneratingFS.againstfe){
+    return _min(col);
+  }
   return "@MAX("+col+")";
 }
 function count(col){
   col=fixCol(col);
+  if (typeof theGeneratingFS.against != 'undefined'){
+    if (theGeneratingFS.againstfe){
+      return _sum("COUNT("+col+")");
+    }
+    return "@SUM(\"COUNT("+col+")\")";
+  }
   return "@COUNT("+col+")";
 }
 function countdistinct(col){
   col=fixCol(col);
+  if (typeof theGeneratingFS.against != 'undefined')//not supported
+    return;
   return "@COUNT( distinct "+col+")";
 }
 function countif(p,cond){
 }
 function sum(col){
   col=fixCol(col);
-  if (typeof theGeneratingFS.against != 'undefined')
+  if (typeof theGeneratingFS.against != 'undefined'){
+    if (theGeneratingFS.againstfe){
+      return _sum("SUM("+col+")");
+    }
     return "@SUM(\"SUM("+col+")\")";
+  }
   return "@SUM("+col+")";
 }
 function sumif(col,cond){
@@ -710,16 +710,19 @@ function avg(col){
     if (theGeneratingFS.attsA.indexOf("SUM("+col+")")<0);
       return "@SUM("+col+")";
   }
-  else if (typeof theGeneratingFS.against != 'undefined')
-    return div(sum("@"+col),"@SUM(dacount)");
+  else if (typeof theGeneratingFS.against != 'undefined'){
+    if (theGeneratingFS.againstfe){
+      return _div( _sum("SUM("+col+")"), _sum("dacount"));
+    }
+    return div(mul(sum("@"+col),'@ROUND(1.0,2)'),"@SUM(dacount)");
+  }
   return "@AVG("+col+")";
-
 }
 
 function date(col){
-  col=fixCol(col);
+  //col=fixCol(col);
   if (theGeneratingFS.againstfe){
-    return _substring(col,n,m);
+    return _date(col);
   }
   return col;
 }

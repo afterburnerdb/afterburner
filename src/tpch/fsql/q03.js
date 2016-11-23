@@ -13,8 +13,8 @@ function query3_fsql(noasm){
    .where(eq("@c_mktsegment", 'BUILDING'),
           eq("@c_custkey", "@o_custkey"),
           eq("@l_orderkey", "@o_orderkey"),
-          lt("@o_orderdate",'1995-03-15'),
-          gt("@l_shipdate", '1995-03-15')
+          lt("@o_orderdate",date('1995-03-15')),
+          gt("@l_shipdate",date('1995-03-15'))
          )
    .field("@l_orderkey", as(sum( mul("@l_extendedprice", sub(1,"@l_discount"))),"revenue"),"@o_orderdate","@o_shippriority")
    .group("@l_orderkey", "@o_orderdate", "@o_shippriority")

@@ -16,8 +16,8 @@ function query4_fsql(noasm){
   return ABi.select()
     .from("@orders")
     .field("@o_orderpriority", as(count("@o_orderpriority"),"order_count"))
-    .where(gte("@o_orderdate", "1993-07-01"),
-           lt("@o_orderdate", "1993-10-01"),
+    .where(gte("@o_orderdate",date("1993-07-01")),
+           lt("@o_orderdate",date( "1993-10-01")),
            exists(subq))
     .group("@o_orderpriority")
     .order("@o_orderpriority");

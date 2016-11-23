@@ -18,8 +18,8 @@ function mav12(){
                  isin("@l_shipmode",['MAIL', 'SHIP']),
 	         lt("@l_commitdate","@l_receiptdate"),
                  lt("@l_shipdate","@l_commitdate"),
-                 gte("@l_receiptdate",'1994-01-01'),
-                 lt("@l_receiptdate",'1995-01-01'))
+                 gte("@l_receiptdate",date('1994-01-01')),
+                 lt("@l_receiptdate",date('1995-01-01')))
 	  .group("@l_shipmode")
           .order("@l_shipmode");
 

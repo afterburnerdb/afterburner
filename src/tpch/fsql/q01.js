@@ -7,8 +7,8 @@ if(typeof module == 'undefined'){
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 
-function query1_fsql(execwhere){
-return select(execwhere)
+function query1_fsql(against){
+return select(against)
   .from('@lineitem')
   .field('@l_returnflag','@l_linestatus',
     sum('@l_quantity'),
@@ -19,7 +19,7 @@ return select(execwhere)
     avg('@l_extendedprice'),
     avg('@l_discount'),
     count('@*'))
-  .where(lte('@l_shipdate','1998-09-02'))
+  .where(lte('@l_shipdate',date('1998-09-02')))
   .group('@l_returnflag','@l_linestatus')
   .order('@l_returnflag','@l_linestatus')
 }

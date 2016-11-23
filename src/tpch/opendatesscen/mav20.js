@@ -17,8 +17,8 @@ function mav20(){
               .field(mul(0.5,sum("@l_quantity")))
               .where(eq("@l_partkey","@ps_partkey"),
                      eq("@l_suppkey","@ps_suppkey"),
-                     gte("@l_shipdate",'1994-01-01'),
-                     lt("@l_shipdate",'1995-01-01'))
+                     gte("@l_shipdate",date('1994-01-01')),
+                     lt("@l_shipdate",date('1995-01-01')))
   var subq2=select()
     .from("@partsupp")
     .field("@ps_suppkey")

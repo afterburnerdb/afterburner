@@ -20,7 +20,7 @@ function query7_fsql(noasm){
           eq("@c_nationkey","@n2.n_nationkey"),
           or(and(eq("@n1.n_name",'FRANCE'),eq("@n2.n_name",'GERMANY')), 
              and(eq("@n1.n_name",'GERMANY'),eq("@n2.n_name",'FRANCE'))),
-          between("@l_shipdate",'1995-01-01','1996-12-31'))
+          between("@l_shipdate",date('1995-01-01'),date('1996-12-31')))
    .group("@supp_nation","@cust_nation","@l_year")
    .order("@supp_nation","@cust_nation","@l_year");
 }

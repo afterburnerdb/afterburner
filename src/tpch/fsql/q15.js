@@ -11,8 +11,8 @@ function query15_fsql(noasm){
   revenue0=select()
     .from("@lineitem")
     .field(as("@l_suppkey","supplier_no"),as(sum(mul("@l_extendedprice", sub(1, "@l_discount"))),"total_revenue"))
-    .where(gte("@l_shipdate",'1996-01-01'),
-            lt("@l_shipdate",'1996-04-01'))
+    .where(gte("@l_shipdate",date('1996-01-01')),
+            lt("@l_shipdate",date('1996-04-01')))
     .group("@l_suppkey");
 
   subq1=select().from(revenue0).field(max("@total_revenue"));

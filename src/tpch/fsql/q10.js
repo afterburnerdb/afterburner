@@ -15,8 +15,8 @@ function query10_fsql(noasm){
         "@c_acctbal","@n_name","@c_address","@c_phone","@c_comment")
     .where(eq("@c_custkey","@o_custkey"),
            eq("@l_orderkey","@o_orderkey"),
-           gte("@o_orderdate",'1993-10-01'),
-           lt("@o_orderdate",'1994-01-01'),
+           gte("@o_orderdate",date('1993-10-01')),
+           lt("@o_orderdate",date('1994-01-01')),
            eq("@l_returnflag",'R'),
            eq("@c_nationkey","@n_nationkey"))
     .group("@c_custkey","@c_name","@c_acctbal","@c_phone","@n_name","@c_address","@c_comment")
