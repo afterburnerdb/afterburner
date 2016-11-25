@@ -40,8 +40,6 @@ fs.writeFile("/tmp/fserver.pid", process.pid +"", function(err) {
    console.log("Pid file created");
 
 function send_monetdb_query(res,qstr){
-//    var conn = new monetdb(options);
-//    conn.connect();
     conn.query(qstr).then(function(result){
       res.send(result);
     }).fail(function(result){
@@ -50,10 +48,9 @@ function send_monetdb_query(res,qstr){
 }
 
 function send_monetdb_query_json(res,qstr){
-//    var conn = new monetdb(options);
-//    conn.connect();
     conn.query(qstr).then(function(result){
       console.log("@send_monetdb_query_json type of result:"+typeof result);
+      console.log("sending:"+res.length);
       res.json(result);
     }).fail(function(result){
       res.json(result);
@@ -119,20 +116,20 @@ app.get('/pull', function (req, res) {
   }
 });
 app.get('/demo_be.html', function (req, res) {
-   res.sendfile('demo_be.html',{root:'../../'});
+   res.sendFile('demo_be.html',{root:'../../'});
 })
 app.get('/browser-frontend.min.js', function (req, res) {
-   res.sendfile('browser-frontend.min.js',{root:'../../'});
+   res.sendFile('browser-frontend.min.js',{root:'../../'});
 })
 
 app.get(/.*js$/, function (req, res) {
-   res.sendfile(req.originalUrl,{root:'../..'});
+   res.sendFile(req.originalUrl,{root:'../..'});
 })
 app.get(/.*html$/, function (req, res) {
-   res.sendfile(req.originalUrl,{root:'../..'});
+   res.sendFile(req.originalUrl,{root:'../..'});
 })
 app.get(/.*bootstrap.*/, function (req, res) {
-   res.sendfile(req.originalUrl,{root:'../..'});
+   res.sendFile(req.originalUrl,{root:'../..'});
 })
 
 app.use(function(req, res, next) {

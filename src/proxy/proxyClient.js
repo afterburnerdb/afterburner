@@ -64,7 +64,9 @@ function proxyClient(HOST,PORT){
     return this.get(uri);
   }
   this.dropBE_MAVS=function(){
-    drop_mavs=this.execSQL("SELECT 'DROP TABLE ' || tables.name  || ';'  FROM tables WHERE tables.name LIKE 'stmt%';");
+    var drop_mavs=this.execSQL("SELECT 'DROP TABLE ' || tables.name  || ';'  FROM tables WHERE tables.name LIKE 'stmt%';");
+    if (typeof drop_mavs.data == 'undefined')
+      return;
     for (var i=0; i<drop_mavs.data.length;i++){
       console.log(drop_mavs.data[i][0]);
       this.execSQL(drop_mavs.data[i][0]);

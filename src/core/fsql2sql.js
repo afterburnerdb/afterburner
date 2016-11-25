@@ -66,37 +66,39 @@ function fsql2sql(){
   this.orderA=[];
   this.limitA=-1;
   this.resA=[];
+  this.hasAVG=false;
 //  this.als2tab={};
 //  this.tab2als={};
   this.name="STMT"+ uniqueCounter++;
+  this.opened;
   this.openA=[];
-  this.hasAVG=false;
   this.against;
   this.againstbe;
   this.againstfe;
-  this.femat;
-  this.bemat;
+  this.mat;
+  this.matbe;
+  this.matfe;
   this.ABI;
   ////
   this.select = function(against){
     theGeneratingFS=this;
     if (against instanceof fsql2sql){
       this.against=against.clone();
-      if (typeof against.femat != 'undefined'){
-        console.log("This query is against fronend mav name:"+against.femat.name);
+      if (against.matfe){
+        console.log("This query is against fronend mav name:"+against.mat.name);
         this.againstfe=true;
         this.ABI=new Afterburner();
-        this.ABI.select().from(against.femat.name);
+        this.ABI.select().from(against.mat.name);
       }
-      else if (typeof against.bemat != 'undefined'){
-        console.log("This query is against backend mav name:"+against.bemat.name);
+      else if (against.matbe){
+        DEBUG("This query is against backend mav name:"+against.mat.name);
         this.againstbe=true;
-        this.fromA.push(against.bemat.name);
+        this.fromA.push(against.mat.name);
       }
       else 
         console.log("ERROR!!! what type of mav is this ??");
     } else {
-      console.log("This query is against base relations!!");
+      DEBUG("This query is against base relations!!");
     }
     return this;
   }
@@ -107,6 +109,7 @@ function fsql2sql(){
     }
     col=fixCol(col);
     this.openA.push(col);
+    this.opened=true;
     if (rest.length>0)
       return this.open(rest[0], ...rest.slice(1));
     else 
@@ -408,67 +411,98 @@ function fsql2sql(){
 
     return sqlstr;
   }
-  this.toArray = function(vanilla){
-    if (this.againstfe)
-      return this.ABI.toArray();
-    this.materialize();
-    return this.femat.toArray();
-  }
-  this.toArray2 = function(vanilla){
-    if (this.againstfe)
-      return this.ABI.toArray2();
-    this.materialize();
-    return this.femat.toArray2();
-  }
-  this.eval = function(vanilla){
-    if (this.againstfe)
-      return this.ABI.eval();
-    this.materialize();
-    return this.femat.eval();
-  }
+//  this.toArray = function(vanilla){
+//    // Type A
+//    this.materialize();
+//    if (this.againstfe)
+//      return this.femat.toArray(vanilla);
+//    else if (this.againstbe)
+//      return this.bemat.toArray(vanilla);
+//    else 
+//
+//    return this.femat.toArray();
+//  }
+    this.toArray2 = function(vanilla){
+      if (this.opened){
+        console.log("Please use materialize_be or materialize_fe to materialize an opened query (mav)!");
+        return;
+      }
+      if (this.againstfe)
+        return this.ABI.toArray2();
+      else if (this.againstbe || true) 
+        return [].concat.apply([], pci.execSQL(this.toSQL()).data);
+    }
+//  this.eval = function(vanilla){
+//    if (this.againstfe)
+//      return this.ABI.eval();
+//    this.materialize();
+//    return this.femat.eval();
+//  }
   this.materialize = function(){
-    if (this.femat)
-     return this.femat;
-    if (this.bemat)
-     return this.bemat;
+    if (typeof this.mat !='undefined')
+      return this;
+
+    if (this.opened){
+      console.log("Please use materialize_be or materialize_fe to materialize an opened query (mav)!");
+      return;
+    }
+
     if (this.againstfe){
-      this.femat=this.ABI.materialize();
+      console.log("running closed query.. query against fe..");
+      var tabname=this.ABI.materialize();
+      this.mat=daSchema.getTable(tabname);
+      this.matfe=true;
+      return this;
+    } else if (this.againstbe) {
+      console.log("running closed query.. query against be..");
+      var be_jsn=pci.execSQL(this.toSQL());
+      var ds= new dataSource(be_jsn);
+      this.mat=new aTable(ds);
+      this.matbe=true;
+      return this;
+    } else {
+      console.log("running closed query.. query not against anything..");
+      var be_jsn=pci.execSQL(this.toSQL());
+      var ds= new dataSource(be_jsn);
+      var tab=new aTable(ds);
+      if (this.openA.length>0)
+        tab.setMAVdef(this);
+      this.mat=tab;
       return this;
     }
-    var jawsan=pci.execSQL(this.toSQL());
-    var ds= new dataSource(jawsan);
-    var tab=new aTable(ds);
-    if (this.openA.length>0)
-      tab.setMAVdef(this);
-    this.femat=tab;
-    return this;
   }
   this.materialize_be = function(){
-    if (this.againstfe){
+    if (typeof this.against != 'undefined'){
       console.log("SORRY THIS IS NOT SUPPORTED !!! <<PLUS WHY?>>");
       return ;
     }
     if (this.bemat)
       return this;
     var mav_def="CREATE TABLE "+ this.name + " AS " + this.toSQL() + " WITH DATA;";
-    console.log(mav_def);
     var be_response=pci.execSQL(mav_def);
-    console.log("be_response:"+be_response);
     newTable= new aTable(null);
     newTable.name=this.name;
     newTable.setMAVdef(this);
     daSchema.addTable(newTable);
-    this.bemat=newTable;
+    this.mat=newTable;
+    this.matbe=true;
     return this;
   }
   this.materialize_fe = function(){
-    if (this.femat)
-      return this;
-    if (this.againstfe){
-      this.femat=this.ABI.materialize();
-      return this;
+    if (typeof this.against != 'undefined'){
+      console.log("SORRY THIS IS NOT SUPPORTED !!! <<PLUS WHY?>>");
+      return ;
     }
-    return this.materialize();
+    if (this.mat)
+      return this;
+    var be_jsn=pci.execSQL(this.toSQL());
+    var ds= new dataSource(be_jsn);
+    var tab=new aTable(ds);
+    if (this.openA.length>0)
+      tab.setMAVdef(this);
+    this.mat=tab;
+    this.matfe=true;
+    return this;
   }
 
   this.clone = function(){
@@ -498,8 +532,9 @@ function fsql2sql(){
     newi.against=this.against;
     newi.againstbe=this.againstbe;
     newi.againstfe=this.againstfe;
-    newi.femat=this.femat;
-    newi.bemat=this.bemat;
+    newi.mat=this.mat;
+    newi.matbe=this.matbe;
+    newi.matfe=this.matfe;
     newi.ABI=this.ABI;
     return newi;
   }
@@ -712,7 +747,7 @@ function avg(col){
   }
   else if (typeof theGeneratingFS.against != 'undefined'){
     if (theGeneratingFS.againstfe){
-      return _div( _sum("SUM("+col+")"), _sum("dacount"));
+      return _postdiv(_sum("SUM("+col+")"), _sum("dacount"));
     }
     return div(mul(sum("@"+col),'@ROUND(1.0,2)'),"@SUM(dacount)");
   }

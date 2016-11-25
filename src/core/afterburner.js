@@ -1505,6 +1505,34 @@ function _avg(p){
 function _date(p1){
   return strdate_to_int(p1);
 }
+function _postarith(op,p1,p2){
+  var ret="";
+  var op1varname;
+  var op2varname;
+  if (typeof p1 =='string'){
+    op1varname=p1.substring(p1.indexOf("var")+3,p1.indexOf("="));
+    var op1colname= p1.substring(p1.indexOf("'")+1); op1colname=op1colname.substring(0,op1colname.indexOf("'"));
+    ret = ret + p1.substring(0,p1.indexOf("postexek:"));
+  } else { op1varname=""+p1;}
+
+  if (typeof p2 =='string'){
+    op2varname=p2.substring(p1.indexOf("var")+3,p2.indexOf("="));
+    var op2colname= p2.substring(p2.indexOf("'")+1); op2colname=op1colname.substring(0,op2colname.indexOf("'"));
+    ret = ret + p2.substring(0,p2.indexOf("postexek:"));
+  } else { op2varname=""+p2;}
+
+  ret = ret+ "postexek:memF32[(temps+(tempsptr<<2))>>2]=+("+coerceFloat(op1varname) + op + coerceFloat(op2varname) +");tempsptr= (tempsptr + 1 )|0;::";
+  ret = ret.replace((new RegExp("post:.*::",'')), "");
+  _as(ret, ""+op1varname + op + op1varname);
+  return ret;
+}
+function _postdiv(p1,p2){
+  return _postarith("/",p1,p2);
+}
+function _postmul(p1,p2){
+  return _postarith("*",p1,p2);
+}
+
 function _arith(op,p1,p2){
   var p1b=bindCol(p1);
   var p2b=bindCol(p2);

@@ -205,7 +205,7 @@ function verify_query(qnum,q,ma,noasm){
 //  }
 //  return {veri:verifiedA, runt:runtimesMSA};
 //}
-function verifyqs(noasm,backend){
+function verifyqs(noasm,backend, against){
   var verifiedA=[];
   if (backend)
     console.log("verifying q's_fsql");

@@ -43,6 +43,19 @@ function printSchema(){
     scons.appendChild(daSchema.toHTMLTable());
   }
 }
+function get_time_ms(){
+    if (inNode)
+      return process.hrtime();
+    else
+      return window.performance.now();
+}
+function time_diff(t0,t1){
+    if (inNode)
+      return ((((t1[0]-t0[0])*(1000)) + ((t1[1]-t0[1])/(1000*1000))));
+    else 
+      return (t1-t0);
+}
+
 function strToString(str){
   str=str|0;
   ret="";

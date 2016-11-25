@@ -43,8 +43,9 @@ function query8(noasm){
   
   return par_line_sup_ord=ABi.select()
 	.from(ord_cus).join(par_line_sup).on("o_orderkey","l_orderkey")
-	.field("o_year",_as(_sumif(_mul("l_extendedprice", _sub(1,"l_discount")),_eq("nation",'BRAZIL')),'share'),
-	_as(_sum(_mul("l_extendedprice", _sub(1,"l_discount"))),'share'))
+	.field("o_year",
+        _as(_postdiv(_sumif(_mul("l_extendedprice", _sub(1,"l_discount")),_eq("nation",'BRAZIL')),
+	_sum(_mul("l_extendedprice", _sub(1,"l_discount")))),'share'))
 	.group('o_year')
 	.order([0]);
 }

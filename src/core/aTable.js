@@ -247,6 +247,9 @@ function aTable(dSrc) {
     } else if (this.src.type='query') {
       DEBUG('new table from query')
       this.colptrs=dSrc.colptrs;
+      for (var i=0;i<this.numcols;i++){
+        this.cols[i]=mem32[(this.colptrs+(i<<2))>>2];
+      } 
     } else if (this.src.type='monetjsn') {
       DEBUG('new table from a monetjsn, **not implemented**')
     } else { 
