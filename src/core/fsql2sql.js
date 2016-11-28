@@ -7,7 +7,7 @@ if(typeof module == 'undefined'){
 //////////////////////////////////////////////////////////////////////////////
 var uniqueCounter=0;
 var theGeneratingFS;
-//base types: relation, column, cond, litral
+//Basic types: relation, column, condition, literal
 /*****
 //////
 Query Types:
@@ -67,8 +67,6 @@ function fsql2sql(){
   this.limitA=-1;
   this.resA=[];
   this.hasAVG=false;
-//  this.als2tab={};
-//  this.tab2als={};
   this.name="STMT"+ uniqueCounter++;
   this.opened;
   this.openA=[];

@@ -46,7 +46,7 @@ if (inNode){
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
-mavs_ods=[mav1,mav3,mav4,mav5,mav6,mav7,mav8,mav10,mav12,mav14,mav15,mav20];
+mavs_ods=[mav1,mav3,mav4,mav5,mav6,mav7,mav8,mav10,mav12,mav14/*,mav15,mav20*/];
 
 queries_fsql_ods=[query1_fsql,
 query3_fsql,
@@ -117,15 +117,44 @@ function verifyqs_ods(noasm,mats){
 function materialize_mavs(who){
   var mats=[];
   for (var i=0;i<mavs_ods.length;i++){
-    if (who == 'backend')
+    if (who == 'backend'){
       mats.push(mavs_ods[i]().materialize_be());
-    else if (who == 'frontend')
+    } else if (who == 'frontend'){
       mats.push(mavs_ods[i]().materialize_fe());
-    else
+    } else {
       mats.push(undefined);
+    }
   }
   return mats;
 }
+
+function benchmark_materialize_mavs(rounds, who){
+  var matsSizeBytes=[];
+  var sizes;
+  for (var ii=0;ii<rounds;ii++){
+    var timeA=[];
+    var t0,t1, mem0,mem1;
+    for (var i=0;i<mavs_ods.length;i++){
+      if (who == 'backend'){
+        t0=get_time_ms();
+        mavs_ods[i]().materialize_be();
+        t1=get_time_ms();
+      } else if (who == 'frontend'){
+        mem0=malloc(0);
+        t0=get_time_ms();
+        mavs_ods[i]().materialize_fe()
+        t1=get_time_ms();
+        mem1=malloc(0);
+        matsSizeBytes.push(mem1-mem0);
+      } 
+      timeA.push(time_diff(t0,t1));
+      console.log("time to create mav#"+i+" at:" + who+":"+timeA[i] + " and size:"+matsSizeBytes[i])
+    }
+  }
+  console.log("===== benchmark_materialize_mavs done.. =====");
+  return;
+}
+
 function benchmark_ods(warmup,rounds,noasm,against){
   //input:
   //int warmup; warmup rounds are verrified

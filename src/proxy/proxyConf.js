@@ -9,15 +9,15 @@ if(typeof module == 'undefined'){
 
 proxyConf = {};
 proxyConf.monetdb={};
-proxyConf.monetdb.host="127.0.0.1";
-proxyConf.monetdb.port=12345;
-proxyConf.monetdb.dbname='monetdb-sf1';
-proxyConf.monetdb.user='monetdb';   
-proxyConf.monetdb.password='monetdb';
+proxyConf.monetdb.host="127.0.0.1";    //Where is MonetDB?
+proxyConf.monetdb.port=12345;          //Listening on which port?
+proxyConf.monetdb.dbname='monetdb-sf1';//Name of the database
+proxyConf.monetdb.user='monetdb';      //MonetDB username
+proxyConf.monetdb.password='monetdb';  //MonetDB password
 
 proxyConf.proxy={};
-proxyConf.proxy.webhost="127.0.0.1";
-proxyConf.proxy.webport=54397;
+proxyConf.proxy.webhost="127.0.0.1";   //Where is Express webserver?
+proxyConf.proxy.webport=54397;         //Listening on which port?
 
 
 //////////////////////////////////////////////////////////////////////////////

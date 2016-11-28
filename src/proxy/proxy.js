@@ -49,8 +49,8 @@ function send_monetdb_query(res,qstr){
 
 function send_monetdb_query_json(res,qstr){
     conn.query(qstr).then(function(result){
-      console.log("@send_monetdb_query_json type of result:"+typeof result);
-      console.log("sending:"+res.length);
+      DEBUG("@send_monetdb_query_json type of result:"+typeof result);
+      DEBUG("sending:"+res.length);
       res.json(result);
     }).fail(function(result){
       res.json(result);
@@ -60,26 +60,26 @@ function send_monetdb_query_json(res,qstr){
 var app = express();
 
 app.get('/getSchema', function (req, res) {
-   console.log("Got a GET /getSchema");
+   DEBUG("Got a GET /getSchema");
    send_monetdb_query(res,"select tables.name,columns.name,columns.type from tables,columns where tables.id=columns.table_id and tables.system=false and tables.type=0");
 });
 
 app.get('/getTableNames', function (req, res) {
-   console.log("Got a GET /getTableNames");
+   DEBUG("Got a GET /getTableNames");
    send_monetdb_query(res,"select tables.name from tables where tables.system=false and tables.type=0");
 });
 
 
 app.get('/getTables', function (req, res) {
-   console.log("Got a GET /getTables");
+   DEBUG("Got a GET /getTables");
    res.send('file server serving something carrying mem');
 });
 app.get('/query', function (req, res) {
   if (req.query.fsql){
-    console.log('Got query fsql:'+req.query.fsql);
+    DEBUG('Got query fsql:'+req.query.fsql);
   }
   if (req.query.sql){
-    console.log('Got query sql:'+req.query.sql);
+    DEBUG('Got query sql:'+req.query.sql);
     var desql=req.query.sql;
 //    var desql=atob(req.query.sql);
 //    console.log('Got query atob(sql):'+desql);
