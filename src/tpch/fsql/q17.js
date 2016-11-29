@@ -7,12 +7,12 @@ if(typeof module == 'undefined'){
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 
-function query17_fsql(noasm){
+function query17_fsql(against){
   var subq=select()
              .from("@lineitem")
              .field(mul(0.2,(avg("@l_quantity"))))
              .where(eq("@l_partkey","@p_partkey"))
-  return select()
+  return select(against)
     .from("@lineitem","@part")
     .field(as(div(sum("@l_extendedprice"),7.0),"avg_yearly"))
     .where(eq("@p_partkey","@l_partkey"),

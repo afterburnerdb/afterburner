@@ -7,8 +7,8 @@ if(typeof module == 'undefined'){
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 
-function query6_fsql(){
-  return  select()
+function query6_fsql(against){
+  return  select(against)
     .from("@lineitem")
     .field(as(sum(mul("@l_extendedprice","@l_discount")),"revenue"))
     .where(gte("@l_shipdate",date('1994-01-01')),

@@ -7,7 +7,7 @@ if(typeof module == 'undefined'){
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 
-function query21_fsql(noasm){
+function query21_fsql(against){
   var subq0=select()
               .from("@lineitem l2")
               .where(eq("@l2.l_orderkey","@l1.l_orderkey"),
@@ -19,7 +19,7 @@ function query21_fsql(noasm){
                      neq("@l3.l_suppkey","@l1.l_suppkey"),
                      gt("@l3.l_receiptdate","@l3.l_commitdate"))
               .field("@*")
-  return select()
+  return select(against)
     .from("@supplier","@lineitem l1","@orders","@nation")
     .where(eq("@s_suppkey","@l1.l_suppkey"),
            eq("@o_orderkey","@l1.l_orderkey"),

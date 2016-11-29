@@ -7,8 +7,8 @@ if(typeof module == 'undefined'){
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 
-function query3_fsql(noasm){
-  return select()
+function query3_fsql(against){
+  return select(against)
    .from("@customer","@orders","@lineitem")
    .where(eq("@c_mktsegment", 'BUILDING'),
           eq("@c_custkey", "@o_custkey"),

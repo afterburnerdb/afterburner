@@ -7,7 +7,7 @@ if(typeof module == 'undefined'){
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 
-function query2_fsql(noasm){
+function query2_fsql(against){
   var subq=select()
              .from("@partsupp","@supplier","@nation","@region")
              .field(min("@ps_supplycost"))
@@ -17,7 +17,7 @@ function query2_fsql(noasm){
                     eq("@n_regionkey","@r_regionkey"),
                     eq("@r_name",'EUROPE'));
 
-  return select()
+  return select(against)
   .from("@part","@supplier","@partsupp","@nation","@region")
   .field("@s_acctbal","@s_name","@n_name","@p_partkey","@p_mfgr","@s_address","@s_phone","@s_comment")
   .where(eq("@p_partkey","@ps_partkey"),

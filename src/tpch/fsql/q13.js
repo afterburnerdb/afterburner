@@ -7,8 +7,8 @@ if(typeof module == 'undefined'){
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 
-function query13_fsql(noasm){
-  var subq=select()
+function query13_fsql(against){
+  var subq=select(against)
             .from("@customer")
             .ljoin("@orders")
               .on(eq("@c_custkey","@o_custkey"),

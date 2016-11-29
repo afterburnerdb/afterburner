@@ -7,12 +7,12 @@ if(typeof module == 'undefined'){
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 
-function query16_fsql(noasm){
+function query16_fsql(against){
   var subq=select()
              .from("@supplier")
              .field("@s_suppkey")
              .where(like("@s_comment",'%Customer%Complaints%'))
-  return select()
+  return select(against)
            .from("@partsupp","@part")
            .field("@p_brand","@p_type","@p_size", as(countdistinct("@ps_suppkey"), "supplier_cnt"))
            .where(eq("@p_partkey" ,"@ps_partkey"),

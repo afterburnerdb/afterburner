@@ -7,7 +7,7 @@ if(typeof module == 'undefined'){
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 
-function query22_fsql(noasm){
+function query22_fsql(against){
   var min_bal=select()
                 .from("@customer")
                 .field(avg("@c_acctbal"))
@@ -24,7 +24,7 @@ function query22_fsql(noasm){
     .where(isin(substring("@c_phone",1,2),['13', '31', '23', '29', '30', '18', '17']),
       gt("@c_acctbal",min_bal),
       notexists(subq))
-  return select()
+  return select(against)
     .from(cus_ord)
     .field("@cntrycode",
       as(count("@*"),"numcust"),

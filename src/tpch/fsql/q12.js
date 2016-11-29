@@ -7,8 +7,8 @@ if(typeof module == 'undefined'){
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 
-function query12_fsql(noasm){
-  return select()
+function query12_fsql(against){
+  return select(against)
 	  .from("@lineitem","@orders")
 	  .field("@l_shipmode",
 			  as(sumif(1,or(eq("@o_orderpriority","1-URGENT"),eq("@o_orderpriority","2-HIGH"))),"high_line_count"),

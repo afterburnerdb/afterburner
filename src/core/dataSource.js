@@ -321,6 +321,10 @@ handyColTypes["upgrade"]=[
     for (var i=0;i<src.structure.length;i++){
       if (src.structure[i].type== 'int')
         this.coltypes.push(0);
+      else if (src.structure[i].type== 'i2')
+        this.coltypes.push(0);
+      else if (src.structure[i].type== 'hugeint')
+        this.coltypes.push(0);
       else if (src.structure[i].type== 'bigint')
         this.coltypes.push(0);
       else if (src.structure[i].type== 'smallint')

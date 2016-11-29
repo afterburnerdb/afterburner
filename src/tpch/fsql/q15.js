@@ -7,7 +7,7 @@ if(typeof module == 'undefined'){
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 
-function query15_fsql(noasm){
+function query15_fsql(against){
   revenue0=select()
     .from("@lineitem")
     .field(as("@l_suppkey","supplier_no"),as(sum(mul("@l_extendedprice", sub(1, "@l_discount"))),"total_revenue"))
@@ -17,7 +17,7 @@ function query15_fsql(noasm){
 
   subq1=select().from(revenue0).field(max("@total_revenue"));
     
-  return select()
+  return select(against)
     .from("@supplier",revenue0)
     .field("@s_suppkey","@s_name","@s_address","@s_phone","@total_revenue")
     .where(eq("@s_suppkey","@supplier_no"),

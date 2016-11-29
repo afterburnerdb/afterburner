@@ -7,8 +7,8 @@ if(typeof module == 'undefined'){
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 
-function query10_fsql(noasm){
-  return select()
+function query10_fsql(against){
+  return select(against)
     .from("@customer","@orders","@lineitem","@nation")
     .field("@c_custkey","@c_name",
       as(sum(mul("@l_extendedprice",sub(1,"@l_discount"))), "revenue"),

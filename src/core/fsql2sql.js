@@ -140,6 +140,16 @@ function fsql2sql(){
       return true;
     }
   }
+  this.antiWhere = function(cond){
+    var pos=this.whereA.indexOf(cond);
+    if (pos<0)
+      return false;
+    else{
+      this.whereA.splice(pos,1);
+      return true;
+    }
+  }
+
   this.join = function(rel){
     this.inheretIf(rel);
     this.joinA.push(rel);
@@ -215,10 +225,25 @@ function fsql2sql(){
         opened=true;
     }
     if (!opened){
-      if (this.againstfe) 
-        this.ABI.where(cond);
-      else 
+      if (this.againstfe || this.againstbe){
+        var cond_against_done=this.against.antiWhere(cond);
+        var cond_against_opened=(this.against.openA.indexOf(cond)>-1);
+        var cond_against_opened=false;
+        for (var i=0;i<this.against.openA.length;i++){
+          if (cond.indexOf(this.against.openA[i])>-1){
+            cond_against_opened=true;
+            break;
+          }
+        }
+        if (!cond_against_done && !cond_against_opened)
+          return;
+        if (this.againstbe && cond_against_opened)
+          this.whereA.push(cond);
+        if (this.againstfe)
+          this.ABI.where(cond);
+      } else {
         this.whereA.push(cond);
+      }
     }
     if (rest.length>0)
       return this.where(rest[0], ...rest.slice(1));

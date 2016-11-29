@@ -7,8 +7,8 @@ if(typeof module == 'undefined'){
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 
-function query8_fsql(noasm){
-  return select()
+function query8_fsql(against){
+  return select(against)
 	.from("@part","@supplier","@lineitem","@orders","@customer","@nation n1","@nation n2","@region")
         .where(eq("@p_partkey","@l_partkey"),
                eq("@s_suppkey","@l_suppkey"),

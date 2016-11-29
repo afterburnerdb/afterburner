@@ -7,7 +7,7 @@ if(typeof module == 'undefined'){
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 
-function query20_fsql(noasm){
+function query20_fsql(against){
   var subq0=select()
               .from("@part")
               .field("@p_partkey")
@@ -24,7 +24,7 @@ function query20_fsql(noasm){
     .field("@ps_suppkey")
     .where(isin("@ps_partkey", subq0),
            gt("@ps_availqty", subq1 ))
-  return select()
+  return select(against)
     .from("@supplier","@nation")
     .where(isin("@s_suppkey",subq2),
       eq("@s_nationkey","@n_nationkey"),
