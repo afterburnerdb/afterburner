@@ -110,6 +110,7 @@ function verifyqs_ods(noasm,mats){
     var query=queries_fsql_ods[i];
     var model_answer=answers_ods[i];
     var verified= verify_query_fsql(i,query(mats[i]),model_answer,noasm);
+    //console.log("@verifyqs_ods[i="+i+"]: verified="+verified);
     verifiedA.push(verified);
   }
   return verifiedA;
@@ -188,7 +189,7 @@ function benchmark_ods(warmup,rounds,noasm,against){
   }
   for (var i=0; (typeof  verifiedAA[0] !='undefined')&& i<verifiedAA[0].length; i++ ){
     tmpstr="";
-    for (var ii=0; ii<rounds;ii++){
+    for (var ii=0; ii<warmup;ii++){
       tmpstr+=verifiedAA[ii][i] +",";
     }
     console.log("query"+(i+1) + ":" + tmpstr);

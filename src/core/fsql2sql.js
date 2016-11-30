@@ -66,6 +66,10 @@ function fsql2sql(){
   this.orderA=[];
   this.limitA=-1;
   this.resA=[];
+  this.als2tab={};
+  this.tab2als={};
+  this.als2col={};
+  this.col2als={};
   this.hasAVG=false;
   this.name="STMT"+ uniqueCounter++;
   this.opened;
@@ -122,8 +126,11 @@ function fsql2sql(){
         return;
       }
     }
+
     this.inheretIf(rel)
     rel=fixRel(rel);
+    if (this.opened){
+    }
     this.fromA.push(rel);
     if (rest.length>0)
       return this.from(rest[0], ...rest.slice(1));
@@ -202,7 +209,7 @@ function fsql2sql(){
       col=col.substring(col.indexOf('{')+1,col.indexOf('~'));
       col = col + " AS " + alias;
     }
-    if (this.openA.length>0){
+    if (this.opened){
       if(this.attsA.indexOf(col)<0)
         this.attsA.push(col);
     } else if (this.againstfe){
@@ -398,8 +405,11 @@ function fsql2sql(){
 //        console.log("ERROR!!! BAD OPENNESS! Handle when handling WHERE");
     }
     for (var i=0;i<this.attsA.length;i++){
-      if (this.attsA[i].indexOf('AS') <0)
-        this.attsA[i]=this.attsA[i] + " AS \""+ this.attsA[i]+"\"";
+      var indexofAS=this.attsA[i].indexOf(' AS');
+      if (indexofAS>-1){
+        console.log('NOW THIS IS AN ERROR!');
+      }
+      this.attsA[i]=this.attsA[i] + " AS \""+ this.attsA[i]+"\"";
     }
     if (this.hasAVG)
       this.field(as(count("@*"),"dacount"));
@@ -484,7 +494,7 @@ function fsql2sql(){
       this.matbe=true;
       return this;
     } else {
-      console.log("running closed query.. query not against anything..");
+      DEBUG("running closed query.. query not against anything..");
       var be_jsn=pci.execSQL(this.toSQL());
       var ds= new dataSource(be_jsn);
       var tab=new aTable(ds);
@@ -803,6 +813,8 @@ function div(col1,col2){
   return arith("/",col1,col2);
 }
 function as(col,al){
+ // if (theGeneratingFS.opened) 
+ //   return col;// ignore aliases in mavs
   return col + " AS " + al;
 }
 function exists(relation){
@@ -818,9 +830,20 @@ function fixCol(col){
       col=col.substring(1)
     else 
       col="'"+col+"'";
-
+    var indexofAS=col.indexOf(' AS');
+    if (theGeneratingFS.opened && indexofAS>-1){
+      var colname=col.substring(0,indexofAS);
+      var alsname=col.substring(indexofAS+4);
+      theGeneratingFS.col2als[colname]=alsname;
+      theGeneratingFS.als2col[alsname]=colname;
+      col=colname;      
+    }
   } else if (col instanceof fsql2sql){
       col= "(" + col.toSQL() + ")";
+  }
+  //
+  if (typeof theGeneratingFS.als2col[col] !='undefined'){
+    col="\"" + theGeneratingFS.als2col[col] + "\"";
   }
   return col;
 }

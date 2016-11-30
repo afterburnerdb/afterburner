@@ -8,7 +8,7 @@ if(typeof module == 'undefined'){
 //////////////////////////////////////////////////////////////////////////////
 function query7_fsql(against){
  return select(against)
-   .from("@supplier","@lineitem","@orders","@customer",as("@nation","n1"),as("@nation","n2"))
+   .from("@supplier","@lineitem","@orders","@customer","@nation n1","@nation n2")
    .field(as("@n1.n_name","supp_nation"),
           as("@n2.n_name","cust_nation"),
           as(toYear("@l_shipdate"),"l_year"),
