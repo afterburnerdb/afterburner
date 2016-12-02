@@ -30,7 +30,7 @@ function timediff(t1,t0){
 function micro1_JSO_(scale,o_totalpriceA){
   var count = 0;
   for (var ii=0;ii<scale;ii++){
-    if (o_totalpriceA[ii] < 1555.5)
+    if (o_totalpriceA[ii] > 1555555.5)
       count= count + 1;
   }
   return count;
@@ -51,7 +51,7 @@ function micro1_TA_(scale, memF32,o_totalpriceOffset){
   var count=0;
   var lastOffset=scale*4;
   for (var ii=0;ii<lastOffset;ii=ii+4){
-    if (memF32[(o_totalpriceOffset + ii)>>2] < 1555.5)
+    if (memF32[(o_totalpriceOffset + ii)>>2] > 1555555.5)
       count= count + 1;
   }
   return count;
@@ -78,7 +78,7 @@ var asm_m1 = (function (global, env, mem){
     var sscale=0;
     sscale= scale<<2;
     while ((ii|0)<(sscale|0)){
-      if (+(memF32[((o_totalpriceOffset + ii)|0)>>2]) < 1555.5)
+      if (+(memF32[((o_totalpriceOffset + ii)|0)>>2]) > 1555555.5)
         count= (count + 1)|0;
       ii=(ii+4)|0;
     }
@@ -154,7 +154,7 @@ function micro1(scale){
 function micro2_JSO_(scale, o_shippriorityA){
   var count=0;
   for (var ii=0;ii<scale;ii++){
-    if (o_shippriorityA[ii] == 0)
+    if (o_shippriorityA[ii] > 0)
       count= count+ 1;
   }
   return count;
@@ -175,7 +175,7 @@ function micro2_TA_(scale, mem32,o_shippriorityOffset){
   var count=0;
   var lastOffset=scale*4;
   for (var ii=0;ii<lastOffset;ii=ii+4){
-    if (mem32[(o_shippriorityOffset+ii)>>2] == 0)
+    if (mem32[(o_shippriorityOffset+ii)>>2] > 0)
       count= count+1;
   }
   return count;
@@ -202,7 +202,7 @@ var asm_m2 = (function (global, env, mem){
     var sscale=0;
     sscale= scale<<2;
     while ((ii|0)<(sscale|0)){
-      if ( (mem32[((o_shippriorityOffset + ii)|0)>>2]|0) == 0)
+      if ( (mem32[((o_shippriorityOffset + ii)|0)>>2]|0) > 0)
         count= (count + 1)|0;
       ii=(ii+4)|0;
     }
