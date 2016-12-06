@@ -733,8 +733,9 @@ function Afterburner(){
   var curr1NumBucks=1;
   var curr2NumBucks=1;
   var curr3NumBucks=1
-  var mem32 = new global.Int32Array(mem);
   var mem8 = new global.Int8Array(mem);
+  var mem16 = new global.Int16Array(mem);
+  var mem32 = new global.Int32Array(mem);
   var memF32 = new global.Float32Array(mem);
   var redo=1;
   var producable=0;
@@ -751,6 +752,7 @@ function Afterburner(){
   var hk=0;
   var tmp=0;
   var tmpstrlen=0;
+  var laddr=0;
   var hash=0;
   var dtyluptr=`+dateToYearLUTab()+`;
   var dtyby=1970;
@@ -1076,21 +1078,42 @@ function defun(fbody){
   return funname;
 }
 function like_begins(strp,strlit){
-  var ret="";
-  var strlitlen=strlit.length;
-  for (var i=0;i<strlitlen;i++){
-    intval=(strlit.charCodeAt(i)||0);
-    ret+='((mem8[('+strp+'+'+i+')|0]|0)==('+intval+'|0))&';
+  var quartets=Math.floor(strlit.length/4);
+  var ret="((laddr="+strp+"|0)|1)&";
+  var c=0;
+  var intval;
+  var i;
+  for (i=0;i<quartets;i++){
+    intval=(strlit.charCodeAt(c++)||0)+
+         ((strlit.charCodeAt(c++)||0)<<8)+
+         ((strlit.charCodeAt(c++)||0)<<16)+
+         ((strlit.charCodeAt(c++)||0)<<24);
+    ret+='((mem32[(('+strp+' + ('+i+'<<2))|0)>>2]|0)==('+intval+'|0))&';
+  }
+  if (c==(strlit.length-3)){
+    intval=(strlit.charCodeAt(c++)||0)+
+         ((strlit.charCodeAt(c++)||0)<<8);
+    ret= ret+'((mem16[((laddr + ('+((i<<2))+'|0))|0)>>1]|0)==('+intval+'|0))&';
+    ret= ret+'((mem8 [ (laddr + ('+((i<<2)+2)+'|0))    |0]|0)==('+strlit.charCodeAt(c)+'|0))&';
+  } else if (c==(strlit.length-2)){
+    intval=(strlit.charCodeAt(c++)||0)+
+         ((strlit.charCodeAt(c++)||0)<<8);
+    ret= ret + '((mem16[((laddr + ('+((i<<2))+'|0))|0)>>1]|0)==('+intval+'|0))&';
+  }else if (c==(strlit.length-1)){
+    ret= ret + '((mem8 [ (laddr + ('+((i<<2))+'|0))    |0]|0)==('+strlit.charCodeAt(c++)+'|0))&';
   }
   return ret.substring(0,ret.length-1);
 }
+
 function like_ends(strp, strlit){
-  var ret="((tmpstrlen=(strlen("+strp+"))|0)|1)&";
-  var c=0;
   var strlitlen=strlit.length;
-  for (var i=0;i<strlitlen;i++){
+  var ret="((laddr="+strp+"|0)|1)&((tmpstrlen=(strlen(laddr))|0)|1)&";//("+strlitlen+">=tmpstrlen)&&";
+  var c=0;
+  var intval;
+  var i;
+  for (i=0;i<strlitlen;i++){
     intval=(strlit.charCodeAt(c++)||0);
-    ret+='((mem8[(('+strp+' + ( tmpstrlen - '+ (strlitlen-i)+' ))|0)]|0)==('+intval+'|0))&';
+    ret+='((mem8[((laddr + ( tmpstrlen - '+ (strlitlen-i)+' ))|0)]|0)==('+intval+'|0))&';
   }
   return ret.substring(0,ret.length-1);
 }
@@ -1133,7 +1156,7 @@ function build_snake(strlit, islast){
       i=(i+1)|0;
     }`;
   }
-function like_haslist(strp, list){
+function like_haslist(strp, list,from,to){
   if (list.length == 0) return 0;
   var snakes="";
   for (var i=0;i<list.length;i++){
@@ -1144,7 +1167,8 @@ function like_haslist(strp, list){
     strp=strp|0;
     var len=0;
     var i=0;
-    len=strlen(strp)|0;
+    strp=(strp+`+from+`|0);
+    len=((strlen(strp)|0)-`+to+`)|0;
     `+snakes+`
     return 0;
   }`;
@@ -1179,19 +1203,19 @@ function isPreBoundNumber(p1){
   return p1.indexOf('pb$')<0 && p1.indexOf('pb')==0 ;
 }
 function expandStrLitComp(strp, strlit){
-  quartets=Math.ceil((strlit.length+1)/4);
-  ret="";
-  c=0;
+  var quartets=Math.ceil((strlit.length+1)/4);
+  var ret="";
+  var c=0;
+  var intval;
   for (var i=0;i<quartets;i++){
     if((c==strlit.length)){
-        ret+='((mem8[(('+strp+' + ('+i+'<<2))|0)]|0)==0)&';
-    }
-    else{
-    intval=(strlit.charCodeAt(c++)||0)+
+      ret+='((mem8[(('+strp+' + ('+i+'<<2))|0)]|0)==0)&';
+    } else{
+      intval=(strlit.charCodeAt(c++)||0)+
            ((strlit.charCodeAt(c++)||0)<<8)+
            ((strlit.charCodeAt(c++)||0)<<16)+
            ((strlit.charCodeAt(c++)||0)<<24);
-        ret+='((mem32[(('+strp+' + ('+i+'<<2))|0)>>2]|0)==('+intval+'|0))&';
+      ret+='((mem32[(('+strp+' + ('+i+'<<2))|0)>>2]|0)==('+intval+'|0))&';
     }
   }
   return ret.substring(0,ret.length-1);
@@ -1223,6 +1247,7 @@ function _like(p1,strlit){
   var ends="";
 
   if (numpct ==0) return _eq(p1,strlit);
+  if (strlit =="%")  return ("(1)");
   
   var frst_pct=strlit.indexOf('%');
 
@@ -1232,6 +1257,7 @@ function _like(p1,strlit){
   }
 
   var last_pct=strlit.lastIndexOf('%');
+  var mustendb4=(strlit.length-last_pct)-1;
   if  (last_pct<(strlit.length-1)){
     ends=like_ends(strp,strlit.substring(last_pct+1));
     strlit=strlit.substring(0,last_pct+1);
@@ -1242,7 +1268,7 @@ function _like(p1,strlit){
   for (var i=0;i<lit_list.length;i++)
     if (lit_list[i] != "")
       rest_list.push(lit_list[i])
-  var rest=like_haslist(strp,rest_list);
+  var rest=like_haslist(strp,rest_list,frst_pct,mustendb4);
 
   if (begins!= "") ret=begins;
   if (ends!="") ret+= '&'+ ends;
