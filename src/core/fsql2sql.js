@@ -91,6 +91,7 @@ function fsql2sql(){
         this.againstfe=true;
         this.ABI=new Afterburner();
         this.ABI.select().from(against.mat.name);
+        console.log("Create a ABI.. should fill that up, next");
       }
       else if (against.matbe){
         DEBUG("This query is against backend mav name:"+against.mat.name);
@@ -213,10 +214,8 @@ function fsql2sql(){
       if(this.attsA.indexOf(col)<0)
         this.attsA.push(col);
     } else if (this.againstfe){
-//      console.log("@fsql2sql.field running against fe:"+col);
        this.ABI.field(col);
     } else {
-//      console.log("@fsql2sql.field {everybody else}:"+col);
        this.attsA.push(col);
     }
     if (rest.length>0)
@@ -231,27 +230,31 @@ function fsql2sql(){
            && (cond.indexOf('SELECT')<0))
         opened=true;
     }
-    if (!opened){
-      if (this.againstfe || this.againstbe){
-        var cond_against_done=this.against.antiWhere(cond);
-        var cond_against_opened=(this.against.openA.indexOf(cond)>-1);
-        var cond_against_opened=false;
-        for (var i=0;i<this.against.openA.length;i++){
-          if (cond.indexOf(this.against.openA[i])>-1){
-            cond_against_opened=true;
-            break;
-          }
-        }
-        if (!cond_against_done && !cond_against_opened)
-          return;
-        if (this.againstbe && cond_against_opened)
-          this.whereA.push(cond);
-        if (this.againstfe)
-          this.ABI.where(cond);
-      } else {
-        this.whereA.push(cond);
-      }
-    }
+     if (!opened){
+       if (this.againstfe && cond!='alreadyready'){
+           
+           this.ABI.where(cond);
+       } else if (this.againstbe){
+         var cond_against_done=this.against.antiWhere(cond);
+         var cond_against_opened=(this.against.openA.indexOf(cond)>-1);
+         var cond_against_opened=false;
+         for (var i=0;i<this.against.openA.length;i++){
+           if (cond.indexOf(this.against.openA[i])>-1){
+             cond_against_opened=true;
+             break;
+           }
+         }
+         if (!cond_against_done && !cond_against_opened){
+           console.log("ERROR: Query with a condition not covered by the against MAV.. cond:"+cond);
+           return ;
+         }
+         if (this.againstbe && cond_against_opened)
+           this.whereA.push(cond);
+       } else {
+         this.whereA.push(cond);
+       }
+     }
+
     if (rest.length>0)
       return this.where(rest[0], ...rest.slice(1));
     else 
@@ -260,11 +263,9 @@ function fsql2sql(){
   this.group = function(col, ...rest){
     col=fixCol(col);
     if (this.againstfe){
-//      console.log("@fsql2sql.group running against fe:"+col);
       this.ABI.group(col);
     }
     else{
-//      console.log("@fsql2sql.group {everybody else}:"+col);
       this.groupA.push(col);
     }
     if (rest.length>0)
@@ -280,13 +281,19 @@ function fsql2sql(){
       return this;
   }
   this.order = function(col, ...rest){
-    if (col[0]== '-')
-      col= col.substring(1) + " DESC";
-    col=fixCol(col);
-    if (this.againstfe) 
+    if (this.againstfe){
+      if (col[0]== '-'){
+        col="-"+fixCol(col.substring(1));
+      } else {
+        col=fixCol(col);
+      }
       this.ABI.order(col);
-    else
+    } else {
+      if (col[0]== '-')
+        col= col.substring(1) + " DESC";
+      col=fixCol(col);
       this.orderA.push(col);
+    }
     if (rest.length>0)
       return this.order(rest[0], ...rest.slice(1));
     else 
@@ -397,13 +404,15 @@ function fsql2sql(){
     for (var i=0;i<this.openA.length;i++){
       if (this.attsA.join('').indexOf(this.openA[i]) < 0){
         this.field("@"+this.openA[i]);
-        if (this.groupA.join('').indexOf(this.openA[i]) < 0)
-          this.group("@"+this.openA[i]);
+        //if (this.groupA.join('').indexOf(this.openA[i]) < 0)
+        //  this.group("@"+this.openA[i]);
       }
-//      if ((this.whereA.join('').indexOf(this.openA[i]) > -1)
-//           && (cond.indexOf('SELECT') <0))
-//        console.log("ERROR!!! BAD OPENNESS! Handle when handling WHERE");
     }
+    for (var i=0;i<this.attsA.length;i++){
+      if (this.groupA.indexOf(no_alias(this.attsA[i]) == -1))
+        this.groupA.push(no_alias(this.attsA[i]));
+    }
+
     for (var i=0;i<this.attsA.length;i++){
       var indexofAS=this.attsA[i].indexOf(' AS');
       if (indexofAS>-1){
@@ -509,8 +518,10 @@ function fsql2sql(){
       console.log("SORRY THIS IS NOT SUPPORTED !!! <<PLUS WHY?>>");
       return ;
     }
-    if (this.bemat)
+    if (this.matbe){
+      console.log("Hey, already materialized @BE, returning this");
       return this;
+    }
     var mav_def="CREATE TABLE "+ this.name + " AS " + this.toSQL() + " WITH DATA;";
     var be_response=pci.execSQL(mav_def);
     newTable= new aTable(null);
@@ -526,9 +537,10 @@ function fsql2sql(){
       console.log("SORRY THIS IS NOT SUPPORTED !!! <<PLUS WHY?>>");
       return ;
     }
-    if (this.mat)
+    if (this.matfe)
       return this;
-    var be_jsn=pci.execSQL(this.toSQL());
+    var betab=this.materialize_be();
+    var be_jsn=pci.execSQL("SELECT * FROM "+ betab.name);
     var ds= new dataSource(be_jsn);
     var tab=new aTable(ds);
     if (this.openA.length>0)
@@ -700,7 +712,15 @@ function compare(op,col1,col2){
   col1=fixCol(col1);
   col2=fixCol(col2);
 
+  var condSQL=col1 + op + col2;
+
   if (theGeneratingFS.againstfe){
+//   if (theGeneratingFS.against.whereA.indexOf(condSQL)>-1)
+//      return condSQL;
+    if (theGeneratingFS.against.antiWhere(condSQL))
+      return "alreadyready";
+    
+    if (op== "=") op = "==";
     return _compare(op,col1,col2);
   }
 
@@ -858,3 +878,9 @@ function fixRel(rel){
   }
   return rel;
 }
+function no_alias(namewithalias){
+  var asi=namewithalias.indexOf(" AS");
+  if (asi<0) return namewithalias;
+  else return namewithalias.substring(0,asi);
+}
+
