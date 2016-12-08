@@ -84,6 +84,8 @@ function aTable(dSrc) {
 	}
         daSchema.addTable(this);
         deletetmpstr();
+        fp.cleanUp();
+        delete fp;
     };
     this.setsize = function(size){
       this.numrows=size;

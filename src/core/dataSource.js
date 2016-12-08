@@ -304,7 +304,9 @@ handyColTypes["upgrade"]=[
     this.colnames=qr.colnames;
     this.coltypes=qr.coltypes;
   }
-  this.fromMonetJSON= function(src){
+  this.fromMonetJSON= function(srcA){
+    console.log('@fromMonetJSON');
+    var src=srcA[0];
     if (inNode){
       monetJSONParser= require('./monetJSONParser.js');
     }
@@ -313,7 +315,11 @@ handyColTypes["upgrade"]=[
 
     this.name='monetdb_qid'+src.queryid;
     this.fname=null;
-    this.numrows=src.rows;
+    this.numrows=0;
+    for (var i=0; i<srcA.length;i++)
+      this.numrows+=srcA[i].rows;
+    console.log("srcA.length:"+srcA.length);
+    console.log("tot numrows:"+ this.numrows);
     this.numcols=src.cols;
     this.colptrs=null;
     this.colnames=Object.keys(src.col);
@@ -352,7 +358,7 @@ handyColTypes["upgrade"]=[
         console.log('unsupported data types from monetdb:' + src.structure[i].type );
       }
     }
-    this.parser=new monetJSONParser(src);
+    this.parser=new monetJSONParser(srcA);
   }
   this.fromHTML5File= function(file,funk){//firefox browser file                  
       console.log('@fromHTML5File');
@@ -382,7 +388,7 @@ handyColTypes["upgrade"]=[
     this.fromHTML5File(src,funk);
   } else if (typeof src == 'string' && (inNode)){
     this.fromFile(src);
-  } else if (typeof src.data !== 'undefined'){
+  } else if (typeof src == "object" && typeof src[0] == "object" && typeof src[0].data == 'object'){
     this.fromMonetJSON(src);
   } else {
     console.log('Unsupported DS type, typeof DS:'+ typeof DS);

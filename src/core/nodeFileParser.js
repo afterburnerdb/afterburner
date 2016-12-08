@@ -55,6 +55,9 @@ function nodeFileParser(fname) {
   this.getFileName =function(){
     return this.fname;
   }
+  this.cleanUp = function(){
+    delete this.buffer;
+  }
   //Constructor:
   var fs=require('fs');
   console.log('this.fname='+this.fname);

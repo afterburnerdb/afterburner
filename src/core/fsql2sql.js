@@ -540,9 +540,22 @@ function fsql2sql(){
     if (this.matfe)
       return this;
     var betab=this.materialize_be();
-    var be_jsn=pci.execSQL("SELECT * FROM "+ betab.name);
+    var getMore=true;
+    var rowChunk=1000000;
+    var chunkID=0;
+    var be_jsn=[]
+    while(getMore){
+      var curr_jsn=pci.execSQL("SELECT * FROM "+ betab.name + " LIMIT "+ rowChunk + " OFFSET " +  (chunkID*rowChunk));
+      if (curr_jsn.data.length>0)
+        getMore=true;
+      else 
+        getMore=false;
+      be_jsn.push(curr_jsn);
+      chunkID++;
+    }
     var ds= new dataSource(be_jsn);
     var tab=new aTable(ds);
+    delete ds;
     if (this.openA.length>0)
       tab.setMAVdef(this);
     this.mat=tab;
