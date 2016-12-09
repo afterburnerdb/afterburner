@@ -318,8 +318,6 @@ handyColTypes["upgrade"]=[
     this.numrows=0;
     for (var i=0; i<srcA.length;i++)
       this.numrows+=srcA[i].rows;
-    console.log("srcA.length:"+srcA.length);
-    console.log("tot numrows:"+ this.numrows);
     this.numcols=src.cols;
     this.colptrs=null;
     this.colnames=Object.keys(src.col);

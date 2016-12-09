@@ -71,6 +71,8 @@ function fsql2sql(){
   this.als2col={};
   this.col2als={};
   this.hasAVG=false;
+  this.hasgroup=false;
+  this.hasagg=false;
   this.name="STMT"+ uniqueCounter++;
   this.opened;
   this.openA=[];
@@ -261,6 +263,7 @@ function fsql2sql(){
       return this;
   }
   this.group = function(col, ...rest){
+    this.hasgroup=true;
     col=fixCol(col);
     if (this.againstfe){
       this.ABI.group(col);
@@ -408,11 +411,18 @@ function fsql2sql(){
         //  this.group("@"+this.openA[i]);
       }
     }
-    for (var i=0;i<this.attsA.length;i++){
-      if (this.groupA.indexOf(no_alias(this.attsA[i]) == -1))
-        this.groupA.push(no_alias(this.attsA[i]));
+    if(!this.hasgroup && !this.hasagg){
+      for (var i=0;i<this.attsA.length;i++){
+        if (this.groupA.indexOf(no_alias(this.attsA[i]) == -1))
+          this.groupA.push(no_alias(this.attsA[i]));
+      }
+    } else {
+      for (var i=0;i<this.openA.length;i++){
+        if (this.groupA.join('').indexOf(this.openA[i]) < 0)
+          this.group("@"+this.openA[i]);
+      }
     }
-
+   
     for (var i=0;i<this.attsA.length;i++){
       var indexofAS=this.attsA[i].indexOf(' AS');
       if (indexofAS>-1){
@@ -420,8 +430,9 @@ function fsql2sql(){
       }
       this.attsA[i]=this.attsA[i] + " AS \""+ this.attsA[i]+"\"";
     }
-    if (this.hasAVG)
-      this.field(as(count("@*"),"dacount"));
+    if (this.hasAVG){
+        this.attsA.push("COUNT(*) AS dacount");
+    }
   }
   this.toOpenSQL = function(){
     this.ensureOpenness();
@@ -532,12 +543,12 @@ function fsql2sql(){
     this.matbe=true;
     return this;
   }
-  this.materialize_fe = function(){
+  this.materialize_fe = function(forceredo){
     if (typeof this.against != 'undefined'){
       console.log("SORRY THIS IS NOT SUPPORTED !!! <<PLUS WHY?>>");
       return ;
     }
-    if (this.matfe)
+    if (this.matfe && !forceredo)
       return this;
     var betab=this.materialize_be();
     var getMore=true;
@@ -605,7 +616,11 @@ function select(param, ...rest){
 }
 function like(col,strlit){
   col=fixCol(col);
+  var condSQL=col + " LIKE '" + strlit+"'";
   if (theGeneratingFS.againstfe){
+    if (theGeneratingFS.against.antiWhere(condSQL))
+      return "alreadyready";
+
     return _like(col,strlit);
   }
   return col + " LIKE '" + strlit+"'";
@@ -758,6 +773,7 @@ function toYear(col){
   return "@EXTRACT(YEAR FROM "+ col + ")";
 }
 function min(col){
+  theGeneratingFS.hasagg=true;
   col=fixCol(col);
   if (theGeneratingFS.againstfe){
     return _min(col);
@@ -765,6 +781,7 @@ function min(col){
   return "@MIN("+col+")";
 }
 function max(col){
+  theGeneratingFS.hasagg=true;
   col=fixCol(col);
   if (theGeneratingFS.againstfe){
     return _min(col);
@@ -772,6 +789,7 @@ function max(col){
   return "@MAX("+col+")";
 }
 function count(col){
+  theGeneratingFS.hasagg=true;
   col=fixCol(col);
   if (typeof theGeneratingFS.against != 'undefined'){
     if (theGeneratingFS.againstfe){
@@ -782,6 +800,7 @@ function count(col){
   return "@COUNT("+col+")";
 }
 function countdistinct(col){
+  theGeneratingFS.hasagg=true;
   col=fixCol(col);
   if (typeof theGeneratingFS.against != 'undefined')//not supported
     return;
@@ -790,6 +809,7 @@ function countdistinct(col){
 function countif(p,cond){
 }
 function sum(col){
+  theGeneratingFS.hasagg=true;
   col=fixCol(col);
   if (typeof theGeneratingFS.against != 'undefined'){
     if (theGeneratingFS.againstfe){
@@ -800,11 +820,13 @@ function sum(col){
   return "@SUM("+col+")";
 }
 function sumif(col,cond){
+  theGeneratingFS.hasagg=true;
   col=fixCol(col);
   return "@SUM(CASE WHEN ("+cond+") THEN " + col + " ELSE 0 END)"
 }
 
 function avg(col){
+  theGeneratingFS.hasagg=true;
   col=fixCol(col);
   theGeneratingFS.hasAVG=true;
   if (theGeneratingFS.openA.length>0){

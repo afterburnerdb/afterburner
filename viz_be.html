@@ -54,8 +54,8 @@
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
             <li><a href="./index.html">Home</a></li>
-            <li class="active"><a href="./demo.html">Demo</a></li>
-            <li><a href="./viz_be.html">Viz</a></li>
+            <li><a href="./demo_be.html">Demo</a></li>
+            <li class="active"><a href="./viz_be.html">Viz</a></li>
             <li><a href="https://github.com/lintool/afterburner/">Code (GitHub)</a></li>
           </ul>
 
@@ -65,24 +65,9 @@
 
     <!-- Main jumbotron for a primary marketing message or call to action -->
 
-<!--<div>
-      <a>Load a table from a file server.</a><br>
-     Server: <input type="text" name="fserverIP" value="127.0.0.1"><br>
-     Port: <input type="text" name="fserverPort" value="55443"><br>
-     <button submit="submit" id="loadserver">get table from server</button><hr>
-</div>-->
 
 <!-- <div class="jumbotron"> -->
   <div class="container">
-    <div class="row">
-      <div class="col-md-3">
-        <label class="btn btn-default btn-file" href="#" data-toggle="tooltip" data-placement="bot" title="Load a database table from a local file">
-          Load table
-          <input type="file" id="fileInput" style="display: none;"> 
-        </label>
-      </div>
-    </div>
-
     <div class="row">
         <div class="col-md-12">
         <div id="sconsole" class="table-responsive">
@@ -91,26 +76,9 @@
       </div>
       <div class="row">
         <div class="col-md-6">
-          <h2>JavaScript</h2>
+          <h2>Output</h2>
 		<textarea rows="11" id="TAASM" name="TAASM" class="prettyprint form-control animated" placeholder="" ></textarea>
-		<button type="button" onclick="runASM()" class="btn btn-default" href="#" data-toggle="tooltip" data-placement="bot" title="Run code (Query)">
-                  Run ASM</button>
-       </div>
-        <div class="col-md-6">
-          <h2>Fluent SQL</h2>
-		<textarea rows="11" id="TAFluent" name="TAFluent" class="prettyprint form-control animated linenums language-css" placeholder="Type Fluent SQL or use example buttons.."></textarea>
-		<button type="button" onclick="fluentToASM()" class="btn btn-default" href="#" data-toggle="tooltip" data-placement="bot" title="Translate Fluent into JavaScript code">
-                  Fluent to ASM</button><br>
-		<button type="button" onclick="resetFluentASMq1()" class="btn btn-default" href="#" >
-                  Q1 Fluent</button>
-		<button type="button" onclick="resetFluentASMq2()" class="btn btn-default" href="#" >
-                  Q2 Fluent</button>
-		<button type="button" onclick="resetFluentASMq3()" class="btn btn-default" href="#" >
-                  Q3 Fluent</button>
-		<button type="button" onclick="resetFluentASMq4()" class="btn btn-default" href="#" data-toggle="tooltip" data-placement="bot" title="Load Fluent SQL for Q4">
-                  Q4 Fluent</button>
         </div>
-
       </div>
        <div class="row"><div class="col-xs-12" style="height:50px;"></div></div>
        <div class="row">
@@ -124,7 +92,6 @@
       <div class="col-md-12">
         <p id="console">Console area!</p>
       </div>
-<!--    </div> -->
   </div> <!-- /container -->
 
   <div id="waitForFile" class="modal fade" role="dialog">
@@ -243,9 +210,6 @@
 <script src="./src/tpch/benchmark_tpch.js"></script>
 <script src="./src/tpch/opendatesscen/benchmark_opendatescen.js"></script>
 <script src="./src/micro/benchmark_micro.js"></script>
-
-<script src="./src/tpch/q1allscen/benchmark_q1allscen.js"></script>
-<script src="./src/tpch/q1allscen/mav01a.js"></script>
 
 
 <script src="./src/tpch/q2allscen/benchmark_q2allscen.js"></script>
