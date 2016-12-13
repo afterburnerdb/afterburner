@@ -7,24 +7,24 @@ if(typeof module == 'undefined'){
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 
-function query3c_mav(){
-
+function query4a_mav(){
+  var subq=select()
+             .from("@lineitem")
+             .field("@*")
+             .where(eq("@l_orderkey","@o_orderkey"),
+                    lt("@l_commitdate","@l_receiptdate"));
   return select()
-    .open("@l_shipdate")
-    .from("@customer","@orders","@lineitem")
-    .where(eq("@c_mktsegment", 'BUILDING'),
-           eq("@c_custkey", "@o_custkey"),
-           eq("@l_orderkey", "@o_orderkey"),
-           lt("@o_orderdate",date('1995-03-15'))
-          )
-    .field("@l_orderkey", as(sum( mul("@l_extendedprice", sub(1,"@l_discount"))),"revenue"),"@o_orderdate","@o_shippriority")
-    .group("@l_orderkey", "@o_orderdate", "@o_shippriority")
-    .order("-@revenue","@o_orderdate")
-    .limit(10)
+    .open("@o_orderdate")
+    .from("@orders")
+    .field("@o_orderpriority", as(count("@o_orderpriority"),"order_count"))
+    .where(exists(subq))
+    .group("@o_orderpriority")
+    .order("@o_orderpriority");
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 if(inNode){
-  module.exports=query3c_mav;
+  global.query4a_mav=query4a_mav;
+  module.exports=query4a_mav;
 } else delete module;
 //////////////////////////////////////////////////////////////////////////////

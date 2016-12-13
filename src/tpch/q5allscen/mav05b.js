@@ -7,24 +7,25 @@ if(typeof module == 'undefined'){
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 
-function query3c_mav(){
+function query5b_mav(){
 
   return select()
-    .open("@l_shipdate")
-    .from("@customer","@orders","@lineitem")
-    .where(eq("@c_mktsegment", 'BUILDING'),
-           eq("@c_custkey", "@o_custkey"),
-           eq("@l_orderkey", "@o_orderkey"),
-           lt("@o_orderdate",date('1995-03-15'))
-          )
-    .field("@l_orderkey", as(sum( mul("@l_extendedprice", sub(1,"@l_discount"))),"revenue"),"@o_orderdate","@o_shippriority")
-    .group("@l_orderkey", "@o_orderdate", "@o_shippriority")
-    .order("-@revenue","@o_orderdate")
-    .limit(10)
+    .open("@o_orderdate")
+    .from("@customer","@orders","@lineitem","@supplier","@nation","@region")
+    .where(eq("@c_custkey","@o_custkey"),
+           eq("@l_orderkey","@o_orderkey"),
+           eq("@l_suppkey","@s_suppkey"),
+           eq("@c_nationkey","@s_nationkey"),
+           eq("@s_nationkey","@n_nationkey"),
+           eq("@n_regionkey","@r_regionkey"),
+           eq("@r_name",'ASIA'))
+    .field("@n_name",as(sum(mul("@l_extendedprice", sub(1,"@l_discount"))),"revenue"))
+    .group("@n_name")
+    .order("-@revenue");
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 if(inNode){
-  module.exports=query3c_mav;
+  module.exports=query5b_mav;
 } else delete module;
 //////////////////////////////////////////////////////////////////////////////

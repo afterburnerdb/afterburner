@@ -93,7 +93,6 @@ function fsql2sql(){
         this.againstfe=true;
         this.ABI=new Afterburner();
         this.ABI.select().from(against.mat.name);
-        console.log("Create a ABI.. should fill that up, next");
       }
       else if (against.matbe){
         DEBUG("This query is against backend mav name:"+against.mat.name);
@@ -150,14 +149,12 @@ function fsql2sql(){
       return true;
     }
   }
-  this.antiWhere = function(cond){
+  this.matchWhere = function(cond){
     var pos=this.whereA.indexOf(cond);
     if (pos<0)
       return false;
-    else{
-      this.whereA.splice(pos,1);
+    else
       return true;
-    }
   }
 
   this.join = function(rel){
@@ -237,30 +234,33 @@ function fsql2sql(){
            && (cond.indexOf('SELECT')<0))
         opened=true;
     }
-     if (!opened){
-       if (this.againstfe && cond!='alreadyready'){
-           
-           this.ABI.where(cond);
-       } else if (this.againstbe){
-         var cond_against_done=this.against.antiWhere(cond);
-         var cond_against_opened=(this.against.openA.indexOf(cond)>-1);
-         var cond_against_opened=false;
-         for (var i=0;i<this.against.openA.length;i++){
-           if (cond.indexOf(this.against.openA[i])>-1){
-             cond_against_opened=true;
-             break;
-           }
-         }
-         if (!cond_against_done && !cond_against_opened){
-           console.log("ERROR: Query with a condition not covered by the against MAV.. cond:"+cond);
-           return ;
-         }
-         if (this.againstbe && cond_against_opened)
-           this.whereA.push(cond);
-       } else {
-         this.whereA.push(cond);
-       }
-     }
+    if (!opened){
+      if (this.againstfe && cond!='alreadyready'){
+        if(cond!='alreadyready'){
+          if(!this.against.matchWhere(cond))
+            this.ABI.where(cond);
+        }
+          
+      } else if (this.againstbe){
+        var cond_against_done=this.against.matchWhere(cond);
+        var cond_against_opened=(this.against.openA.indexOf(cond)>-1);
+        var cond_against_opened=false;
+        for (var i=0;i<this.against.openA.length;i++){
+          if (cond.indexOf(this.against.openA[i])>-1){
+            cond_against_opened=true;
+            break;
+          }
+        }
+        if (!cond_against_done && !cond_against_opened){
+          console.log("ERROR: Query with a condition not covered by the against MAV.. cond:"+cond);
+          return ;
+        }
+        if (this.againstbe && cond_against_opened)
+          this.whereA.push(cond);
+      } else {
+        this.whereA.push(cond);
+      }
+    }
 
     if (rest.length>0)
       return this.where(rest[0], ...rest.slice(1));
@@ -367,13 +367,13 @@ function fsql2sql(){
       return this.toSQL();
   }
   this.toSQL = function(){
-    if (this.SQLstr)
-      return this.SQLstr;
+//    if (this.SQLstr)
+//      return this.SQLstr;
     if (this.againstfe)
       return "ABI";
     if (this.openA.length>0)
       return this.toOpenSQL();
-    var SELECT_STMT="SELECT " + this.attsA.join(', ');
+    var SELECT_STMT="/*CLOSED SQL*/SELECT " + this.attsA.join(', ');
     var FROM_STMT="FROM " + this.fromA.join(', ');
 
     var LJOIN_STMT="";
@@ -408,13 +408,22 @@ function fsql2sql(){
       HAVING_STMT + " " +
       ORDER_STMT + " " +
       LIMIT_STMT;
-    this.SQLstr=sqlstr;
+ //   this.SQLstr=sqlstr;
     return sqlstr;
   }
   this.ensureOpenness= function(){
+    //todo: make sure all the filters are there.. 
+    //so we check for not only new filters.. 
+    //we should also make sure that already done filters are in the new query..
     for (var i=0;i<this.openA.length;i++){
-      if (this.attsA.join('').indexOf(this.openA[i]) < 0){
-        this.field("@"+this.openA[i]);
+      var isThere=false;
+      for (var ii=0;ii<this.attsA.length;ii++){
+        if (this.attsA[ii] ==this.openA[i]){
+          isThere=true;
+        }
+        if (!isThere)
+          this.field("@"+this.openA[i]);
+        //if (this.attsA.join('').indexOf(this.openA[i]) < 0){
         //if (this.groupA.join('').indexOf(this.openA[i]) < 0)
         //  this.group("@"+this.openA[i]);
       }
@@ -432,11 +441,9 @@ function fsql2sql(){
     }
    
     for (var i=0;i<this.attsA.length;i++){
-      var indexofAS=this.attsA[i].indexOf(' AS');
-      if (indexofAS>-1){
-        console.log('NOW THIS IS AN ERROR!');
-      }
-      this.attsA[i]=this.attsA[i] + " AS \""+ this.attsA[i]+"\"";
+      var cleanAtt=no_alias(this.attsA[i]);
+      var indexofAS=cleanAtt.indexOf(' AS');
+      this.attsA[i]=cleanAtt + " AS \""+ cleanAtt+"\"";
     }
     if (this.hasAVG){
         this.attsA.push("COUNT(*) AS dacount");
@@ -444,7 +451,7 @@ function fsql2sql(){
   }
   this.toOpenSQL = function(){
     this.ensureOpenness();
-    var SELECT_STMT="SELECT " + this.attsA.join(', ');
+    var SELECT_STMT="/*OPENED SQL*/\nSELECT " + this.attsA.join(', ');
     var FROM_STMT="FROM " + this.fromA.join(', ');
 
     var LJOIN_STMT="";
@@ -638,7 +645,7 @@ function like(col,strlit){
   col=fixCol(col);
   var condSQL=col + " LIKE '" + strlit+"'";
   if (theGeneratingFS.againstfe){
-    if (theGeneratingFS.against.antiWhere(condSQL))
+    if (theGeneratingFS.against.matchWhere(condSQL))
       return "alreadyready";
 
     return _like(col,strlit);
@@ -755,6 +762,8 @@ function and(cond1,cond2, ...rest){
   else
     return '(' + cond1 + ')';
 }
+
+
 function compare(op,col1,col2){
   theGeneratingFS.inheretIf(col1,col2);
   col1=fixCol(col1);
@@ -763,20 +772,16 @@ function compare(op,col1,col2){
   var condSQL=col1 + op + col2;
 
   if (theGeneratingFS.againstfe){
-    if (theGeneratingFS.against.antiWhere(condSQL)){
-      console.log("condSQL is already ready:"+condSQL);
+    if (theGeneratingFS.against.matchWhere(condSQL)){
+      //console.log("condSQL is already ready:"+condSQL);
       return "alreadyready";
     }else{
-      console.log("condSQL is not ready.. so it has to be done against the against MAV:"+condSQL);
+      //console.log("condSQL is not ready.. so it has to be done against the against MAV:["+condSQL+"]");
     }
     
     if (op== "=") op = "==";
-    if (col1.indexOf("DATE")>-1){
-      col1=_date(col1);
-    }
-    if (col2.indexOf("DATE")>-1){
-      col2=_date(col2);
-    }
+    col1=fixColForAB(col1);
+    col2=fixColForAB(col2);
     return _compare(op,col1,col2);
   }
 
@@ -896,8 +901,8 @@ function div(col1,col2){
   return arith("/",col1,col2);
 }
 function as(col,al){
- // if (theGeneratingFS.opened) 
- //   return col;// ignore aliases in mavs
+  //if (theGeneratingFS.opened) 
+  //  return col;// ignore aliases in mavs
   return col + " AS " + al;
 }
 function exists(relation){
@@ -907,6 +912,21 @@ function notexists(relation){
   return ' NOT EXISTS (' + relation.toSQL() + ')';
 }
 
+function fixColForAB(col){
+  if (typeof col=='string'){
+    if (col.indexOf("DATE")>-1)
+      return _date(col);
+    if (col[0] == "'" && col[col.length-1] == "'"  ){
+      console.log("peeling col:"+col);
+      return peel(col);
+    }
+    else{
+      return col;
+    }
+  } else{
+    return col;
+  }
+}
 function fixCol(col){
   if (typeof col == 'string'){
     if (col[0]=='@')
@@ -946,4 +966,9 @@ function no_alias(namewithalias){
   if (asi<0) return namewithalias;
   else return namewithalias.substring(0,asi);
 }
+
+function peel( str ){
+  return str.substring(1,str.length-1);
+}
+
 

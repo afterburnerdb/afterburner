@@ -7,7 +7,7 @@ if(typeof module == 'undefined'){
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 
-function query2b_mav(against){
+function query2b_mav(){
   var subq=select()
              .from("@partsupp","@supplier","@nation","@region")
              .field(min("@ps_supplycost"))
@@ -17,7 +17,7 @@ function query2b_mav(against){
                     eq("@n_regionkey","@r_regionkey"),
                     eq("@r_name",'EUROPE'));
 
-  return select(against)
+  return select()
   .open("@p_type")
   .from("@part","@supplier","@partsupp","@nation","@region")
   .field("@s_acctbal","@s_name","@n_name","@p_partkey","@p_mfgr","@s_address","@s_phone","@s_comment")

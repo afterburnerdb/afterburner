@@ -7,9 +7,9 @@ if(typeof module == 'undefined'){
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 
-function query3b_mav(against){
+function query3b_mav(){
 
-  return select(against)
+  return select()
     .from("@customer","@orders","@lineitem")
     .open("@o_orderdate")
     .where(eq("@c_mktsegment", 'BUILDING'),

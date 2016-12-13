@@ -7,9 +7,9 @@ if(typeof module == 'undefined'){
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 
-function query3a_mav(against){
+function query3a_mav(){
 
-  return select(against)
+  return select()
    .open("@c_mktsegment")
    .from("@customer","@orders","@lineitem")
    .where(eq("@c_custkey", "@o_custkey"),

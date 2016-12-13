@@ -7,24 +7,20 @@ if(typeof module == 'undefined'){
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 
-function query3c_mav(){
+function query6c_mav(){
 
   return select()
-    .open("@l_shipdate")
-    .from("@customer","@orders","@lineitem")
-    .where(eq("@c_mktsegment", 'BUILDING'),
-           eq("@c_custkey", "@o_custkey"),
-           eq("@l_orderkey", "@o_orderkey"),
-           lt("@o_orderdate",date('1995-03-15'))
-          )
-    .field("@l_orderkey", as(sum( mul("@l_extendedprice", sub(1,"@l_discount"))),"revenue"),"@o_orderdate","@o_shippriority")
-    .group("@l_orderkey", "@o_orderdate", "@o_shippriority")
-    .order("-@revenue","@o_orderdate")
-    .limit(10)
+    .open("@l_quantity")
+    .from("@lineitem")
+    .field(as(sum(mul("@l_extendedprice","@l_discount")),"revenue"))
+    .where(gte("@l_shipdate",date('1994-01-01')),
+      lt ("@l_shipdate",date('1995-01-01')),
+      gte("@l_discount",0.0499999),
+      lte("@l_discount",0.0700001));
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 if(inNode){
-  module.exports=query3c_mav;
+  module.exports=query6c_mav;
 } else delete module;
 //////////////////////////////////////////////////////////////////////////////
