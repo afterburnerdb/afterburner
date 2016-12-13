@@ -216,6 +216,11 @@ function fsql2sql(){
       if(this.attsA.indexOf(col)<0)
         this.attsA.push(col);
     } else if (this.againstfe){
+       if (col.indexOf(" AS ")>-1){
+         var colname=col.substring(0,col.indexOf(" AS "));
+         var alsname=col.substring(col.indexOf(" AS ")+4,col.length-1);
+         col=_as(colname,alsname);
+       }
        this.ABI.field(col);
     } else {
        this.attsA.push(col);
@@ -362,6 +367,8 @@ function fsql2sql(){
       return this.toSQL();
   }
   this.toSQL = function(){
+    if (this.SQLstr)
+      return this.SQLstr;
     if (this.againstfe)
       return "ABI";
     if (this.openA.length>0)
@@ -401,6 +408,7 @@ function fsql2sql(){
       HAVING_STMT + " " +
       ORDER_STMT + " " +
       LIMIT_STMT;
+    this.SQLstr=sqlstr;
     return sqlstr;
   }
   this.ensureOpenness= function(){
@@ -557,11 +565,13 @@ function fsql2sql(){
     var be_jsn=[]
     while(getMore){
       var curr_jsn=pci.execSQL("SELECT * FROM "+ betab.name + " LIMIT "+ rowChunk + " OFFSET " +  (chunkID*rowChunk));
-      if (curr_jsn.data.length>0)
+      if (typeof curr_jsn.data == 'object' && curr_jsn.data.length>0){
         getMore=true;
-      else 
+        be_jsn.push(curr_jsn);
+      }
+      else {
         getMore=false;
-      be_jsn.push(curr_jsn);
+      }
       chunkID++;
     }
     var ds= new dataSource(be_jsn);
@@ -573,7 +583,17 @@ function fsql2sql(){
     this.matfe=true;
     return this;
   }
+  //this.exploreMAVOptions =function(){
+  //  console.log("exploreMAVOptions:");
 
+  //  //Explore Ones:
+  //  for (var i=0;i<this.whereA.length;i++){
+  //    console.log("Try opening query on:"+this.whereA[i]);
+  //    var tmpMAV= new fsql2sql();
+  //    var tmpFSQL= new fsql2sql();
+  //  }
+  //  
+  //}
   this.clone = function(){
     var newi= new fsql2sql();
     newi.fromA=this.fromA.slice();
@@ -743,12 +763,20 @@ function compare(op,col1,col2){
   var condSQL=col1 + op + col2;
 
   if (theGeneratingFS.againstfe){
-//   if (theGeneratingFS.against.whereA.indexOf(condSQL)>-1)
-//      return condSQL;
-    if (theGeneratingFS.against.antiWhere(condSQL))
+    if (theGeneratingFS.against.antiWhere(condSQL)){
+      console.log("condSQL is already ready:"+condSQL);
       return "alreadyready";
+    }else{
+      console.log("condSQL is not ready.. so it has to be done against the against MAV:"+condSQL);
+    }
     
     if (op== "=") op = "==";
+    if (col1.indexOf("DATE")>-1){
+      col1=_date(col1);
+    }
+    if (col2.indexOf("DATE")>-1){
+      col2=_date(col2);
+    }
     return _compare(op,col1,col2);
   }
 
@@ -844,11 +872,11 @@ function avg(col){
 
 function date(col){
   //col=fixCol(col);
-  if (theGeneratingFS.againstfe){
-    return _date(col);
-  }
-  return col;
-}
+//  if (theGeneratingFS.againstfe){
+//    return ("date " + col);
+//  }
+  return "@DATE \'" + col + "\'";
+} 
 function arith(op,c1,c2){
   theGeneratingFS.inheretIf(c1,c2);
   c1=fixCol(c1);

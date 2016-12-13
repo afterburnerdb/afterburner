@@ -1367,13 +1367,12 @@ function _compare(op,p1,p2){
       if (p2t == 2)
         return expandStrLitComp(p2b,p1);
       else if (p2t == 4 && p1.length==1)
-        return expandLitComp(op,p2t,p2b,p1.charCodeAt(0));
+        return expandLitComp(op,p2t,p1.charCodeAt(0), p2b);
       else 
         badFSQL('@_compare');
 
     } else {
-      //return expandLitComp(op,p2t,p2b,p1);  
-      return expandLitComp(op,1,p2b,p1);  
+      return expandLitComp(op,1,p1,p2b);  
     }
   }
   else{//todo: eval here 
@@ -1529,6 +1528,11 @@ function _avg(p){
   postexek:memF32[(temps+(tempsptr<<2))>>2]=+(+(` +  varnamesum  + `)/ +(` + varnamecount + `));tempsptr= (tempsptr + 1 )|0;::`;
 }
 function _date(p1){
+  if (p1.indexOf('DATE') > -1){
+    p1=p1.substring(p1.indexOf('DATE')+5);
+    return _date(p1.substring(p1.indexOf("'")+1,p1.lastIndexOf("'")));
+//    return _date(p1.substring(p1.indexOf('DATE')+5));
+  }
   return strdate_to_int(p1);
 }
 function _postarith(op,p1,p2){
