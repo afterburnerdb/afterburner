@@ -25,27 +25,23 @@ function bench_mavs_q5allscen(){
     timeA.push(time_diff(t0,t1));
   } 
   console.log("time to create query5b_mav @BE:"+timeA.join(','));
-}
 
-function bench_mavs_q5allscen_a(){
   timeA=[];
-  for (var i=0; i<3; i++){
+  for (var i=0; i<5; i++){
     be_mav5a=query5a_mav();
     be_mav5a.materialize_be();
     t0=get_time_ms();
-    be_mav5a.materialize_fe(true);
+    be_mav5a.materialize_fe();
     t1=get_time_ms();
     timeA.push(time_diff(t0,t1));
   } 
   console.log("time to create query5a_mav @FE:"+timeA.join(','));
-}
-function bench_mavs_q5allscen_b(){
   timeA=[];
-  for (var i=0; i<2; i++){
+  for (var i=0; i<5; i++){
     be_mav5b=query5b_mav();
     be_mav5b.materialize_be();
     t0=get_time_ms();
-    be_mav5b.materialize_fe(true);
+    be_mav5b.materialize_fe();
     t1=get_time_ms();
     timeA.push(time_diff(t0,t1));
   } 

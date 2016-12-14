@@ -33,43 +33,38 @@ function bench_mavs_q6allscen(){
     timeA.push(time_diff(t0,t1));
   } 
   console.log("time to create query6c_mav @BE:"+timeA.join(','));
-}
 
-function bench_mavs_q6allscen_a(){
   timeA=[];
-  for (var i=0; i<3; i++){
+  for (var i=0; i<5; i++){
     be_mav6a=query6a_mav();
     be_mav6a.materialize_be();
     t0=get_time_ms();
-    be_mav6a.materialize_fe(true);
+    be_mav6a.materialize_fe();
     t1=get_time_ms();
     timeA.push(time_diff(t0,t1));
   } 
   console.log("time to create query6a_mav @FE:"+timeA.join(','));
-}
-function bench_mavs_q6allscen_b(){
   timeA=[];
-  for (var i=0; i<2; i++){
+  for (var i=0; i<5; i++){
     be_mav6b=query6b_mav();
     be_mav6b.materialize_be();
     t0=get_time_ms();
-    be_mav6b.materialize_fe(true);
+    be_mav6b.materialize_fe();
     t1=get_time_ms();
     timeA.push(time_diff(t0,t1));
   } 
   console.log("time to create query6b_mav @FE:"+timeA.join(','));
-}
-function bench_mavs_q6allscen_c(){
   timeA=[];
-  for (var i=0; i<1; i++){
+  for (var i=0; i<5; i++){
     be_mav6c=query6c_mav();
     be_mav6c.materialize_be();
     t0=get_time_ms();
-    be_mav6c.materialize_fe(true);
+    be_mav6c.materialize_fe();
     t1=get_time_ms();
     timeA.push(time_diff(t0,t1));
   } 
   console.log("time to create query6c_mav @FE:"+timeA.join(','));
+
 }
 
 function bench_query6_latency_q6allscen(){
@@ -110,8 +105,8 @@ function bench_query6_latency_q6allscen(){
     timeA.push(time_diff(t0,t1));
   } 
   console.log("time to run query 6 against query6c_mav@BE:"+timeA.join(','));
+  
   timeA=[];
-
   be_mav6a=query6a_mav();
   be_mav6a.materialize_fe();
   for (var i=0; i<10; i++){
@@ -122,8 +117,8 @@ function bench_query6_latency_q6allscen(){
     timeA.push(time_diff(t0,t1));
   } 
   console.log("time to run query 6 again query6a_mav@FE:"+timeA.join(','));
+  
   timeA=[];
-
   be_mav6b=query6b_mav();
   be_mav6b.materialize_fe();
   for (var i=0; i<10; i++){
@@ -134,7 +129,19 @@ function bench_query6_latency_q6allscen(){
     timeA.push(time_diff(t0,t1));
   } 
   console.log("time to run query 6 again query6b_mav@FE:"+timeA.join(','));
+  
   timeA=[];
+  be_mav6c=query6c_mav();
+  be_mav6c.materialize_fe();
+  for (var i=0; i<10; i++){
+    t0=get_time_ms();
+    var q6=query6_fsql(be_mav6c);
+    q6.ABI.materialize();
+    t1=get_time_ms();
+    timeA.push(time_diff(t0,t1));
+  } 
+  console.log("time to run query 6 again query6c_mav@FE:"+timeA.join(','));
+
 }
 
 //////////////////////////////////////////////////////////////////////////////

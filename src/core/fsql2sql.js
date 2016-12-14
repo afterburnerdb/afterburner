@@ -917,7 +917,7 @@ function fixColForAB(col){
     if (col.indexOf("DATE")>-1)
       return _date(col);
     if (col[0] == "'" && col[col.length-1] == "'"  ){
-      console.log("peeling col:"+col);
+      //console.log("peeling col:"+col);
       return peel(col);
     }
     else{

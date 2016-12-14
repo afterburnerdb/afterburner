@@ -13,7 +13,7 @@ function query4_fsql(against){
              .field("@*")
              .where(eq("@l_orderkey","@o_orderkey"),
                     lt("@l_commitdate","@l_receiptdate"));
-  return ABi.select(against)
+  return select(against)
     .from("@orders")
     .field("@o_orderpriority", as(count("@o_orderpriority"),"order_count"))
     .where(gte("@o_orderdate",date("1993-07-01")),
