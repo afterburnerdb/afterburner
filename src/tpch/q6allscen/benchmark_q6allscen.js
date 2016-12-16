@@ -116,7 +116,7 @@ function bench_query6_latency_q6allscen(){
     t1=get_time_ms();
     timeA.push(time_diff(t0,t1));
   } 
-  console.log("time to run query 6 again query6a_mav@FE:"+timeA.join(','));
+  console.log("time to run query 6 against query6a_mav@FE:"+timeA.join(','));
   
   timeA=[];
   be_mav6b=query6b_mav();
@@ -128,7 +128,7 @@ function bench_query6_latency_q6allscen(){
     t1=get_time_ms();
     timeA.push(time_diff(t0,t1));
   } 
-  console.log("time to run query 6 again query6b_mav@FE:"+timeA.join(','));
+  console.log("time to run query 6 against query6b_mav@FE:"+timeA.join(','));
   
   timeA=[];
   be_mav6c=query6c_mav();
@@ -140,7 +140,7 @@ function bench_query6_latency_q6allscen(){
     t1=get_time_ms();
     timeA.push(time_diff(t0,t1));
   } 
-  console.log("time to run query 6 again query6c_mav@FE:"+timeA.join(','));
+  console.log("time to run query 6 against query6c_mav@FE:"+timeA.join(','));
 
 }
 

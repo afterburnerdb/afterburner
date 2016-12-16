@@ -115,6 +115,7 @@ function fsql2sql(){
     col=fixCol(col);
     this.openA.push(col);
     this.opened=true;
+    //
     if (rest.length>0)
       return this.open(rest[0], ...rest.slice(1));
     else 
@@ -124,16 +125,16 @@ function fsql2sql(){
     if(typeof this.against != 'undefined'){
       if (this.against.matchFrom(rel)){
         return this;
-      }
-      else{
+      } else {
         return;
       }
     }
 
-    this.inheretIf(rel)
+    this.inheretIf(rel);
     rel=fixRel(rel);
-    if (this.opened){
-    }
+    //
+
+    //
     this.fromA.push(rel);
     if (rest.length>0)
       return this.from(rest[0], ...rest.slice(1));
@@ -181,8 +182,6 @@ function fsql2sql(){
     return this;
   }
   this.tabAliasif = function(){
-//    this.als2tab;
-//    this.tab2als;
     return this;
   }
   this.on = function(cond, ...rest){
@@ -193,23 +192,9 @@ function fsql2sql(){
       return this;
   }
   this.field = function(col, ...rest){
-    if (col.indexOf("@AVG")>-1){
-      this.hasAVG=true;
-      if (this.openA.length>0)
-        col=col.replace("@AVG","@SUM");
-      else if (this.againstbe)
-        col=div(col.replace("@AVG","@SUM"),sum('@dacount'));
-      else if (this.againstfe)
-        console.log("YOU SHOULD NOT BE HERE!!!");
-    }
     this.inheretIf(col);
     col=fixCol(col);
-    if (col.substring(0,2)=='as'){
-      var alias=col;
-      alias=col.substring(col.indexOf('~')+1, col.indexOf('}'));
-      col=col.substring(col.indexOf('{')+1,col.indexOf('~'));
-      col = col + " AS " + alias;
-    }
+    //
     if (this.opened){
       if(this.attsA.indexOf(col)<0)
         this.attsA.push(col);
@@ -223,9 +208,12 @@ function fsql2sql(){
          col=_as(colname,alsname);
        }
        this.ABI.field(col);
-    } else {
+    } else if (this.againstbe){
        this.attsA.push(col);
+    } else {
+      this.attsA.push(col);
     }
+    //
     if (rest.length>0)
       return this.field(rest[0], ...rest.slice(1));
     else 
@@ -265,7 +253,7 @@ function fsql2sql(){
         this.whereA.push(cond);
       }
     }
-
+    //
     if (rest.length>0)
       return this.where(rest[0], ...rest.slice(1));
     else 
@@ -274,14 +262,15 @@ function fsql2sql(){
   this.group = function(col, ...rest){
     this.hasgroup=true;
     col=fixCol(col);
+    //
     if (this.againstfe){
       if (typeof this.against.als2col[col] != undefined)
         col=this.against.als2col[col];
       this.ABI.group(col);
-    }
-    else{
+    } else{
       this.groupA.push(col);
     }
+    //
     if (rest.length>0)
       return this.group(rest[0], ...rest.slice(1));
     else 
@@ -289,6 +278,7 @@ function fsql2sql(){
   }
   this.having = function(cond, ...rest){
     this.havingA.push(cond);
+    //
     if (rest.length>0)
       return this.having(rest[0], ...rest.slice(1));
     else 
@@ -308,6 +298,7 @@ function fsql2sql(){
       col=fixCol(col);
       this.orderA.push(col);
     }
+    //
     if (rest.length>0)
       return this.order(rest[0], ...rest.slice(1));
     else 
@@ -381,6 +372,7 @@ function fsql2sql(){
       return this.toConpensatingSQL();
     if (this.openA.length>0)
       return this.toOpenSQL();
+    //
     var SELECT_STMT="/*CLOSED SQL*/SELECT " + this.attsA.join(', ');
     var FROM_STMT="FROM " + this.fromA.join(', ');
 
@@ -533,15 +525,6 @@ function fsql2sql(){
       HAVING_STMT="HAVING "+ this.havingA.join(' AND ');
 
     var sqlstr=""; 
-    //if (GROUP_STMT.indexOf('(')>-1)
-    //  sqlstr= "SELECT * FROM (" +
-    //  SELECT_STMT + " " +
-    //  FROM_STMT + " " +
-    //  LJOIN_STMT + " " +
-    //  WHERE_STMT + " " + ") as stmt" + (++uniqueCounter) + " " +
-    //  GROUP_STMT + " " +
-    //  HAVING_STMT;
-    //else   
       sqlstr= SELECT_STMT + " " +
       FROM_STMT + " " +
       LJOIN_STMT + " " +
@@ -551,17 +534,6 @@ function fsql2sql(){
 
     return sqlstr;
   }
-//  this.toArray = function(vanilla){
-//    // Type A
-//    this.materialize();
-//    if (this.againstfe)
-//      return this.femat.toArray(vanilla);
-//    else if (this.againstbe)
-//      return this.bemat.toArray(vanilla);
-//    else 
-//
-//    return this.femat.toArray();
-//  }
     this.toArray2 = function(vanilla){
       if (this.opened){
         console.log("Please use materialize_be or materialize_fe to materialize an opened query (mav)!");
@@ -572,12 +544,6 @@ function fsql2sql(){
       else if (this.againstbe || true) 
         return [].concat.apply([], pci.execSQL(this.toSQL()).data);
     }
-//  this.eval = function(vanilla){
-//    if (this.againstfe)
-//      return this.ABI.eval();
-//    this.materialize();
-//    return this.femat.eval();
-//  }
   this.materialize = function(){
     if (typeof this.mat !='undefined')
       return this;
@@ -673,42 +639,42 @@ function fsql2sql(){
   //  }
   //  
   //}
-  this.clone = function(){
-    var newi= new fsql2sql();
-    newi.fromA=this.fromA.slice();
-    newi.joinA=this.joinA.slice();
-    newi.ljoinA=this.ljoinA.slice();
-    newi.on=this.on;
-    newi.joinP=this.joinP;
-    newi.hasljoin=this.hasljoin;
-    newi.hasin=this.hasin;
-    newi.isinFlag=this.isinFlag;
-    newi.attsA=this.attsA.slice();
-    newi.fstr=this.fstr;
-    newi.aggsA=this.aggsA.slice();
-    newi.whereA=this.whereA.slice();
-    newi.groupA=this.groupA.slice();
-    newi.havingA=this.havingA.slice();
-    newi.orderA=this.orderA.slice();
-    newi.limitA=this.limitA;
-    newi.resA=this.resA.slice();
-    newi.als2tab=this.als2tab;
-    newi.tab2als=this.tab2als;
-    newi.als2col=this.als2col={};
-    newi.col2als=this.col2als={};
-    newi.name=this.name;
-    newi.openA=this.openA.slice();
-    newi.dotAttsA=this.dotAttsA.slice();
-    newi.hasAVG=this.hasAVG;
-    newi.against=this.against;
-    newi.againstbe=this.againstbe;
-    newi.againstfe=this.againstfe;
-    newi.mat=this.mat;
-    newi.matbe=this.matbe;
-    newi.matfe=this.matfe;
-    newi.ABI=this.ABI;
-    return newi;
-  }
+  //this.clone = function(){
+  //  var newi= new fsql2sql();
+  //  newi.fromA=this.fromA.slice();
+  //  newi.joinA=this.joinA.slice();
+  //  newi.ljoinA=this.ljoinA.slice();
+  //  newi.on=this.on;
+  //  newi.joinP=this.joinP;
+  //  newi.hasljoin=this.hasljoin;
+  //  newi.hasin=this.hasin;
+  //  newi.isinFlag=this.isinFlag;
+  //  newi.attsA=this.attsA.slice();
+  //  newi.fstr=this.fstr;
+  //  newi.aggsA=this.aggsA.slice();
+  //  newi.whereA=this.whereA.slice();
+  //  newi.groupA=this.groupA.slice();
+  //  newi.havingA=this.havingA.slice();
+  //  newi.orderA=this.orderA.slice();
+  //  newi.limitA=this.limitA;
+  //  newi.resA=this.resA.slice();
+  //  newi.als2tab=this.als2tab;
+  //  newi.tab2als=this.tab2als;
+  //  newi.als2col=this.als2col={};
+  //  newi.col2als=this.col2als={};
+  //  newi.name=this.name;
+  //  newi.openA=this.openA.slice();
+  //  newi.dotAttsA=this.dotAttsA.slice();
+  //  newi.hasAVG=this.hasAVG;
+  //  newi.against=this.against;
+  //  newi.againstbe=this.againstbe;
+  //  newi.againstfe=this.againstfe;
+  //  newi.mat=this.mat;
+  //  newi.matbe=this.matbe;
+  //  newi.matfe=this.matfe;
+  //  newi.ABI=this.ABI;
+  //  return newi;
+  //}
 }
 
 //API
@@ -729,10 +695,13 @@ function like(col,strlit){
 }
 function notlike(col,strlit){
   col=fixCol(col);
+  var condSQL=col + " NOT LIKE '" + strlit+"'";
   if (theGeneratingFS.againstfe){
+    if (theGeneratingFS.against.matchWhere(condSQL))
+      return "alreadyready";
+
     return _notlike(col,strlit);
   }
-
   return col + " NOT LIKE '" + strlit+"'";
 }
 
@@ -855,21 +824,15 @@ function compare(op,col1,col2){
   col2=fixCol(col2);
 
   var condSQL=col1 + op + col2;
-
   if (theGeneratingFS.againstfe){
     if (theGeneratingFS.against.matchWhere(condSQL)){
-      //console.log("condSQL is already ready:"+condSQL);
       return "alreadyready";
-    }else{
-      //console.log("condSQL is not ready.. so it has to be done against the against MAV:["+condSQL+"]");
     }
-    
     if (op== "=") op = "==";
     col1=fixColForAB(col1);
     col2=fixColForAB(col2);
     return _compare(op,col1,col2);
   }
-
   return col1 + op + col2;
 }
 function substring(col,n,m){
@@ -893,29 +856,44 @@ function toYear(col){
 function min(col){
   theGeneratingFS.hasagg=true;
   col=fixCol(col);
-  if (theGeneratingFS.againstfe){
-    return _min(col);
+
+  if (theGeneratingFS.opened){
+    return "@MIN("+col+")";
+  } else if (theGeneratingFS.againstfe){
+    return _min("MIN("+col+")");
+  } else if (theGeneratingFS.againstbe){
+    return "@MIN(\"MIN("+col+")\")";
+  } else {
+    return "@MIN("+col+")";
   }
-  return "@MIN("+col+")";
 }
 function max(col){
   theGeneratingFS.hasagg=true;
   col=fixCol(col);
-  if (theGeneratingFS.againstfe){
-    return _min(col);
+
+  if (theGeneratingFS.opened){
+    return "@MAX("+col+")";
+  } else if (theGeneratingFS.againstfe){
+    return _max("MAX("+col+")");
+  } else if (theGeneratingFS.againstbe){
+    return "@MAX(\"MAX("+col+")\")";
+  } else {
+    return "@MAX("+col+")";
   }
-  return "@MAX("+col+")";
 }
 function count(col){
   theGeneratingFS.hasagg=true;
   col=fixCol(col);
-  if (typeof theGeneratingFS.against != 'undefined'){
-    if (theGeneratingFS.againstfe){
-      return _sum("COUNT("+col+")");
-    }
+
+  if (theGeneratingFS.opened){
+    return "@COUNT("+col+")";
+  } else if (theGeneratingFS.againstfe){
+    return _sum("COUNT("+col+")");
+  } else if (theGeneratingFS.againstbe){
     return "@SUM(\"COUNT("+col+")\")";
+  } else {
+    return "@COUNT("+col+")";
   }
-  return "@COUNT("+col+")";
 }
 function countdistinct(col){
   theGeneratingFS.hasagg=true;
@@ -925,52 +903,75 @@ function countdistinct(col){
   return "@COUNT( distinct "+col+")";
 }
 function countif(p,cond){
+  return sum(1,cond);
 }
 function sum(col){
   theGeneratingFS.hasagg=true;
   col=fixCol(col);
-  if (typeof theGeneratingFS.against != 'undefined'){
-    if (theGeneratingFS.againstfe){
+
+  if (theGeneratingFS.opened){
+    if (theGeneratingFS.attsA.indexOf("SUM("+col+")")<0);
+      return "@SUM("+col+")";
+  } else if (theGeneratingFS.againstfe){
       return _sum("SUM("+col+")");
-    }
+  } else if (theGeneratingFS.againstbe){
     return "@SUM(\"SUM("+col+")\")";
+  } else {
+    return "@SUM("+col+")";
   }
-  return "@SUM("+col+")";
 }
 function sumif(col,cond){
   theGeneratingFS.hasagg=true;
   col=fixCol(col);
-  return "@SUM(CASE WHEN ("+cond+") THEN " + col + " ELSE 0 END)"
+  if (theGeneratingFS.opened){
+    return "@SUM(CASE WHEN ("+cond+") THEN " + col + " ELSE 0 END)"
+  } else if (theGeneratingFS.againstfe){
+    return _sum("SUM("+col+")");
+  } else if (theGeneratingFS.againstbe){
+    return "@SUM(\"SUM(CASE WHEN ("+cond+") THEN " + col + " ELSE 0 END)\")";
+  } else {
+    return "@SUM(CASE WHEN ("+cond+") THEN " + col + " ELSE 0 END)"
+  }
 }
 
 function avg(col){
   theGeneratingFS.hasagg=true;
   col=fixCol(col);
   theGeneratingFS.hasAVG=true;
-  if (theGeneratingFS.openA.length>0){
-    if (theGeneratingFS.attsA.indexOf("SUM("+col+")")<0);
-      return "@SUM("+col+")";
-  }
-  else if (typeof theGeneratingFS.against != 'undefined'){
-    if (theGeneratingFS.againstfe){
-      return _postdiv(_sum("SUM("+col+")"), _sum("dacount"));
-    }
+  if (theGeneratingFS.opened){
+    return sum(col);
+  } else if (theGeneratingFS.againstfe){
+    return _postdiv(_sum("SUM("+col+")"), _sum("dacount"));
+  } else if (theGeneratingFS.againstbe){
     return div(mul(sum("@"+col),'@ROUND(1.0,2)'),"@SUM(dacount)");
+  } else {
+    return "@AVG("+col+")";
   }
-  return "@AVG("+col+")";
 }
 
 function date(col){
-  //col=fixCol(col);
-//  if (theGeneratingFS.againstfe){
-//    return ("date " + col);
-//  }
   return "@DATE \'" + col + "\'";
 } 
 function arith(op,c1,c2){
   theGeneratingFS.inheretIf(c1,c2);
   c1=fixCol(c1);
   c2=fixCol(c2);
+  if (theGeneratingFS.opened){
+    var c1hasAgg=colHasAgg(c1);
+    var c2hasAgg=colHasAgg(c2);
+    if (c1hasAgg ||c2hasAgg ){
+      var c1isNaN= isNaN(c1);
+      var c2isNaN= isNaN(c2);
+      if (c1isNaN && c2isNaN){
+        theGeneratingFS.field("@"+c2);
+        return "@" + c1;
+      } else if (c1isNaN) {
+        return "@" + c1;
+      } else { //must be c2 is NaN -> c2 is hasAg
+        return "@" + c2;
+      }
+    } // else proceed as usual
+  }
   return "@("+c1 + op + c2 + ")";
 }
 function add(col1,col2){
@@ -986,8 +987,6 @@ function div(col1,col2){
   return arith("/",col1,col2);
 }
 function as(col,al){
-  //if (theGeneratingFS.opened) 
-  //  return col;// ignore aliases in mavs
   return col + " AS " + al;
 }
 function exists(relation){
@@ -1001,14 +1000,8 @@ function fixColForAB(col){
   if (typeof col=='string'){
     if (col.indexOf("DATE")>-1)
       return _date(col);
-    if (col[0] == "'" && col[col.length-1] == "'"  ){
-      //console.log("peeling col:"+col);
-      return peel(col);
-    }
-    else{
-      return col;
-    }
-  } else{
+    return peelDQIf(col);
+  } else {
     return col;
   }
 }
@@ -1016,8 +1009,6 @@ function fixCol(col){
   if (typeof col == 'string'){
     if (col[0]=='@'){
       col=col.substring(1);
-//      if (theGeneratingFS.againstbe)
-//        col='"'+col+'"';
     } else {
       col="'"+col+"'";
     }
@@ -1067,3 +1058,12 @@ function peelDQIf( str ){
     return str;
 }
 
+function colHasAgg(col){
+  if(!isNaN(col))
+    return false;
+  var daAggs=['SUM(','AVG(','MIN(','MAX(','COUNT('];
+  for (var i=0;i<daAggs.length;i++)
+    if (col.indexOf(daAggs[i])>-1)
+      return true;
+  return false;
+}
