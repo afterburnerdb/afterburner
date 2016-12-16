@@ -320,7 +320,7 @@ handyColTypes["upgrade"]=[
       this.numrows+=srcA[i].rows;
     this.numcols=src.cols;
     this.colptrs=null;
-    this.colnames=Object.keys(src.col);
+    this.colnames=Object.keys(src.col).map(peelDQIf);
     this.coltypes=[];
     for (var i=0;i<src.structure.length;i++){
       if (src.structure[i].type== 'int')

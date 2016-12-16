@@ -76,6 +76,7 @@ function fsql2sql(){
   this.name="STMT"+ uniqueCounter++;
   this.opened;
   this.openA=[];
+  this.dotAttsA=[];
   this.against;
   this.againstbe;
   this.againstfe;
@@ -87,7 +88,7 @@ function fsql2sql(){
   this.select = function(against){
     theGeneratingFS=this;
     if (against instanceof fsql2sql){
-      this.against=against.clone();
+      this.against=against;//.clone();
       if (against.matfe){
         console.log("This query is against fronend mav name:"+against.mat.name);
         this.againstfe=true;
@@ -121,7 +122,7 @@ function fsql2sql(){
   }
   this.from = function(rel, ...rest){
     if(typeof this.against != 'undefined'){
-      if (this.against.antiFrom(rel)){
+      if (this.against.matchFrom(rel)){
         return this;
       }
       else{
@@ -139,13 +140,13 @@ function fsql2sql(){
     else 
       return this;
   }
-  this.antiFrom = function(rel){
+  this.matchFrom = function(rel){
     rel=fixRel(rel);
     var pos=this.fromA.indexOf(rel);
     if (pos<0)
       return false;
     else{
-      this.fromA.splice(pos,1);
+//      this.fromA.splice(pos,1);
       return true;
     }
   }
@@ -215,7 +216,10 @@ function fsql2sql(){
     } else if (this.againstfe){
        if (col.indexOf(" AS ")>-1){
          var colname=col.substring(0,col.indexOf(" AS "));
-         var alsname=col.substring(col.indexOf(" AS ")+4,col.length-1);
+         if (colname.indexOf("addCol2")>-1)
+           var alsname=col.substring(col.indexOf(" AS ")+4,col.length-1);
+         else 
+           var alsname=col.substring(col.indexOf(" AS ")+4,col.length);
          col=_as(colname,alsname);
        }
        this.ABI.field(col);
@@ -228,13 +232,13 @@ function fsql2sql(){
       return this;
   }
   this.where = function(cond, ...rest){
-    var opened=false;
+    var openedcond=false;
     for (var i=0;i<this.openA.length;i++){
       if ((cond.indexOf(this.openA[i]) >-1)
            && (cond.indexOf('SELECT')<0))
-        opened=true;
+        openedcond=true;
     }
-    if (!opened){
+    if (!openedcond){
       if (this.againstfe && cond!='alreadyready'){
         if(cond!='alreadyready'){
           if(!this.against.matchWhere(cond))
@@ -271,6 +275,8 @@ function fsql2sql(){
     this.hasgroup=true;
     col=fixCol(col);
     if (this.againstfe){
+      if (typeof this.against.als2col[col] != undefined)
+        col=this.against.als2col[col];
       this.ABI.group(col);
     }
     else{
@@ -371,6 +377,8 @@ function fsql2sql(){
 //      return this.SQLstr;
     if (this.againstfe)
       return "ABI";
+    if (this.againstbe)
+      return this.toConpensatingSQL();
     if (this.openA.length>0)
       return this.toOpenSQL();
     var SELECT_STMT="/*CLOSED SQL*/SELECT " + this.attsA.join(', ');
@@ -411,14 +419,68 @@ function fsql2sql(){
  //   this.SQLstr=sqlstr;
     return sqlstr;
   }
+  this.toConpensatingSQL = function(){
+    if (this.againstfe || this.opened){
+      console.log("Should not come here!!");
+      return ;
+    }
+
+    for ( var i=0;i<this.attsA.length; i++){
+      if (this.attsA[i].indexOf('.') > -1){
+        for (var ii=0;ii<this.against.dotAttsA.length;ii++){
+          this.attsA[i]=this.attsA[i].replace(this.against.dotAttsA[ii],'"'+this.against.dotAttsA[ii]+'"');
+        }
+      }  
+    }
+    var SELECT_STMT="/*CONPENSATING SQL*/SELECT " + this.attsA.join(', ');
+    var FROM_STMT="FROM " + this.fromA.join(', ');
+
+    var LJOIN_STMT="";
+    if(this.ljoinA.length>0)
+      LJOIN_STMT="LEFT JOIN " + this.ljoinA + " ON " + this.onA.join(' AND ');
+
+    var WHERE_STMT="";
+    if (this.whereA.length>0)
+      WHERE_STMT="WHERE "+ this.whereA.join(' AND ');
+
+    var GROUP_STMT="";
+    if (this.groupA.length>0)
+      GROUP_STMT="GROUP BY "+ this.groupA.join(', ');
+
+    var HAVING_STMT="";
+    if (this.havingA.length>0)
+      HAVING_STMT="HAVING "+ this.havingA.join(' AND ');
+
+    var ORDER_STMT="";
+    if (this.orderA.length) 
+      ORDER_STMT="ORDER BY "+ this.orderA.join(', ');
+
+    var LIMIT_STMT="";
+    if (this.limitA >0)
+      LIMIT_STMT="LIMIT "+ this.limitA;
+
+    var sqlstr= SELECT_STMT + " " +
+      FROM_STMT + " " +
+      LJOIN_STMT + " " +
+      WHERE_STMT + " " +
+      GROUP_STMT + " " +
+      HAVING_STMT + " " +
+      ORDER_STMT + " " +
+      LIMIT_STMT;
+    return sqlstr;
+  }
+
   this.ensureOpenness= function(){
+    if (this.opennessEnsured)
+      return;
+    this.opennessEnsured=true;
     //todo: make sure all the filters are there.. 
     //so we check for not only new filters.. 
     //we should also make sure that already done filters are in the new query..
     for (var i=0;i<this.openA.length;i++){
       var isThere=false;
       for (var ii=0;ii<this.attsA.length;ii++){
-        if (this.attsA[ii] ==this.openA[i]){
+        if (this.attsA[ii] == this.openA[i]){
           isThere=true;
         }
         if (!isThere)
@@ -435,8 +497,8 @@ function fsql2sql(){
       }
     } else {
       for (var i=0;i<this.openA.length;i++){
-        if (this.groupA.join('').indexOf(this.openA[i]) < 0)
-          this.group("@"+this.openA[i]);
+        if (this.groupA.indexOf(this.openA[i]) < 0)
+         this.group("@"+this.openA[i]);
       }
     }
    
@@ -470,7 +532,17 @@ function fsql2sql(){
     if (this.havingA.length>0)
       HAVING_STMT="HAVING "+ this.havingA.join(' AND ');
 
-    var sqlstr= SELECT_STMT + " " +
+    var sqlstr=""; 
+    //if (GROUP_STMT.indexOf('(')>-1)
+    //  sqlstr= "SELECT * FROM (" +
+    //  SELECT_STMT + " " +
+    //  FROM_STMT + " " +
+    //  LJOIN_STMT + " " +
+    //  WHERE_STMT + " " + ") as stmt" + (++uniqueCounter) + " " +
+    //  GROUP_STMT + " " +
+    //  HAVING_STMT;
+    //else   
+      sqlstr= SELECT_STMT + " " +
       FROM_STMT + " " +
       LJOIN_STMT + " " +
       WHERE_STMT + " " +
@@ -622,8 +694,11 @@ function fsql2sql(){
     newi.resA=this.resA.slice();
     newi.als2tab=this.als2tab;
     newi.tab2als=this.tab2als;
+    newi.als2col=this.als2col={};
+    newi.col2als=this.col2als={};
     newi.name=this.name;
     newi.openA=this.openA.slice();
+    newi.dotAttsA=this.dotAttsA.slice();
     newi.hasAVG=this.hasAVG;
     newi.against=this.against;
     newi.againstbe=this.againstbe;
@@ -693,7 +768,9 @@ function between(col1,col2,col3){
   col3=fixCol(col3);
 
   if (theGeneratingFS.againstfe){
-    return _between(col1,col2,col3);
+    return _between(fixColForAB(col1),
+                    fixColForAB(col2),
+                    fixColForAB(col3));
   }
   return col1 + " BETWEEN " + col2 + " AND " + col3;
 }
@@ -740,6 +817,14 @@ function gtlit(p1,p2){
 function betweenlit(p1,p2,p3){
 }
 function or(cond1,cond2, ...rest){
+  if (theGeneratingFS.opened){
+    for (var i=0;i<theGeneratingFS.openA.length;i++){
+      if (cond1.indexOf(theGeneratingFS.openA[i]) >-1)
+       cond1="(1=0)";
+      if (cond2.indexOf(theGeneratingFS.openA[i]) >-1)
+       cond2="(0=1)";
+    }
+  }
   if (theGeneratingFS.againstfe){
     return _or(cond1,cond2, ...rest)
   }
@@ -800,7 +885,7 @@ function toYear(col){
   col=fixCol(col);
 
   if (theGeneratingFS.againstfe){
-    return _toYear(col);
+    return "@"+_toYear(col);
   }
 
   return "@EXTRACT(YEAR FROM "+ col + ")";
@@ -929,17 +1014,22 @@ function fixColForAB(col){
 }
 function fixCol(col){
   if (typeof col == 'string'){
-    if (col[0]=='@')
-      col=col.substring(1)
-    else 
+    if (col[0]=='@'){
+      col=col.substring(1);
+//      if (theGeneratingFS.againstbe)
+//        col='"'+col+'"';
+    } else {
       col="'"+col+"'";
+    }
     var indexofAS=col.indexOf(' AS');
     if (theGeneratingFS.opened && indexofAS>-1){
       var colname=col.substring(0,indexofAS);
       var alsname=col.substring(indexofAS+4);
       theGeneratingFS.col2als[colname]=alsname;
       theGeneratingFS.als2col[alsname]=colname;
-      col=colname;      
+      col=colname;
+      if (col.indexOf(".") > -1)
+        theGeneratingFS.dotAttsA.push(col);
     }
   } else if (col instanceof fsql2sql){
       col= "(" + col.toSQL() + ")";
@@ -970,5 +1060,10 @@ function no_alias(namewithalias){
 function peel( str ){
   return str.substring(1,str.length-1);
 }
-
+function peelDQIf( str ){
+  if (str[0]=='"' && str[str.length-1]=='"')
+    return peel(str);
+  else 
+    return str;
+}
 

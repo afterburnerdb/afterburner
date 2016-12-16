@@ -908,13 +908,15 @@ function resolve(colname){
     var alias;
     if (typeof colname == 'string'){
       if (colname.indexOf('.')>-1) {
+        if (typeof daSchema.getColPByName(colname,tabs) != 'number'){
         var maybeA= colname.split('.')[0];
-        if (qc().als2tab[maybeA] != 'undefined'){
-          alias=maybeA;
-          tabs=[alias];
-          colname=colname.split('.')[1];
-          tabs=[qcontext.als2tab[alias]]
-         }
+          if (qc().als2tab[maybeA] != 'undefined'){
+            alias=maybeA;
+            tabs=[alias];
+            colname=colname.split('.')[1];
+            tabs=[qcontext.als2tab[alias]]
+          }
+        }
       }
     }
     var ret={tabs:tabs , col:colname, als:alias};
