@@ -264,7 +264,7 @@ function fsql2sql(){
     col=fixCol(col);
     //
     if (this.againstfe){
-      if (typeof this.against.als2col[col] != undefined)
+      if (typeof this.against.als2col[col] != 'undefined')
         col=this.against.als2col[col];
       this.ABI.group(col);
     } else{
@@ -588,7 +588,6 @@ function fsql2sql(){
       return this;
     }
     var mav_def="CREATE TABLE "+ this.name + " AS " + this.toSQL() + " WITH DATA;";
-    console.log("mav_def:"+mav_def);
     var be_response=pci.execSQL(mav_def);
     newTable= new aTable(null);
     newTable.name=this.name;
@@ -953,7 +952,7 @@ function avg(col){
   col=fixCol(col);
   theGeneratingFS.hasAVG=true;
   if (theGeneratingFS.opened){
-    return sum(col);
+    return sum("@"+col);
   } else if (theGeneratingFS.againstfe){
     return _postdiv(_sum("SUM("+col+")"), _sum("dacount"));
   } else if (theGeneratingFS.againstbe){
