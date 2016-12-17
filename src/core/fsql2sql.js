@@ -421,6 +421,7 @@ function fsql2sql(){
       if (this.attsA[i].indexOf('.') > -1){
         for (var ii=0;ii<this.against.dotAttsA.length;ii++){
           this.attsA[i]=this.attsA[i].replace(this.against.dotAttsA[ii],'"'+this.against.dotAttsA[ii]+'"');
+          this.attsA[i]=this.attsA[i].replace('""'+this.against.dotAttsA[ii]+'""','"'+this.against.dotAttsA[ii]+'"');//to counter over conpensation..
         }
       }  
     }
@@ -587,6 +588,7 @@ function fsql2sql(){
       return this;
     }
     var mav_def="CREATE TABLE "+ this.name + " AS " + this.toSQL() + " WITH DATA;";
+    console.log("mav_def:"+mav_def);
     var be_response=pci.execSQL(mav_def);
     newTable= new aTable(null);
     newTable.name=this.name;
@@ -735,12 +737,17 @@ function between(col1,col2,col3){
   col1=fixCol(col1);
   col2=fixCol(col2);
   col3=fixCol(col3);
-
+  //
+  var condSQL= col1 + " BETWEEN " + col2 + " AND " + col3;
   if (theGeneratingFS.againstfe){
+    if (theGeneratingFS.against.matchWhere(condSQL))
+      return "alreadyready";
+
     return _between(fixColForAB(col1),
                     fixColForAB(col2),
                     fixColForAB(col3));
   }
+  //
   return col1 + " BETWEEN " + col2 + " AND " + col3;
 }
 function isin(col,list){
@@ -831,7 +838,10 @@ function compare(op,col1,col2){
     if (op== "=") op = "==";
     col1=fixColForAB(col1);
     col2=fixColForAB(col2);
-    return _compare(op,col1,col2);
+    //var col1sql=xSQLfromAB(col1);
+    //var col2sql=xSQLfromAB(col2);
+    
+    return _compare(op,col1,col2) + "/*SQL="+condSQL+"*/" ;
   }
   return col1 + op + col2;
 }
@@ -847,11 +857,15 @@ function toYear(col){
   theGeneratingFS.inheretIf(col);
   col=fixCol(col);
 
-  if (theGeneratingFS.againstfe){
-    return "@"+_toYear(col);
+  if (theGeneratingFS.opened){
+    return "@EXTRACT(YEAR FROM "+ col + ")";
+  } else if (theGeneratingFS.againstfe){
+    return "@EXTRACT(YEAR FROM "+ col + ")";
+  } else if (theGeneratingFS.againstbe){
+    return "@\"EXTRACT(YEAR FROM "+ col + ")\"";
+  } else {
+    return "@EXTRACT(YEAR FROM "+ col + ")";
   }
-
-  return "@EXTRACT(YEAR FROM "+ col + ")";
 }
 function min(col){
   theGeneratingFS.hasagg=true;
@@ -926,7 +940,7 @@ function sumif(col,cond){
   if (theGeneratingFS.opened){
     return "@SUM(CASE WHEN ("+cond+") THEN " + col + " ELSE 0 END)"
   } else if (theGeneratingFS.againstfe){
-    return _sum("SUM("+col+")");
+    return _sum("SUM(CASE WHEN ("+xSQLfromAB(cond)+") THEN " + col + " ELSE 0 END)");
   } else if (theGeneratingFS.againstbe){
     return "@SUM(\"SUM(CASE WHEN ("+cond+") THEN " + col + " ELSE 0 END)\")";
   } else {
@@ -970,7 +984,13 @@ function arith(op,c1,c2){
       } else { //must be c2 is NaN -> c2 is hasAg
         return "@" + c2;
       }
-    } // else proceed as usual
+    }
+  } else if(theGeneratingFS.againstfe){
+    var c1hasAgg=colHasABAgg(c1);
+    var c2hasAgg=colHasABAgg(c2);
+    if (c1hasAgg ||c2hasAgg ){
+      return _postarith(op,c1,c2);
+    }
   }
   return "@("+c1 + op + c2 + ")";
 }
@@ -1000,7 +1020,7 @@ function fixColForAB(col){
   if (typeof col=='string'){
     if (col.indexOf("DATE")>-1)
       return _date(col);
-    return peelDQIf(col);
+    return peelQIf(col);
   } else {
     return col;
   }
@@ -1047,16 +1067,47 @@ function no_alias(namewithalias){
   if (asi<0) return namewithalias;
   else return namewithalias.substring(0,asi);
 }
-
+function isQ (str){
+  if (str[0]=="'" && str[str.length-1]=="'")
+    return true;
+  else 
+    return false;
+}
+function isDQ (str){
+  if (str[0]=='"' && str[str.length-1]=='"')
+    return true;
+  else 
+    return false;
+}
 function peel( str ){
   return str.substring(1,str.length-1);
 }
 function peelDQIf( str ){
-  if (str[0]=='"' && str[str.length-1]=='"')
+  if (isDQ(str))
     return peel(str);
   else 
     return str;
 }
+function peelDQorQIf( str ){
+  if (isDQ(str)||isQ(str))
+    return peel(str);
+  else 
+    return str;
+}
+function peelQIf( str ){
+  if (isQ(str))
+    return peel(str);
+  else 
+    return str;
+}
+function escapeIf(str){
+  return str.replace(/\'/g,"\\'");
+}
+//function DQIfnot( str){
+//  if (str[0]=='"' && str[str.length-1]=='"')
+//    return str;
+//  else return '"' + str + '"';
+//}
 
 function colHasAgg(col){
   if(!isNaN(col))
@@ -1067,3 +1118,17 @@ function colHasAgg(col){
       return true;
   return false;
 }
+
+function colHasABAgg(col){
+  if(!isNaN(col))
+    return false;
+  if (col.indexOf("postexek")>-1)
+    return true;
+}
+
+function xSQLfromAB(str){
+  var begin=str.indexOf("SQL=")+4;
+  var end=str.indexOf("*/",begin);
+  return str.substring(begin,end);
+}
+

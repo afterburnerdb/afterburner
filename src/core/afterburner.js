@@ -122,8 +122,8 @@ function Afterburner(){
       else 
       this.fstr.push(`exec:memF32[(temps+(tempsptr<<2))>>2]=`+bindCol(param)+`;tempsptr= (tempsptr + 1 )|0;::
       postexek:memF32[(temps+(tempsptr<<2))>>2]=`+obindCol(param)+`;tempsptr= (tempsptr + 1 )|0;::`);
-
-      this.resA.push("res.addCol2('"+alias+"',"+type+");");
+//      alias=escapeIf(alias);
+      this.resA.push("res.addCol2(\""+alias+"\","+type+");");
     } else {
       this.resA.push(extractfrom(param,'post').replace(param,alias));
       this.aggsA.push(param);
@@ -1589,6 +1589,7 @@ function _mul(p1,p2){
 function _div(p1,p2){
   return _arith('/',p1,p2);
 }
+
 function _as(p1,al){
   var oNameI=p1.indexOf("'",p1.indexOf("addCol2",0));
   if (oNameI>-1){

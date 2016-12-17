@@ -8,7 +8,7 @@ if(typeof module == 'undefined'){
 //////////////////////////////////////////////////////////////////////////////
 
 function query8c_mav(){
-  return select(against)
+  return select()
         .open("@p_type")
 	.from("@part","@supplier","@lineitem","@orders","@customer","@nation n1","@nation n2","@region")
         .where(eq("@p_partkey","@l_partkey"),
@@ -20,8 +20,9 @@ function query8c_mav(){
                eq("@r_name",'AMERICA'),
                eq("@s_nationkey","@n2.n_nationkey"),
                between("@o_orderdate",date('1995-01-01'),date('1996-12-31')))
-	.field(as(toYear("@o_orderdate"),"o_year"),as(div(sumif(mul("@l_extendedprice", sub(1,"@l_discount")),eq("@n2.n_name",'BRAZIL')),
-	sum(mul("@l_extendedprice", sub(1,"@l_discount"))),'mkt_share')))
+	.field(as(toYear("@o_orderdate"),"o_year"),
+               as(div(sumif(mul("@l_extendedprice", sub(1,"@l_discount")),eq("@n2.n_name",'BRAZIL')),
+	                sum(mul("@l_extendedprice", sub(1,"@l_discount")))                           ),'mkt_share'))
 	.group('@o_year')
 	.order('@o_year');
 }

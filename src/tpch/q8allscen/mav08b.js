@@ -20,8 +20,9 @@ function query8b_mav(){
                eq("@r_name",'AMERICA'),
                eq("@s_nationkey","@n2.n_nationkey"),
                eq("@p_type",'ECONOMY ANODIZED STEEL'))
-	.field(as(toYear("@o_orderdate"),"o_year"),as(div(sumif(mul("@l_extendedprice", sub(1,"@l_discount")),eq("@n2.n_name",'BRAZIL')),
-	sum(mul("@l_extendedprice", sub(1,"@l_discount"))),'mkt_share')))
+	.field(as(toYear("@o_orderdate"),"o_year"),
+               as(div(sumif(mul("@l_extendedprice", sub(1,"@l_discount")),eq("@n2.n_name",'BRAZIL')),
+	                sum(mul("@l_extendedprice", sub(1,"@l_discount")))                           ),'mkt_share'))
 	.group('@o_year')
 	.order('@o_year');
 }
