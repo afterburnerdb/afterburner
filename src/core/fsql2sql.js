@@ -70,6 +70,7 @@ function fsql2sql(){
   this.tab2als={};
   this.als2col={};
   this.col2als={};
+  this.subqA=[];
   this.hasAVG=false;
   this.hasgroup=false;
   this.hasagg=false;
@@ -171,8 +172,12 @@ function fsql2sql(){
     return this;
   }
   this.inheretIf = function(isitsubq, ...rest){
-    if (isitsubq instanceof fsql2sql)
+    if (isitsubq instanceof fsql2sql){
       this.openA=this.openA.concat(isitsubq.openA);
+      this.subqA.push(isitsubq);
+      this.als2col=Object.assign(this.als2col,isitsubq.als2col);
+      this.col2als=Object.assign(this.col2als,isitsubq.col2als);
+    }
     if (rest.length>0)
       return this.inheretIf(rest[0], ...rest.slice(1));
     else 
@@ -205,6 +210,7 @@ function fsql2sql(){
            var alsname=col.substring(col.indexOf(" AS ")+4,col.length-1);
          else 
            var alsname=col.substring(col.indexOf(" AS ")+4,col.length);
+
          col=_as(colname,alsname);
        }
        this.ABI.field(col);
@@ -226,7 +232,7 @@ function fsql2sql(){
            && (cond.indexOf('SELECT')<0))
         openedcond=true;
     }
-    if (!openedcond){
+    //if (!openedcond){
       if (this.againstfe && cond!='alreadyready'){
         if(cond!='alreadyready'){
           if(!this.against.matchWhere(cond))
@@ -247,12 +253,12 @@ function fsql2sql(){
           console.log("ERROR: Query with a condition not covered by the against MAV.. cond:"+cond);
           return ;
         }
-        if (this.againstbe && cond_against_opened)
+        if (this.againstbe && cond_against_opened && !cond_against_done )
           this.whereA.push(cond);
       } else {
         this.whereA.push(cond);
       }
-    }
+    //}
     //
     if (rest.length>0)
       return this.where(rest[0], ...rest.slice(1));
@@ -476,12 +482,14 @@ function fsql2sql(){
         if (this.attsA[ii] == this.openA[i]){
           isThere=true;
         }
-        if (!isThere)
-          this.field("@"+this.openA[i]);
+      }
+      if (!isThere){
+        //console.log("i:"+i+"adding openA[i]:["+this.openA[i]+"] because its not in attsA:["+this.attsA.join('],['));
+        this.field("@"+this.openA[i]);
+      }
         //if (this.attsA.join('').indexOf(this.openA[i]) < 0){
         //if (this.groupA.join('').indexOf(this.openA[i]) < 0)
         //  this.group("@"+this.openA[i]);
-      }
     }
     if(!this.hasgroup && !this.hasagg){
       for (var i=0;i<this.attsA.length;i++){
@@ -498,7 +506,7 @@ function fsql2sql(){
     for (var i=0;i<this.attsA.length;i++){
       var cleanAtt=no_alias(this.attsA[i]);
       var indexofAS=cleanAtt.indexOf(' AS');
-      this.attsA[i]=cleanAtt + " AS \""+ cleanAtt+"\"";
+      this.attsA[i]=cleanAtt + " AS \""+ peelDQorQIf(cleanAtt)+"\"";
     }
     if (this.hasAVG){
         this.attsA.push("COUNT(*) AS dacount");
@@ -588,6 +596,7 @@ function fsql2sql(){
       return this;
     }
     var mav_def="CREATE TABLE "+ this.name + " AS " + this.toSQL() + " WITH DATA;";
+//    console.log(mav_def);
     var be_response=pci.execSQL(mav_def);
     newTable= new aTable(null);
     newTable.name=this.name;
@@ -792,16 +801,23 @@ function gtlit(p1,p2){
 function betweenlit(p1,p2,p3){
 }
 function or(cond1,cond2, ...rest){
-  if (theGeneratingFS.opened){
-    for (var i=0;i<theGeneratingFS.openA.length;i++){
-      if (cond1.indexOf(theGeneratingFS.openA[i]) >-1)
-       cond1="(1=0)";
-      if (cond2.indexOf(theGeneratingFS.openA[i]) >-1)
-       cond2="(0=1)";
-    }
-  }
+  //if (theGeneratingFS.opened){
+  //  for (var i=0;i<theGeneratingFS.openA.length;i++){
+  //    if (cond1.indexOf(theGeneratingFS.openA[i]) >-1)
+  //     cond1="(1=0)";
+  //    if (cond2.indexOf(theGeneratingFS.openA[i]) >-1)
+  //     cond2="(0=1)";
+  //  }
+  //}
   if (theGeneratingFS.againstfe){
-    return _or(cond1,cond2, ...rest)
+    var cond1sql=xSQLFromAB(cond1);
+    var cond2sql=xSQLFromAB(cond2);
+    var cond1final=remSQLFromAB(cond1);
+    var cond2final=remSQLFromAB(cond2);
+//    console.log("cond1:"+cond1);
+//    console.log("cond1sql:"+cond1sql);
+//    console.log("cond1final:"+cond1final);
+    return _or(cond1final,cond2final, ...rest) + "/*SQL="+'((' + cond1sql + ') OR (' +cond2sql + '))'+"*/";
   }
   if (rest.length>0)
     return or(cond1, or(cond2,rest[0], ...rest.slice(1)));
@@ -812,7 +828,14 @@ function or(cond1,cond2, ...rest){
 }
 function and(cond1,cond2, ...rest){
   if (theGeneratingFS.againstfe){
-    return _and(cond1,cond2, ...rest);
+    var cond1sql=xSQLFromAB(cond1);
+    var cond2sql=xSQLFromAB(cond2);
+    var cond1final=remSQLFromAB(cond1);
+    var cond2final=remSQLFromAB(cond2);
+//    console.log("cond1:"+cond1);
+//    console.log("cond1sql:"+cond1sql);
+//    console.log("cond1final:"+cond1final);
+    return _and(cond1final,cond2final, ...rest) + "/*SQL="+'((' + cond1sql + ') AND (' +cond2sql + '))'+"*/";
   }
 
   if (rest.length>0)
@@ -837,8 +860,8 @@ function compare(op,col1,col2){
     if (op== "=") op = "==";
     col1=fixColForAB(col1);
     col2=fixColForAB(col2);
-    //var col1sql=xSQLfromAB(col1);
-    //var col2sql=xSQLfromAB(col2);
+    //var col1sql=xSQLFromAB(col1);
+    //var col2sql=xSQLFromAB(col2);
     
     return _compare(op,col1,col2) + "/*SQL="+condSQL+"*/" ;
   }
@@ -926,6 +949,7 @@ function sum(col){
     if (theGeneratingFS.attsA.indexOf("SUM("+col+")")<0);
       return "@SUM("+col+")";
   } else if (theGeneratingFS.againstfe){
+      col=remSQLFromAB(col);
       return _sum("SUM("+col+")");
   } else if (theGeneratingFS.againstbe){
     return "@SUM(\"SUM("+col+")\")";
@@ -939,7 +963,9 @@ function sumif(col,cond){
   if (theGeneratingFS.opened){
     return "@SUM(CASE WHEN ("+cond+") THEN " + col + " ELSE 0 END)"
   } else if (theGeneratingFS.againstfe){
-    return _sum("SUM(CASE WHEN ("+xSQLfromAB(cond)+") THEN " + col + " ELSE 0 END)");
+//    console.log("@sumif, cond:"+cond);
+//    console.log("xSQLFromAB(cond):"+xSQLFromAB(cond));
+    return _sum("SUM(CASE WHEN ("+xSQLFromAB(cond)+") THEN " + col + " ELSE 0 END)");
   } else if (theGeneratingFS.againstbe){
     return "@SUM(\"SUM(CASE WHEN ("+cond+") THEN " + col + " ELSE 0 END)\")";
   } else {
@@ -1016,6 +1042,7 @@ function notexists(relation){
 }
 
 function fixColForAB(col){
+  //col=remSQLFromAB(col);
   if (typeof col=='string'){
     if (col.indexOf("DATE")>-1)
       return _date(col);
@@ -1125,9 +1152,16 @@ function colHasABAgg(col){
     return true;
 }
 
-function xSQLfromAB(str){
+function xSQLFromAB(str){
   var begin=str.indexOf("SQL=")+4;
   var end=str.indexOf("*/",begin);
   return str.substring(begin,end);
+}
+function remSQLFromAB(str){
+  var begin=str.indexOf("/*SQL=");
+  if (begin> -1)
+    return str.substring(0,begin);
+  else 
+    return str;
 }
 

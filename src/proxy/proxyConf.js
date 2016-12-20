@@ -11,7 +11,7 @@ proxyConf = {};
 proxyConf.monetdb={};
 proxyConf.monetdb.host="127.0.0.1";    //Where is MonetDB?
 proxyConf.monetdb.port=12345;          //Listening on which port?
-proxyConf.monetdb.dbname='monetdb-sf100';//Name of the database
+proxyConf.monetdb.dbname='monetdb-sf1';//Name of the database
 proxyConf.monetdb.user='monetdb';      //MonetDB username
 proxyConf.monetdb.password='monetdb';  //MonetDB password
 

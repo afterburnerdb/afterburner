@@ -1420,7 +1420,7 @@ function _min(p){
   var type= typeCol(p);
   var varname="min"+unique
   return `dec:var `+varname+`=10000000000.1;::
-  post:res.addCol2('min(`+p+`)',`+type+`);::
+  post:res.addCol2("min(`+p+`)",`+type+`);::
   preexek:`+varname+`=10000000000.1;::
   exec: if (`+varname+` > (`+bound+`)) {`+varname+` = `+bound+`;}::
   execg:if (`+varname+` > (`+bound+`)) {`+varname+` = `+bound+`;}::
@@ -1439,7 +1439,7 @@ function _max(p){
   var type= typeCol(p);
   var varname="max"+unique
   return `dec:var `+varname+`=-10000000000.1;::
-  post:res.addCol2('max(`+p+`)',`+type+`);::
+  post:res.addCol2("max(`+p+`)",`+type+`);::
   preexek:`+varname+`=-10000000000.1;::
   exec: if (`+varname+` < (`+bound+`)) {`+varname+` = `+bound+`;}::
   execg:if (`+varname+` < (`+bound+`)) {`+varname+` = `+bound+`;}::
@@ -1456,7 +1456,7 @@ function _count(p){
       checknull="if ((trav_"+trav+"|0) !=-666) "; // is not NULL
   }
   return `dec:var `+varname+`=0;::
-  post:res.addCol2('count(`+p+`)',`+type+`);::
+  post:res.addCol2("count(`+p+`)",`+type+`);::
   preexek:`+varname+`=0;::
   exec: `+checknull+varname+`=`+varname+`+1|0;::
   execg:`+checknull+varname+`=`+varname+`+1|0;::
@@ -1473,22 +1473,29 @@ function _countif(p,cond){
       checknull="if ((trav_"+trav+"|0) !=-666) "; // is not NULL
   }
   return `dec:var `+varname+`=0;::
-  post:res.addCol2('count(`+p+`)',`+type+`);::
+  post:res.addCol2("count(`+p+`)",`+type+`);::
   preexek:`+varname+`=0;::
   exec: if(`+cond+`)`+checknull+varname+`=`+varname+`+1|0;::
   execg:if(`+cond+`)`+checknull+varname+`=`+varname+`+1|0;::
   postexek:mem32[(temps+(tempsptr<<2))>>2]=`+varname+`;tempsptr= (tempsptr + 1 )|0;::`;
 }
 function _sum(p){
-  var bound=bindCol(p);
+  var bound;
+  var type;
+  if (!isNaN(p)){
+     bound= p;
+     type= 0;//shobbe 1
+  }  else {
+    bound=bindCol(p);
+    type= typeCol(p);
+  }
   var unique=uniqueVarCounter++;
-  var type= typeCol(p);
   if ((type==0) || (type==3) || (type==4))
     bound=coerceFloat(bound);
   var trav= col2trav(p);
   var varname="sum"+unique
   return `dec:var `+varname+`=0.0;::
-  post:res.addCol2('sum(`+p+`)',1);::
+  post:res.addCol2("sum(`+p+`)",1);::
   preexek:`+varname+`=+(0);::
   exec:`+varname+`=`+varname+`+(`+bound+`);::
   execg:`+varname+`=`+varname+`+(`+bound+`);::
@@ -1503,7 +1510,7 @@ function _sumif(p,cond){
   var trav= col2trav(p);
   var varname="sum"+unique
   return `dec:var `+varname+`=0.0;::
-  post:res.addCol2('sum(`+p+`)',1);::
+  post:res.addCol2("sum(`+p+`)",1);::
   preexek:`+varname+`=+(0);::
   exec: if(`+cond+`)`+varname+`=`+varname+`+(`+bound+`);::
   execg:if(`+cond+`)`+varname+`=`+varname+`+(`+bound+`);::
@@ -1520,7 +1527,7 @@ function _avg(p){
   var varnamecount="avgcount"+unique
   return `dec:var `+varnamecount+`=0.0;::
   dec:var `+varnamesum+`=0.0;::
-  post:res.addCol2('avg(`+p+`)',1);::
+  post:res.addCol2("avg(`+p+`)",1);::
   preexek:`+varnamesum+`=0.0;::
   preexek:`+varnamecount+`=0.0;::
   exec:`+varnamesum+`=`+varnamesum+`+(`+bound+`);::
@@ -1591,9 +1598,9 @@ function _div(p1,p2){
 }
 
 function _as(p1,al){
-  var oNameI=p1.indexOf("'",p1.indexOf("addCol2",0));
+  var oNameI=p1.indexOf('"',p1.indexOf("addCol2",0));
   if (oNameI>-1){
-    var oNamelI=p1.indexOf("'",oNameI+1);
+    var oNamelI=p1.indexOf('"',oNameI+1);
     return p1.substring(0,oNameI+1) + al + p1.substring(oNamelI)
   }
   return 'as{'+p1+'~'+al+'}';

@@ -6,26 +6,24 @@ if(typeof module == 'undefined'){
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
-
-function query13_fsql(against){
-  var subq=select(against)
+function query13a_mav(){
+  var subq=select()
+            .open("@o_comment")
             .from("@customer")
             .ljoin("@orders")
-              .on(eq("@c_custkey","@o_custkey"),
-                  notlike("@o_comment",'%special%requests%'))
+              .on(eq("@c_custkey","@o_custkey"))
             .field("@c_custkey",as(count("@o_orderkey"),"c_count"))
             .group("@c_custkey")
 
-  return select(against)
+  return select()
             .from(subq)
             .field("@c_count",as(count("@*"),"custdist"))
             .group("@c_count")
             .order("-@custdist","-@c_count")
 }
-
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 if(inNode){
-  module.exports=query13_fsql;
+  module.exports=query13a_mav;
 } else delete module;
 //////////////////////////////////////////////////////////////////////////////
