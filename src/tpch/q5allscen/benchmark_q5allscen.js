@@ -76,7 +76,6 @@ function bench_query5_latency_q5allscen(){
   console.log("time to run query 5 against query5b_mav@BE:"+timeA.join(','));
 
   timeA=[];
-
   be_mav5a=query5a_mav();
   be_mav5a.materialize_fe();
   for (var i=0; i<10; i++){
@@ -87,8 +86,8 @@ function bench_query5_latency_q5allscen(){
     timeA.push(time_diff(t0,t1));
   } 
   console.log("time to run query 5 again query5a_mav@FE:"+timeA.join(','));
-  timeA=[];
 
+  timeA=[];
   be_mav5b=query5b_mav();
   be_mav5b.materialize_fe();
   for (var i=0; i<10; i++){
@@ -99,7 +98,6 @@ function bench_query5_latency_q5allscen(){
     timeA.push(time_diff(t0,t1));
   } 
   console.log("time to run query 5 again query5b_mav@FE:"+timeA.join(','));
-  timeA=[];
 }
 
 //////////////////////////////////////////////////////////////////////////////

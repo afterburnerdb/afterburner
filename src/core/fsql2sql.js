@@ -127,6 +127,8 @@ function fsql2sql(){
       if (this.against.matchFrom(rel)){
         return this;
       } else {
+        console.log("Unable to match rel:"+rel);
+        console.log("Against relations:"+this.against.fromA.join("|}{|"));
         return;
       }
     }
@@ -145,9 +147,14 @@ function fsql2sql(){
   this.matchFrom = function(rel){
     rel=fixRel(rel);
     var pos=this.fromA.indexOf(rel);
-    if (pos<0)
-      return false;
-    else{
+    if (pos<0){
+      var matched=false;
+      for (var i=0;i<this.subqA.length;i++){
+        if (this.subqA[i].matchFrom("@"+rel))
+           matched=true;
+      }
+      return matched;
+    } else{
 //      this.fromA.splice(pos,1);
       return true;
     }
@@ -174,6 +181,7 @@ function fsql2sql(){
   this.inheretIf = function(isitsubq, ...rest){
     if (isitsubq instanceof fsql2sql){
       this.openA=this.openA.concat(isitsubq.openA);
+      this.opened=this.opened|isitsubq.opened;
       this.subqA.push(isitsubq);
       this.als2col=Object.assign(this.als2col,isitsubq.als2col);
       this.col2als=Object.assign(this.col2als,isitsubq.col2als);
@@ -512,6 +520,47 @@ function fsql2sql(){
         this.attsA.push("COUNT(*) AS dacount");
     }
   }
+  this.toClosedSQL = function(){
+    console.log("spitting sql in it's literal form");
+    var SELECT_STMT="/*CLOSED SQL*/SELECT " + this.attsA.join(', ');
+    var FROM_STMT="FROM " + this.fromA.join(', ');
+
+    var LJOIN_STMT="";
+    if(this.ljoinA.length>0)
+      LJOIN_STMT="LEFT JOIN " + this.ljoinA + " ON " + this.onA.join(' AND ');
+
+    var WHERE_STMT="";
+    if (this.whereA.length>0)
+      WHERE_STMT="WHERE "+ this.whereA.join(' AND ');
+
+    var GROUP_STMT="";
+    if (this.groupA.length>0)
+      GROUP_STMT="GROUP BY "+ this.groupA.join(', ');
+
+    var HAVING_STMT="";
+    if (this.havingA.length>0)
+      HAVING_STMT="HAVING "+ this.havingA.join(' AND ');
+
+    var ORDER_STMT="";
+    if (this.orderA.length) 
+      ORDER_STMT="ORDER BY "+ this.orderA.join(', ');
+
+    var LIMIT_STMT="";
+    if (this.limitA >0)
+      LIMIT_STMT="LIMIT "+ this.limitA;
+
+    var sqlstr= SELECT_STMT + " " +
+      FROM_STMT + " " +
+      LJOIN_STMT + " " +
+      WHERE_STMT + " " +
+      GROUP_STMT + " " +
+      HAVING_STMT + " " +
+      ORDER_STMT + " " +
+      LIMIT_STMT;
+ //   this.SQLstr=sqlstr;
+    return sqlstr;
+
+  }
   this.toOpenSQL = function(){
     this.ensureOpenness();
     var SELECT_STMT="/*OPENED SQL*/\nSELECT " + this.attsA.join(', ');
@@ -698,8 +747,7 @@ function like(col,strlit){
   if (theGeneratingFS.againstfe){
     if (theGeneratingFS.against.matchWhere(condSQL))
       return "alreadyready";
-
-    return _like(col,strlit);
+    return _like(col,strlit)+ "/*SQL="+condSQL+"*/" ;
   }
   return col + " LIKE '" + strlit+"'";
 }
@@ -761,17 +809,21 @@ function between(col1,col2,col3){
 function isin(col,list){
   theGeneratingFS.inheretIf(col);
   col=fixCol(col);
+  var condSQL;
+  if (list instanceof Array)
+    condSQL=col + " IN (" + list.map(fixCol).join(",") + ")"
+  else {
+    theGeneratingFS.inheretIf(list);
+    condSQL= col + " IN (" + list.toSQL() + ")"
+  }
 
   if (theGeneratingFS.againstfe){
+    if (theGeneratingFS.against.matchWhere(condSQL))
+      return "alreadyready";
     return _isin(col,list);
   }
 
-  if (list instanceof Array)
-    return col + " IN (" + list.map(fixCol).join(",") + ")"
-  else {
-    theGeneratingFS.inheretIf(list);
-    return col + " IN (" + list.toSQL() + ")"
-  }
+  return condSQL;
 }
 function isnotin(col,list){
   theGeneratingFS.inheretIf(col);
@@ -1013,6 +1065,8 @@ function arith(op,c1,c2){
   } else if(theGeneratingFS.againstfe){
     var c1hasAgg=colHasABAgg(c1);
     var c2hasAgg=colHasABAgg(c2);
+    c1=peelQIf(c1)
+    c2=peelQIf(c2)
     if (c1hasAgg ||c2hasAgg ){
       return _postarith(op,c1,c2);
     }
@@ -1069,6 +1123,9 @@ function fixCol(col){
         theGeneratingFS.dotAttsA.push(col);
     }
   } else if (col instanceof fsql2sql){
+    if (this.opened)
+      col= "(" + col.toClosedSQL() + ")";
+    else 
       col= "(" + col.toSQL() + ")";
   }
   //
@@ -1084,7 +1141,10 @@ function fixRel(rel){
     else 
       rel="'"+rel+"'";
   } else if (rel instanceof fsql2sql){
-    rel= "(" + rel.toSQL() + ") AS " + rel.name;
+    if (this.opened)
+      rel= "(" + rel.toClosedSQL() + ") AS " + rel.name;
+    else 
+      rel= "(" + rel.toSQL() + ") AS " + rel.name;
   }
   return rel;
 }

@@ -6,26 +6,17 @@ if(typeof module == 'undefined'){
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
-
-function query13_fsql(against){
-  var subq=select()
-            .from("@customer")
-            .ljoin("@orders")
-              .on(eq("@c_custkey","@o_custkey"),
-                  notlike("@o_comment",'%special%requests%'))
-            .field("@c_custkey",as(count("@o_orderkey"),"c_count"))
-            .group("@c_custkey")
-
-  return select(against)
-            .from(subq)
-            .field("@c_count",as(count("@*"),"custdist"))
-            .group("@c_count")
-            .order("-@custdist","-@c_count")
+function query14a_mav(){
+  return select()
+    .open("@l_shipdate")
+    .from("@lineitem","@part")
+    .field(as(mul(100.00,div(sumif(mul("@l_extendedprice", sub(1,"@l_discount")),like("@p_type", 'PROMO%')), 
+           sum(mul("@l_extendedprice", sub(1,"@l_discount"))))),"promo_revenue"))
+    .where(eq("@l_partkey","@p_partkey"));
 }
-
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 if(inNode){
-  module.exports=query13_fsql;
+  module.exports=query14a_mav;
 } else delete module;
 //////////////////////////////////////////////////////////////////////////////

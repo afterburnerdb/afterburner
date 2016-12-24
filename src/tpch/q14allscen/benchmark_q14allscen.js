@@ -5,64 +5,63 @@ if(typeof module == 'undefined'){
 } else { 
 }
 
-function bench_mavs_q1allscen(){
+function bench_mavs_q14allscen(){
   var t0,t1, mem0,mem1;
   var timeA=[];
-  var be_mav1a;
+  var be_mav14a;
 
-  for (var i=0; i<5; i++){
+  for (var i=0; i<10; i++){
     t0=get_time_ms();
-    query1a_mav().materialize_be();
+    query14a_mav().materialize_be();
     t1=get_time_ms();
     timeA.push(time_diff(t0,t1));
   } 
-  console.log("time to create query1a_mav @BE:"+timeA.join(','));
+  console.log("time to create query14a_mav @BE:"+timeA.join(','));
+
   timeA=[];
-  be_mav1a=query1a_mav();
-  be_mav1a.materialize_be();
   for (var i=0; i<5; i++){
+    be_mav14a=query14a_mav();
+    be_mav14a.materialize_be();
     t0=get_time_ms();
-    be_mav1a.materialize_fe(true);
+    be_mav14a.materialize_fe();
     t1=get_time_ms();
     timeA.push(time_diff(t0,t1));
-  } 
-  console.log("time to create query1a_mav @FE:"+timeA.join(','));
+  }
+  console.log("time to create query14a_mav @FE:"+timeA.join(','));
 }
 
-function bench_query1_latency_q1allscen(){
+function bench_query14_latency_q14allscen(){
   var t0,t1, mem0,mem1;
   var timeA=[];
-  var be_mav1a;
-  var q1;
-  be_mav1a=query1a_mav();
-  be_mav1a.materialize_be();
+  var be_mav14a;
+  be_mav14a=query14a_mav();
+  be_mav14a.materialize_be();
   for (var i=0; i<10; i++){
     t0=get_time_ms();
-    q1=query1_fsql(be_mav1a);
-    q1.toArray2();
+    q14=query14_fsql(be_mav14a);
+    q14.toArray2();
     t1=get_time_ms();
     timeA.push(time_diff(t0,t1));
   } 
-  console.log("time to run query 1 against query1a_mav@BE:"+timeA.join(','));
+  console.log("time to run query 14 against query14a_mav@BE:"+timeA.join(','));
+
   timeA=[];
-
-  //be_mav1a=query1a_mav();
-  be_mav1a.materialize_fe();
+  be_mav14a=query14a_mav();
+  be_mav14a.materialize_fe();
   for (var i=0; i<10; i++){
     t0=get_time_ms();
-    q1=query1_fsql(be_mav1a);
-    q1.ABI.materialize();
+    var q14=query14_fsql(be_mav14a);
+    q14.ABI.materialize();
     t1=get_time_ms();
     timeA.push(time_diff(t0,t1));
   } 
-  console.log("time to run query 1 against query1a_mav@FE:"+timeA.join(','));
+  console.log("time to run query 14 against query14a_mav@FE:"+timeA.join(','));
 }
-
 
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 if(inNode){
-  console.log('exporting benchmark_ods');
-  global.benchmark_ods=benchmark_ods;
+  console.log('exporting bench_mavs_q14allscen');
+  global.bench_mavs_q14allscen=bench_mavs_q14allscen;
 } else delete module;
 //////////////////////////////////////////////////////////////////////////////
