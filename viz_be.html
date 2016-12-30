@@ -7,8 +7,25 @@
 
     <title>Afterburner Demo</title>
 
-<!--    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"> -->
+    <!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"> -->
     <link rel="stylesheet" href="bootstrap/css/bootstrap.min.css"> 
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.2/jquery.min.js"></script>
+    <script src="https://d3js.org/d3.v4.min.js"></script>
+    <!-- chart.js> -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.4.0/Chart.bundle.min.js"></script>
+    <!-- chart.js> -->
+    <!-- two way slider -->
+    <!-- <link rel="stylesheet" href="https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css">
+    <script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+    <script src="https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script> -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/9.1.0/nouislider.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/9.1.0/nouislider.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/wnumb/1.0.4/wNumb.min.js"></script>
+    <!-- two way slider -->
+
+    <link href="https://gitcdn.github.io/bootstrap-toggle/2.2.2/css/bootstrap-toggle.min.css" rel="stylesheet">
+    <script src="https://gitcdn.github.io/bootstrap-toggle/2.2.2/js/bootstrap-toggle.min.js"></script>
+    
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
     <!--[if lt IE 9]>
@@ -35,12 +52,19 @@
         max-height: 150px;
         overflow: auto;
       }
+      .chart div {
+        font: 10px sans-serif;
+        background-color: steelblue;
+        text-align: right;
+        padding: 3px;
+        margin: 1px;
+        color: white;
+      }
     </style>
-
   </head>
   <body>
 
-    <nav class="navbar navbar-inverse navbar-fixed-top">
+    <nav/ class="navbar navbar-inverse navbar-fixed-top">
       <div class="container">
         <div class="navbar-header">
           <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
@@ -68,30 +92,81 @@
 
 <!-- <div class="jumbotron"> -->
   <div class="container">
-    <div class="row">
-        <div class="col-md-12">
-        <div id="sconsole" class="table-responsive">
-        </div>
-        <div>
-      </div>
-      <div class="row">
-        <div class="col-md-6">
-          <h2>Output</h2>
-		<textarea rows="11" id="TAASM" name="TAASM" class="prettyprint form-control animated" placeholder="" ></textarea>
-        </div>
-      </div>
-       <div class="row"><div class="col-xs-12" style="height:50px;"></div></div>
-       <div class="row">
-        <div class="col-md-12">
-          <div id="divcons" class="table-responsive"> </div>
-        </div>
-      </div>
 
+    <div class="row">
+      <div class="col-lg-9">
+        <div class="col-lg-3">
+          <label class="btn btn-default btn-file" href="#" data-toggle="tooltip" data-placement="bot" title="Load a database table from a local file">
+            Load table
+            <input type="file" id="fileInput" style="display: none;"> 
+          </label>
+        </div>
+      </div>
+      <div class="col-lg-9">
+        <hr>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-lg-9">
+        <div class="col-lg-3">
+          <input id="interbox" type="checkbox" checked data-toggle="toggle" onchange="toginteractive();" data-on="Super Interactive" data-off="Interactive">
+        </div>
+        <div class="col-lg-6 pull-right">
+          <div id='btn-runwhere' class="btn-group" data-toggle="buttons" autocomplete="off" >
+            <label class="btn btn-primary active">
+              <input type="radio" checked onchange="q1runwhere='asisBE';" >Normal</label>
+            <label class="btn btn-primary">
+              <input type="radio" onchange="q1runwhere='MAVBE';">Query -> MAV@BE</label>
+            <label class="btn btn-primary">
+              <input type="radio" onchange="q1runwhere='MAVFE';">Query -> MAV@FE</label>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-9">
+        <hr><br>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-lg-9">
+        <canvas id="myChart" width="400" height="180"></canvas>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class=col-lg-9>
+        <div id="slider"> </div>
+      </div>
+    <div> <br> <br>
+    <div class="row">
+      <div class=col-lg-9>
+        <div class="col-lg-3">
+          <div id="event-start"></div>
+        </div>
+        <div class="col-lg-3 pull-right">
+          <div id="event-end" align="right"  ></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-lg-9" style="height:20px;">
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-lg-9">
+        <div id="divcons" class="table-responsive">
+        </div>
+      </div>
+    </div>
     <br>
+
     <div class="row" id="divconsole">
-      <div class="col-md-12">
+      <div class="col-lg-12">
         <p id="console">Console area!</p>
       </div>
+    </div>
   </div> <!-- /container -->
 
   <div id="waitForFile" class="modal fade" role="dialog">
@@ -118,7 +193,6 @@
 <script src="./src/core/html5FileParser.js"></script>
 <script src="./src/core/monetJSONParser.js"></script>
 <script src="./src/frontend/myJS.js"></script>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.2/jquery.min.js"></script>
 <script src="./src/proxy/proxyConf.js"></script>
 <script src="./src/proxy/proxyClient.js"></script>
 <script src="./src/lib/explanation.js"></script>
@@ -221,9 +295,43 @@
 function myOnLoad(){
   ABi = new Afterburner();
   FSi = new fsql2sql();
-  document.getElementById("TAASM").value="";
+
+  //init slider:
+  var slider = document.getElementById('slider');
+  noUiSlider.create(slider, {
+  	start: [strdate_to_int('1992-01-02'), strdate_to_int('1998-12-01')],
+  	connect: true,
+  	range: {
+  		'min': strdate_to_int('1992-01-02'),
+  		'max': strdate_to_int('1998-12-01')
+  	},
+          step: 1,
+  	format: wNumb({
+  		decimals: 0
+  	})
+   
+  });
+  dateValues = [
+  	document.getElementById('event-start'),
+  	document.getElementById('event-end')
+  ];
+  slider.noUiSlider.on('update', function( values, handle ) {
+  	dateValues[handle].innerHTML = int_to_strdate(+values[handle]);
+        if(superinteractive|false){
+          qa=runquery1(q1runwhere, values[0], values[1]);
+          drawChart(qa);
+        }
+  });
+  slider.noUiSlider.on('change', function( values, handle ) {
+        qa=runquery1(q1runwhere, values[0], values[1]);
+        drawChart(qa);
+  });
 }
-window.onload = function() {
+superinteractive=document.getElementById('interbox').checked;
+function toginteractive(){
+  superinteractive=document.getElementById('interbox').checked;
+}
+window.onload = function(){
   inNode=false;
   var fileInput = document.getElementById('fileInput');
   fileInput.addEventListener('change', function(e) {
@@ -232,68 +340,215 @@ window.onload = function() {
   });
   myOnLoad();
 }
-function runASM(){
-  asmcode=document.getElementById("TAASM").value;
-  document.getElementById("console").innerHTML = "ASM=" + asmcode
-  tt0=window.performance.now();
-  runMyAdhocCode(asmcode);
-  tt1=window.performance.now();
-  console.log('time to run asm:'+ (tt1-tt0));
+
+q1runwhere='asisBE';
+qa=runquery1(q1runwhere,strdate_to_int('1992-01-02'),strdate_to_int('1998-12-01'));
+drawChart(qa);
+
+function query1_viz(against,mindate,maxdate){
+  return select(against)
+  .from('@lineitem')
+  .field('@l_returnflag','@l_linestatus',
+    sum('@l_quantity'),
+    sum('@l_extendedprice'),
+    sum(mul('@l_extendedprice',sub(1.0 , '@l_discount'))),
+    sum(mul(mul('@l_extendedprice',sub(1.0 , '@l_discount')), add(1.0 , '@l_tax'))),
+    avg('@l_quantity'),
+    avg('@l_extendedprice'),
+    avg('@l_discount'),
+    count('@*'))
+  .where(between('@l_shipdate',date(mindate),date(maxdate)))
+  .group('@l_returnflag','@l_linestatus')
+  .order('@l_returnflag','@l_linestatus')
 }
 
-function resetFluentASMq1(){
-  document.getElementById("TAFluent").value=`ABi.select()
-  .from("orders")
-  .field(count("o_totalprice"))
-  .where(lt("o_totalprice",1500))
-  .toString()`;
-  fluentToASM();
+function runquery1(where, intmindate, intmaxdate){
+  var strmindate=int_to_strdate(intmindate);
+  var strmaxdate=int_to_strdate(intmaxdate);
+  var ret;
+  if (where == 'asisBE')
+    ret=query1_viz(null,strmindate,strmaxdate).toArray2();
+  else if (where== 'MAVBE'){
+    if (typeof mavq1be == 'undefined')
+      mavq1be=mav1().materialize_be();
+    ret=query1_viz(mavq1be,strmindate,strmaxdate).toArray2();
+  }
+  else if (where== 'MAVFE'){
+    if (typeof mavq1fe == 'undefined')
+      mavq1fe=mav1().materialize_fe();
+    ret=query1_viz(mavq1fe,strmindate,strmaxdate).toArray2();
+  }
+  return ret;
 }
-function resetFluentASMq2(){
-  document.getElementById("TAFluent").value=`ABi.select()
-  .from("lineitem").join("orders").on("l_orderkey","o_orderkey")
-  .field(sum('o_totalprice'))
-  .toString()`;
-  fluentToASM();
-}
-function resetFluentASMq3(){
-  document.getElementById("TAFluent").value=`ABi.select()
-  .field("o_orderdate")
-  .field(count('o_orderkey'))
-  .from("orders")
-  .group("o_orderdate")
-  .toString()`;
-  fluentToASM();
-}
-function resetFluentASMq4(){
-  document.getElementById("TAFluent").value=`ABi.select()
-  .from("lineitem").join("orders").on("l_orderkey","o_orderkey")
-  .field("l_orderkey")
-  .field(sum('l_extendedprice'))
-  .field("o_orderdate")
-  .field("o_shippriority")
-  .where(between('o_orderdate', date('1996-01-01'), date('1996-01-31')))
-  .group("l_orderkey")
-  .group("o_orderdate")
-  .group("o_shippriority")
-  .order([-1])
-  .limit(10)
-  .toString()`;
-  fluentToASM();
-}
-/*ABi.select().from("myview").field("l_orderkey").field("revenue").field("o_orderdate").field("o_shippriority").where(eq('o_orderdate',date('1996-01-06'))).order([-1]).limit(10).toString()*/
-function fluentToASM(){
-        strASM="document.getElementById(\"TAASM\").value="
-        strASM= strASM + document.getElementById("TAFluent").value;
 
-	document.getElementById("console").innerHTML = strASM;
 
-	try {
-		runMyAdhocCode(strASM);
-	}
-	catch(err) {
-	    document.getElementById("console").innerHTML = err.message;
-	}
+function drawChart(qa){
+var ctx = document.getElementById("myChart");
+var myChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+        labels: [qa [0] +"|" + qa [1],
+                 qa [10] +"|"+ qa [11],
+                 qa [20] +"|"+ qa [21],
+                 qa [30] +"|"+ qa [31]],
+        datasets: [{
+            label: 'sum_qty',
+            data: [qa[2], qa[12], qa[22], qa[32]],
+            backgroundColor: [
+                'rgba(255, 99, 132, 0.2)',
+                'rgba(255, 99, 132, 0.2)',
+                'rgba(255, 99, 132, 0.2)',
+                'rgba(255, 99, 132, 0.2)',
+            ],
+            borderColor: [
+                'rgba(255, 99, 132, 0.2)',
+                'rgba(255, 99, 132, 0.2)',
+                'rgba(255, 99, 132, 0.2)',
+                'rgba(255, 99, 132, 0.2)',
+            ],
+            borderWidth: 1
+        },{
+            label: 'sum_base_price',
+            data: [qa[3], qa[13], qa[23], qa[33]],
+            backgroundColor: [
+                'rgba(255, 99, 132, 0.2)',
+                'rgba(255, 99, 132, 0.2)',
+                'rgba(255, 99, 132, 0.2)',
+                'rgba(255, 99, 132, 0.2)',
+            ],
+            borderColor: [
+                'rgba(255, 99, 132, 0.2)',
+                'rgba(255, 99, 132, 0.2)',
+                'rgba(255, 99, 132, 0.2)',
+                'rgba(255, 99, 132, 0.2)',
+            ],
+            borderWidth: 1
+        },{
+            label: 'sum_disc_price',
+            data: [qa[4], qa[14], qa[24], qa[34]],
+            backgroundColor: [
+                'rgba(255, 99, 132, 0.2)',
+                'rgba(255, 99, 132, 0.2)',
+                'rgba(255, 99, 132, 0.2)',
+                'rgba(255, 99, 132, 0.2)',
+            ],
+            borderColor: [
+                'rgba(255, 99, 132, 0.2)',
+                'rgba(255, 99, 132, 0.2)',
+                'rgba(255, 99, 132, 0.2)',
+                'rgba(255, 99, 132, 0.2)',
+            ],
+            borderWidth: 1
+        },{
+            label: 'sum_charge',
+            data: [qa[5], qa[15], qa[25], qa[35]],
+            backgroundColor: [
+                'rgba(255, 99, 132, 0.2)',
+                'rgba(255, 99, 132, 0.2)',
+                'rgba(255, 99, 132, 0.2)',
+                'rgba(255, 99, 132, 0.2)',
+            ],
+            borderColor: [
+                'rgba(255, 99, 132, 0.2)',
+                'rgba(255, 99, 132, 0.2)',
+                'rgba(255, 99, 132, 0.2)',
+                'rgba(255, 99, 132, 0.2)',
+            ],
+            borderWidth: 1
+        },{
+            label: 'sum_charge',
+            data: [qa[6], qa[16], qa[26], qa[36]],
+            backgroundColor: [
+                'rgba(255, 99, 132, 0.2)',
+                'rgba(255, 99, 132, 0.2)',
+                'rgba(255, 99, 132, 0.2)',
+                'rgba(255, 99, 132, 0.2)',
+            ],
+            borderColor: [
+                'rgba(255, 99, 132, 0.2)',
+                'rgba(255, 99, 132, 0.2)',
+                'rgba(255, 99, 132, 0.2)',
+                'rgba(255, 99, 132, 0.2)',
+            ],
+            borderWidth: 1
+        },{
+            label: 'avg_qty',
+            data: [qa[7], qa[17], qa[27], qa[37]],
+            backgroundColor: [
+                'rgba(255, 99, 132, 0.2)',
+                'rgba(255, 99, 132, 0.2)',
+                'rgba(255, 99, 132, 0.2)',
+                'rgba(255, 99, 132, 0.2)',
+            ],
+            borderColor: [
+                'rgba(255, 99, 132, 0.2)',
+                'rgba(255, 99, 132, 0.2)',
+                'rgba(255, 99, 132, 0.2)',
+                'rgba(255, 99, 132, 0.2)',
+            ],
+            borderWidth: 1
+        },{
+            label: 'avg_price',
+            data: [qa[7], qa[17], qa[27], qa[37]],
+            backgroundColor: [
+                'rgba(255, 99, 132, 0.2)',
+                'rgba(255, 99, 132, 0.2)',
+                'rgba(255, 99, 132, 0.2)',
+                'rgba(255, 99, 132, 0.2)',
+            ],
+            borderColor: [
+                'rgba(255, 99, 132, 0.2)',
+                'rgba(255, 99, 132, 0.2)',
+                'rgba(255, 99, 132, 0.2)',
+                'rgba(255, 99, 132, 0.2)',
+            ],
+            borderWidth: 1
+        },{
+            label: 'avg_disc',
+            data: [qa[7], qa[17], qa[27], qa[37]],
+            backgroundColor: [
+                'rgba(255, 99, 132, 0.2)',
+                'rgba(255, 99, 132, 0.2)',
+                'rgba(255, 99, 132, 0.2)',
+                'rgba(255, 99, 132, 0.2)',
+            ],
+            borderColor: [
+                'rgba(255, 99, 132, 0.2)',
+                'rgba(255, 99, 132, 0.2)',
+                'rgba(255, 99, 132, 0.2)',
+                'rgba(255, 99, 132, 0.2)',
+            ],
+            borderWidth: 1
+        },{
+            label: 'count_order',
+            data: [qa[7], qa[17], qa[27], qa[37]],
+            backgroundColor: [
+                'rgba(255, 99, 132, 0.2)',
+                'rgba(255, 99, 132, 0.2)',
+                'rgba(255, 99, 132, 0.2)',
+                'rgba(255, 99, 132, 0.2)',
+            ],
+            borderColor: [
+                'rgba(255, 99, 132, 0.2)',
+                'rgba(255, 99, 132, 0.2)',
+                'rgba(255, 99, 132, 0.2)',
+                'rgba(255, 99, 132, 0.2)',
+            ],
+            borderWidth: 1
+        }
+        ]
+    },
+    options: {
+        animation : false,
+        scales: {
+            yAxes: [{
+                ticks: {
+                    beginAtZero:true
+                }
+            }]
+        }
+    }
+});
 }
 </script>
 
@@ -311,7 +566,7 @@ function fluentToASM(){
 <script src="https://maxcdn.bootstrapcdn.com/js/ie10-viewport-bug-workaround.js"></script>
 
 <script type="text/javascript">
-  $(document).ready(function() {
+$(document).ready(function() {
     $("body").tooltip({ selector: '[data-toggle=tooltip]', show: { effect: "blind", duration: 1500} });
 });
 
