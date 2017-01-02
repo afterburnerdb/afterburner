@@ -186,17 +186,17 @@ function Afterburner(){
   var ppfilter=this.expandPostProbeJFilter();
   return  `
    pre:i=0;while(1){::
-   pre:    mem32[((h1bb+(i<<2))|0)>>2]=0;::
+   pre:    mem32[((h1db+(i<<2))|0)>>2]=0;::
    pre:    i=(i+1)|0;::
-   pre:    if((i|0)>=(hashBitFilter|0)) break;::
+   pre:    if((i|0)>(hdbsize32|0)) break;::
    pre:  }::
    dec:var trav_`+jTab+`=-1;::
    pre:trav_`+jTab+`=-1; while(1){trav_`+jTab+`=trav_`+jTab+`+1|0; if((trav_`+jTab+`|0)>=`+tabLen+`) break; `+pbfilter+`;::
    pre:  hk=((`+gbind(this.onA[1])+`) & (hashBitFilter|0))|0;::
-   pre:  if (obp=mem32[((h1bb+(hk<<2))|0)>>2]|0){::
-   pre:    //while(mem32[((bp+(((hash1BucketSize+1)|0)<<2))|0)>>2]|0){::
+   pre:  if (mem8[(h1db + (hk>>3))|0] & (1<<(hk&7))){::
+   pre:  //if (obp=mem32[((h1bb+(hk<<2))|0)>>2]|0){::
+   pre:      obp=mem32[((h1bb+(hk<<2))|0)>>2]|0;::
    pre:      bp= mem32[((obp+(((hash1BucketSize+2)|0)<<2))|0)>>2]|0;::
-   pre:    //}::
    pre:    if((mem32[bp>>2]|0) >= (hash1BucketSize|0)){//extension::
    pre:      nbp=(h1tb+((curr1NumBucks) * (((hash1BucketSize+2)|0)<<2)|0))|0;
    pre:      nbp=(h1tb+(curr1NumBucks<<5))|0;::
@@ -211,6 +211,7 @@ function Afterburner(){
    pre:    bp=(h1tb+(curr1NumBucks<<5))|0;::
    pre:    curr1NumBucks=(curr1NumBucks+1)|0;::
    pre:    mem32[((h1bb+(hk<<2))|0)>>2]=bp|0;::
+   pre:    mem8[(h1db + (hk>>3))|0] = mem8[(h1db + (hk>>3))|0] | (1<<(hk&7));::
    pre:    mem32[bp>>2]=0;::
    pre:    mem32[((bp+(((hash1BucketSize+1)|0)<<2))|0)>>2]=0;::
    pre:    mem32[((bp+(((hash1BucketSize+2)|0)<<2))|0)>>2]=bp;::
@@ -223,10 +224,11 @@ function Afterburner(){
        prej:hk=((`+gbind(this.onA[0])+`) & (hashBitFilter|0))|0;::
        prej:currb=-1;::
        prej:curr=0;::
-       prej:currb=mem32[((h1bb+(hk<<2))|0)>>2]|0;::
+       prej:if(mem8[(h1db + (hk>>3))|0] & (1<<(hk&7)))::
+       prej:  currb=mem32[((h1bb+(hk<<2))|0)>>2]|0;::
        join:odidonce=0;::
-       join:while(currb | (ljoin & (!odidonce)) ){ ::
-       join:  if (currb){::    
+       join:while(((currb|0)>0) | (ljoin & (!odidonce)) ){ ::
+       join:  if ((currb|0)>0){::    
        join:    if (hasin& odidonce) break;::
        join:    if ((curr|0)>=(mem32[currb>>2]|0)){::
        join:      if (currb=mem32[(currb+(((hash1BucketSize+1)|0)<<2)|0)>>2]|0){::
@@ -239,7 +241,7 @@ function Afterburner(){
        join:      trav_`+jTab+`=mem32[((currb+(curr<<2))|0)>>2]|0;::
        join:    }::
        join:  } else trav_`+jTab+`= -666;//NULL::
-       join:  if((!(`+this.joinP+`)) & (ljoin & odidonce))  continue; ::
+       join:  if((!(`+this.joinP+`)) & (ljoin & odidonce))  continue;//todo:must guard mem lookup of null ::
        join:  `+ppfilter+`;::
        join:   odidonce=1;::`;
   }
@@ -312,15 +314,14 @@ function Afterburner(){
       dec:var otrav_`+this.fromA[0]+`=-1;::
       dec:var ntrav_`+this.fromA[0]+`=-1;::
       pre:i=0;while(1){::
-      pre:    mem32[((h2bb+(i<<2))|0)>>2]=0;::
+      pre:    mem32[((h2db+(i<<2))|0)>>2]=0;::
       pre:    i=(i+1)|0;::
-      pre:    if((i|0)>=(hashBitFilter|0)) break;::
+      pre:    if((i|0)>(hdbsize32|0)) break;::
       pre:  }::
       group:  hk=`+daHash+`;::
-      group:  if (obp=mem32[((h2bb+(hk<<2))|0)>>2]|0){::
-      group:    //while(mem32[((bp+(((hash2BucketSize+1)|0)<<2))|0)>>2]|0){::
+      group:  if (mem8[(h2db + (hk>>3))|0] & (1<<(hk&7))){::
+      group:      obp=mem32[((h2bb+(hk<<2))|0)>>2]|0;::
       group:      bp= mem32[((obp+(((hash2BucketSize+2)|0)<<2))|0)>>2]|0;::
-      group:    //}::
       group:    if((mem32[bp>>2]|0) >= (hash2BucketSize|0)){//extension::
       group:      nbp=(h2tb+(curr2NumBucks<<7))|0;::
       group:      curr2NumBucks=(curr2NumBucks+1)|0;::
@@ -331,10 +332,10 @@ function Afterburner(){
       group:      bp=nbp;::
       group:    }::
       group:  }else{//reception::
-      group:    //bp=(h2tb+(curr2NumBucks<<12))|0;::
       group:    bp=(h2tb+(curr2NumBucks<<7))|0;::
       group:    curr2NumBucks=(curr2NumBucks+1)|0;::
       group:    mem32[((h2bb+(hk<<2))|0)>>2]=bp|0;::
+      group:    mem8[(h2db + (hk>>3))|0] = mem8[(h2db + (hk>>3))|0] | (1<<(hk&7));::
       group:    mem32[bp>>2]=0;::
       group:    mem32[((bp+(((hash2BucketSize+1)|0)<<2))|0)>>2]=0;::
       group:    mem32[((bp+(((hash2BucketSize+2)|0)<<2))|0)>>2]=bp;::
@@ -367,17 +368,15 @@ function Afterburner(){
       dec:var ntrav_`+this.fromA[0]+`=-1;::
       dec:var ntrav_`+this.joinA[0]+`=-1;::
       pre:i=0;while(1){::
-      pre:    mem32[((h2bb+(i<<2))|0)>>2]=0;::
+      pre:    mem32[((h2db+(i<<2))|0)>>2]=0;::
       pre:    i=(i+1)|0;::
-      pre:    if((i|0)>=(hashBitFilter|0)) break;::
+      pre:    if((i|0)>(hdbsize32|0)) break;::
       pre:  }::
       group:  hk=`+daHash+`;::
-      group:  if (obp=mem32[((h2bb+(hk<<2))|0)>>2]|0){::
-      group:    //while(mem32[((bp+(((hash2BucketSize+1)|0)<<2))|0)>>2]|0){::
+      group:  if (mem8[(h2db + (hk>>3))|0] & (1<<(hk&7))){::
+      group:      obp=mem32[((h2bb+(hk<<2))|0)>>2]|0;::
       group:      bp= mem32[((obp+(((hash2BucketSize+2)|0)<<2))|0)>>2]|0;::
-      group:    //}::
       group:    if((((mem32[bp>>2]|0)+1)|0) >= (hash2BucketSize|0)){//extension::
-      group:      //nbp=(h2tb+(curr2NumBucks<<12))|0;::
       group:      nbp=(h2tb+(curr2NumBucks<<7))|0;::
       group:      curr2NumBucks=(curr2NumBucks+1)|0;::
       group:      mem32[((bp+((hash2BucketSize+1|0)<<2))|0)>>2]=nbp;::
@@ -390,6 +389,7 @@ function Afterburner(){
       group:    bp=(h2tb+(curr2NumBucks<<7))|0;::
       group:    curr2NumBucks=(curr2NumBucks+1)|0;::
       group:    mem32[((h2bb+(hk<<2))|0)>>2]=bp|0;::
+      group:    mem8[(h2db + (hk>>3))|0] = mem8[(h2db + (hk>>3))|0] | (1<<(hk&7));::
       group:    mem32[bp>>2]=0;::
       group:    mem32[((bp+(((hash2BucketSize+1)|0)<<2))|0)>>2]=0;::
       group:    mem32[((bp+(((hash2BucketSize+2)|0)<<2))|0)>>2]=bp;::
@@ -462,7 +462,13 @@ function Afterburner(){
   redo=-1;
   hki=-1;
   while(1){hki=hki+1|0;if ((hki|0)>=(hashBitFilter|0)) break;
-    if((currb=mem32[((h2bb+(hki<<2))|0)>>2]|0)|((redo|0)>0)){
+    dirtybyte=mem8[(h2db + (hki>>3))|0]|0;
+    if ((dirtybyte|0)==0){
+		hki=(hki+7)|0;
+		continue;
+	}
+    if((dirtybyte & (1<<(hki&7)))|((redo|0)>0)){
+      currb=mem32[((h2bb+(hki<<2))|0)>>2]|0;
       curr=2;producable=0; alarm=0;
         if ((redo|0)>0){
           hki=redo|0;
@@ -592,7 +598,13 @@ function Afterburner(){
   redo=-1;
   hki=-1;
   while(1){hki=hki+1|0;if ((hki|0)>=(hashBitFilter|0)) break;
-    if((currb=mem32[((h2bb+(hki<<2))|0)>>2]|0)|((redo|0)>0)){
+    dirtybyte=mem8[(h2db + (hki>>3))|0]|0;
+    if ((dirtybyte|0)==0){
+      hki=(hki+7)|0;
+      continue;
+    }
+    if((dirtybyte & (1<<(hki&7)))|((redo|0)>0)){ 
+      currb=mem32[((h2bb+(hki<<2))|0)>>2]|0;
       curr=1;producable=0; alarm=0;
         if ((redo|0)>0){
           hki=redo;
@@ -721,12 +733,16 @@ function Afterburner(){
   var storedB=env.storedB|0;
   var malloc_ctr=0;
   var hashBitFilter=env.hashBitFilter|0;
+  var hdbsize32=env.hdbsize32|0;
   var h1bb=env.h1bb|0;
   var h2bb=env.h2bb|0;
   var h3bb=env.h3bb|0;
   var h1tb=env.h1tb|0;
   var h2tb=env.h2tb|0;
   var h3tb=env.h3tb|0;
+  var h1db=env.h1db|0;
+  var h2db=env.h2db|0;
+  var h3db=env.h3db|0;
   var hash1BucketSize=env.hash1BucketSize|0;
   var hash2BucketSize=env.hash2BucketSize|0;
   var hash3BucketSize=env.hash3BucketSize|0;
@@ -760,6 +776,7 @@ function Afterburner(){
   var hasin=`+this.hasin+`;
   var odidonce=0;
   var isintmpstr=0;
+  var dirtybyte=0;
   `+core+`
   function hash_str(strp){
     strp=strp|0;
@@ -846,12 +863,16 @@ function Afterburner(){
 env={'temps':temps,
 'storedB':storedB,
 'hashBitFilter':hashBitFilter,
+'hdbsize32':hdbsize32,
 'h1bb':h1bb,
 'h2bb':h2bb,
 'h3bb':h3bb,
 'h1tb':h1tb,
 'h2tb':h2tb,
 'h3tb':h3tb,
+'h1db':h1db,
+'h2db':h2db,
+'h3db':h3db,
 'hash1BucketSize':hash1BucketSize,
 'hash2BucketSize':hash2BucketSize,
 'hash3BucketSize':hash3BucketSize};

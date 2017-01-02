@@ -22,26 +22,32 @@ var tmpstrStore8= new Int8Array(tmpstrStore);
 var tmpstrStoredB=0;
 //bpool
 var bufPoolMB=200;
-var temps;  
-var storemax=temps=memmax-(bufPoolMB*1024*1024);
+var temps=memmax-(bufPoolMB*1024*1024);
+var storemax=temps;
 //Hash tables
 var hashBits=23;
-var hash1BucketSize=5;
+var hashBitFilter=Math.pow(2,hashBits)-1;
 
-//var hash2BucketSize=1021;
+var hash1BucketSize=5;
 var hash2BucketSize=29;
 var hash3BucketSize=1021;
-var hashBitFilter=Math.pow(2,hashBits)-1;
+
 var bukpool=100*1024*1024;
 var hbbsize=((hashBitFilter+1)*4);
 var htbsize=bukpool;
+var hdbsize=hashBitFilter>>3;
+var hdbsize32=hashBitFilter>>5;
+
 var h1tb=storemax-htbsize;
 var h1bb=h1tb-hbbsize;
-var h2tb=h1bb-htbsize;
+var h1db=h1bb-hdbsize;
+var h2tb=h1db-htbsize;
 var h2bb=h2tb-hbbsize;
-var h3tb=h2bb-htbsize;
+var h2db=h2bb-hdbsize;
+var h3tb=h2db-htbsize;
 var h3bb=h3tb-hbbsize;
-storemax=h3bb;
+var h3db=h3bb-hdbsize;
+storemax=h3db;
 //
 function malloctmpstr(size){
   size=size|0;
@@ -135,10 +141,13 @@ if(inNode){
   global.hashBitFilter=hashBitFilter;
   global.h1tb=h1tb;
   global.h1bb=h1bb;
+  global.h1db=h1db;
   global.h2tb=h2tb;
   global.h2bb=h2bb;
+  global.h2db=h2db;
   global.h3tb=h3tb;
   global.h3bb=h3bb;
+  global.h3db=h3db;
   global.deletetmpstr=deletetmpstr;
   global.storedB=storedB;
   global.mem8=mem8;

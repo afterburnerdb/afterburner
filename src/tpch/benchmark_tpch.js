@@ -158,6 +158,8 @@ function verify_query(qnum,q,ma,noasm){
   var mya= q(noasm).toArray2();
   var name=(qnum+1);
   if (mya.length != ma.length){
+    console.log("query "+ name + " answers dont match in length!!");
+    console.log("model answer:"+ ma.length + " while query answer:"+mya.length);
     return false;
   } else {
   }
@@ -388,7 +390,7 @@ function benchmark(warmup,rounds,noasm,backend){
   }
   for (var i=0; (typeof  verifiedAA[0] !='undefined')&& i<verifiedAA[0].length; i++ ){
     tmpstr="";
-    for (var ii=0; ii<rounds;ii++){
+    for (var ii=0; ii<warmup;ii++){
       tmpstr+=verifiedAA[ii][i] +",";
     }
     console.log("query"+(i+1) + ":" + tmpstr);
