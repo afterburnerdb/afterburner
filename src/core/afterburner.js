@@ -193,9 +193,12 @@ function Afterburner(){
    dec:var trav_`+jTab+`=-1;::
    pre:trav_`+jTab+`=-1; while(1){trav_`+jTab+`=trav_`+jTab+`+1|0; if((trav_`+jTab+`|0)>=`+tabLen+`) break; `+pbfilter+`;::
    pre:  hk=((`+gbind(this.onA[1])+`) & (hashBitFilter|0))|0;::
-   pre:  if (mem8[(h1db + (hk>>3))|0] & (1<<(hk&7))){::
-   pre:  //if (obp=mem32[((h1bb+(hk<<2))|0)>>2]|0){::
-   pre:      obp=mem32[((h1bb+(hk<<2))|0)>>2]|0;::
+   pre:  if (!(mem8[(h1db + (hk>>3))|0] & (1<<(hk&7)))){:://if bit not dirty
+   pre:    mem8[(h1db + (hk>>3))|0] = mem8[(h1db + (hk>>3))|0] | (1<<(hk&7));:: //set dirty bit
+   pre:    mem32[((h1bb+(hk<<2))|0)>>2]=0;::
+   pre:  }::
+   pre:  //if (mem8[(h1db + (hk>>3))|0] & (1<<(hk&7))){::
+   pre:  if (obp=mem32[((h1bb+(hk<<2))|0)>>2]|0){::
    pre:      bp= mem32[((obp+(((hash1BucketSize+2)|0)<<2))|0)>>2]|0;::
    pre:    if((mem32[bp>>2]|0) >= (hash1BucketSize|0)){//extension::
    pre:      nbp=(h1tb+((curr1NumBucks) * (((hash1BucketSize+2)|0)<<2)|0))|0;
@@ -211,7 +214,6 @@ function Afterburner(){
    pre:    bp=(h1tb+(curr1NumBucks<<5))|0;::
    pre:    curr1NumBucks=(curr1NumBucks+1)|0;::
    pre:    mem32[((h1bb+(hk<<2))|0)>>2]=bp|0;::
-   pre:    mem8[(h1db + (hk>>3))|0] = mem8[(h1db + (hk>>3))|0] | (1<<(hk&7));::
    pre:    mem32[bp>>2]=0;::
    pre:    mem32[((bp+(((hash1BucketSize+1)|0)<<2))|0)>>2]=0;::
    pre:    mem32[((bp+(((hash1BucketSize+2)|0)<<2))|0)>>2]=bp;::
@@ -319,8 +321,11 @@ function Afterburner(){
       pre:    if((i|0)>(hdbsize32|0)) break;::
       pre:  }::
       group:  hk=`+daHash+`;::
-      group:  if (mem8[(h2db + (hk>>3))|0] & (1<<(hk&7))){::
-      group:      obp=mem32[((h2bb+(hk<<2))|0)>>2]|0;::
+      group:  if (!(mem8[(h2db + (hk>>3))|0] & (1<<(hk&7)))){:://if bit not dirty
+      group:    mem8[(h2db + (hk>>3))|0] = mem8[(h2db + (hk>>3))|0] | (1<<(hk&7));:://set dirty bit
+      group:    mem32[((h2bb+(hk<<2))|0)>>2]=0;::
+      group:  }::
+      group:  if (obp=mem32[((h2bb+(hk<<2))|0)>>2]|0){::
       group:      bp= mem32[((obp+(((hash2BucketSize+2)|0)<<2))|0)>>2]|0;::
       group:    if((mem32[bp>>2]|0) >= (hash2BucketSize|0)){//extension::
       group:      nbp=(h2tb+(curr2NumBucks<<7))|0;::
@@ -335,7 +340,6 @@ function Afterburner(){
       group:    bp=(h2tb+(curr2NumBucks<<7))|0;::
       group:    curr2NumBucks=(curr2NumBucks+1)|0;::
       group:    mem32[((h2bb+(hk<<2))|0)>>2]=bp|0;::
-      group:    mem8[(h2db + (hk>>3))|0] = mem8[(h2db + (hk>>3))|0] | (1<<(hk&7));::
       group:    mem32[bp>>2]=0;::
       group:    mem32[((bp+(((hash2BucketSize+1)|0)<<2))|0)>>2]=0;::
       group:    mem32[((bp+(((hash2BucketSize+2)|0)<<2))|0)>>2]=bp;::
@@ -373,8 +377,11 @@ function Afterburner(){
       pre:    if((i|0)>(hdbsize32|0)) break;::
       pre:  }::
       group:  hk=`+daHash+`;::
-      group:  if (mem8[(h2db + (hk>>3))|0] & (1<<(hk&7))){::
-      group:      obp=mem32[((h2bb+(hk<<2))|0)>>2]|0;::
+      group:  if (!(mem8[(h2db + (hk>>3))|0] & (1<<(hk&7)))){:://if bit not dirty
+      group:    mem8[(h2db + (hk>>3))|0] = mem8[(h2db + (hk>>3))|0] | (1<<(hk&7));:://set dirty bit
+      group:    mem32[((h2bb+(hk<<2))|0)>>2]=0;::
+      group:  }::
+      group:  if (obp=mem32[((h2bb+(hk<<2))|0)>>2]|0){::
       group:      bp= mem32[((obp+(((hash2BucketSize+2)|0)<<2))|0)>>2]|0;::
       group:    if((((mem32[bp>>2]|0)+1)|0) >= (hash2BucketSize|0)){//extension::
       group:      nbp=(h2tb+(curr2NumBucks<<7))|0;::
@@ -389,7 +396,6 @@ function Afterburner(){
       group:    bp=(h2tb+(curr2NumBucks<<7))|0;::
       group:    curr2NumBucks=(curr2NumBucks+1)|0;::
       group:    mem32[((h2bb+(hk<<2))|0)>>2]=bp|0;::
-      group:    mem8[(h2db + (hk>>3))|0] = mem8[(h2db + (hk>>3))|0] | (1<<(hk&7));::
       group:    mem32[bp>>2]=0;::
       group:    mem32[((bp+(((hash2BucketSize+1)|0)<<2))|0)>>2]=0;::
       group:    mem32[((bp+(((hash2BucketSize+2)|0)<<2))|0)>>2]=bp;::
@@ -598,12 +604,12 @@ function Afterburner(){
   redo=-1;
   hki=-1;
   while(1){hki=hki+1|0;if ((hki|0)>=(hashBitFilter|0)) break;
-    dirtybyte=mem8[(h2db + (hki>>3))|0]|0;
+    dirtybyte=mem16[(h2db + (hki>>3))>>1]|0;
     if ((dirtybyte|0)==0){
-      hki=(hki+7)|0;
+      hki=(hki+15)|0;
       continue;
     }
-    if((dirtybyte & (1<<(hki&7)))|((redo|0)>0)){ 
+    if((dirtybyte & (1<<(hki&15)))|((redo|0)>0)){ 
       currb=mem32[((h2bb+(hki<<2))|0)>>2]|0;
       curr=1;producable=0; alarm=0;
         if ((redo|0)>0){
