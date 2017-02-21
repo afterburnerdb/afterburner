@@ -5,29 +5,53 @@ if(typeof module == 'undefined'){
 } else { 
 }
 if (inNode){
-  query1 =require("q01");
-  query2 =require("q02");
-  query3 =require("q03");
-  query4 =require("q04");
-  query5 =require("q05");
-  query6 =require("q06");
-  query7 =require("q07");
-  query8 =require("q08");
-  query9 =require("q09");
-  query10=require("q10");
-  query11=require("q11");
-  query12=require("q12");
-  query13=require("q13");
-  query14=require("q14");
-  query15=require("q15");
-  query16=require("q16");
-  query17=require("q17");
-  query18=require("q18");
-  query19=require("q19");
-  query20=require("q20");
-  query21=require("q21");
-  query22=require("q22");
-
+  if (typeof tpch_f1 == 'undefined' | tpch_f1 == 1 ){
+    query1 =require("./llfsql_f1/q01");
+    query2 =require("./llfsql_f1/q02");
+    query3 =require("./llfsql_f1/q03");
+    query4 =require("./llfsql_f1/q04");
+    query5 =require("./llfsql_f1/q05");
+    query6 =require("./llfsql_f1/q06");
+    query7 =require("./llfsql_f1/q07");
+    query8 =require("./llfsql_f1/q08");
+    query9 =require("./llfsql_f1/q09");
+    query10=require("./llfsql_f1/q10");
+    query11=require("./llfsql_f1/q11");
+    query12=require("./llfsql_f1/q12");
+    query13=require("./llfsql_f1/q13");
+    query14=require("./llfsql_f1/q14");
+    query15=require("./llfsql_f1/q15");
+    query16=require("./llfsql_f1/q16");
+    query17=require("./llfsql_f1/q17");
+    query18=require("./llfsql_f1/q18");
+    query19=require("./llfsql_f1/q19");
+    query20=require("./llfsql_f1/q20");
+    query21=require("./llfsql_f1/q21");
+    query22=require("./llfsql_f1/q22");
+  } else {
+    query1 =require("./llfsql_f2/q01");
+    query2 =require("./llfsql_f2/q02");
+    query3 =require("./llfsql_f2/q03");
+    query4 =require("./llfsql_f2/q04");
+    query5 =require("./llfsql_f2/q05");
+    query6 =require("./llfsql_f2/q06");
+    query7 =require("./llfsql_f2/q07");
+    query8 =require("./llfsql_f2/q08");
+    query9 =require("./llfsql_f2/q09");
+    query10=require("./llfsql_f2/q10");
+    query11=require("./llfsql_f2/q11");
+    query12=require("./llfsql_f2/q12");
+    query13=require("./llfsql_f2/q13");
+    query14=require("./llfsql_f2/q14");
+    query15=require("./llfsql_f2/q15");
+    query16=require("./llfsql_f2/q16");
+    query17=require("./llfsql_f2/q17");
+    query18=require("./llfsql_f2/q18");
+    query19=require("./llfsql_f2/q19");
+    query20=require("./llfsql_f2/q20");
+    query21=require("./llfsql_f2/q21");
+    query22=require("./llfsql_f2/q22");
+  }
   query1_fsql =require("./fsql/q01");
   query2_fsql =require("./fsql/q02");
   query3_fsql =require("./fsql/q03");
