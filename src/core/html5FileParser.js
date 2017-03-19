@@ -8,6 +8,7 @@ if(typeof module == 'undefined'){
 //////////////////////////////////////////////////////////////////////////////
 function html5FileParser(file,funk) {
     this.file=file;
+    this.fname=null;
     this.fr = new FileReader();
     this.delim='|';
     this.eol='\r';
@@ -82,39 +83,58 @@ function html5FileParser(file,funk) {
       return parseFloat(str);
     };
     this.getFileName =function(){
-      return file.name;
+      return this.fname;
     }
   this.cleanUp = function(){
     delete this.buffer;
   }
 
-  _self=this;
+  prsSrc=this;
   $("#waitForFile").modal();
 
-  this.fr.onload = function(event) {
-    console.log("@this.fr.onload.event:"+event);
-    //
-    var tmp = new Uint8Array(_self.fr.result);
-    for (var i=0;i<tmp.byteLength;i++)
-      _self.buffer[_self.rbptr++] = tmp[i];
-    _self.readReady=true;
-    if (_self.rbptr>= _self.actualcs){
-      DEBUG('file read ready');
-      console.log('file read ready');
-      $("#waitForFile").modal('hide');
-      funk();
-    } else {
-      _self.fr.readAsArrayBuffer(_self.file.slice(_self.rbptr,_self.rbptr + _self.CHUNK_SIZE));
-    }
-  }
   this.fr.onerror = function() {
       alert('file reading error');
   };
   this.actualcs=this.file.size;
-  console.log('this.actualcs:'+this.file.size);
   this.buffer= new Uint8Array(this.file.size);
  
   this.fr.readAsArrayBuffer(file.slice(0,this.CHUNK_SIZE));
+  //
+  this.fname=this.file.name;
+  if (this.fname.match("tar.gz$") || this.fname.match(".gz$")){
+    this.fname=this.fname.replace(/.tar.gz$/,""); 
+    this.fname=this.fname.replace(/.gz$/,"");
+    this.fr.onload = function(event) {
+      //
+      var tmp = new Uint8Array(prsSrc.fr.result);
+      for (var i=0;i<tmp.byteLength;i++)
+        prsSrc.buffer[prsSrc.rbptr++] = tmp[i];
+        prsSrc.readReady=true;
+      if (prsSrc.rbptr>= prsSrc.actualcs){
+        $("#waitForFile").modal('hide');
+        prsSrc.buffer=pako.ungzip(prsSrc.buffer);
+        prsSrc.actualcs=prsSrc.buffer.byteLength;
+        funk();
+      } else {
+        prsSrc.fr.readAsArrayBuffer(prsSrc.file.slice(prsSrc.rbptr,prsSrc.rbptr + prsSrc.CHUNK_SIZE));
+      }
+    }
+  }else{
+    this.fr.onload = function(event) {
+      //
+      var tmp = new Uint8Array(prsSrc.fr.result);
+      for (var i=0;i<tmp.byteLength;i++)
+        prsSrc.buffer[prsSrc.rbptr++] = tmp[i];
+        prsSrc.readReady=true;
+      if (prsSrc.rbptr>= prsSrc.actualcs){
+        DEBUG('file read ready');
+        $("#waitForFile").modal('hide');
+        funk();
+      } else {
+        prsSrc.fr.readAsArrayBuffer(prsSrc.file.slice(prsSrc.rbptr,prsSrc.rbptr + prsSrc.CHUNK_SIZE));
+      }
+    }
+  }
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
