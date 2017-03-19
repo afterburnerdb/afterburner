@@ -6,8 +6,13 @@ if(typeof module == 'undefined'){
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
-function html5FileParser(file,funk) {
-    this.file=file;
+function html5FileParser(file,funk,n) {
+    if (file instanceof FileList){
+      if (n<file.lenght)return;
+      this.file=file[n];
+      this.filelist=file;
+      this.n=n;
+    }else this.file=file;
     this.fname=null;
     this.fr = new FileReader();
     this.delim='|';
@@ -87,10 +92,14 @@ function html5FileParser(file,funk) {
     }
   this.cleanUp = function(){
     delete this.buffer;
+    this.n++;
+    if (this.n<this.filelist.length)
+      var ds= new dataSource(this.filelist, function(){newTable= new aTable(ds);},this.n);
+    else
+      $("#waitForFile").modal('hide');
   }
 
   prsSrc=this;
-  $("#waitForFile").modal();
 
   this.fr.onerror = function() {
       alert('file reading error');
@@ -98,7 +107,7 @@ function html5FileParser(file,funk) {
   this.actualcs=this.file.size;
   this.buffer= new Uint8Array(this.file.size);
  
-  this.fr.readAsArrayBuffer(file.slice(0,this.CHUNK_SIZE));
+  this.fr.readAsArrayBuffer(this.file.slice(0,this.CHUNK_SIZE));
   //
   this.fname=this.file.name;
   if (this.fname.match("tar.gz$") || this.fname.match(".gz$")){
@@ -111,7 +120,6 @@ function html5FileParser(file,funk) {
         prsSrc.buffer[prsSrc.rbptr++] = tmp[i];
         prsSrc.readReady=true;
       if (prsSrc.rbptr>= prsSrc.actualcs){
-        $("#waitForFile").modal('hide');
         prsSrc.buffer=pako.ungzip(prsSrc.buffer);
         prsSrc.actualcs=prsSrc.buffer.byteLength;
         funk();
@@ -128,7 +136,6 @@ function html5FileParser(file,funk) {
         prsSrc.readReady=true;
       if (prsSrc.rbptr>= prsSrc.actualcs){
         DEBUG('file read ready');
-        $("#waitForFile").modal('hide');
         funk();
       } else {
         prsSrc.fr.readAsArrayBuffer(prsSrc.file.slice(prsSrc.rbptr,prsSrc.rbptr + prsSrc.CHUNK_SIZE));

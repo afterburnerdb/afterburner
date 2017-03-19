@@ -6,7 +6,7 @@ if(typeof module == 'undefined'){
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
-function dataSource(src,funk){                        
+function dataSource(src,funk,n){
   this.type="";
   this.qr=null;
   this.fname="";                                 
@@ -360,11 +360,15 @@ handyColTypes["upgrade"]=[
   }
   this.fromHTML5File= function(file,funk){//firefox browser file                  
       console.log('@fromHTML5File');
+      var currf;
+      if (file instanceof FileList)
+        currf=file[n];
+      else currf=file;
       this.type='html5';
-      this.fname=file.name;                  
-      this.file=file;                        
+      this.fname=currf.name;                  
+      this.file=currf;                        
       this.useFnameHints(this.fname);
-      this.parser=new html5FileParser(file,funk);
+      this.parser=new html5FileParser(file,funk,n);
   }
   this.fromFile = function(fname){
       var nodeFileParser= require('./nodeFileParser.js');
@@ -382,7 +386,8 @@ handyColTypes["upgrade"]=[
   }
   if (src instanceof queryResult){
     this.fromQuery(src);
-  } else if ((typeof File !=='undefined')&&(src instanceof File)){
+  } else if (((typeof File !=='undefined')&&(src instanceof File)) ||
+             ((typeof FileList !=='undefined')&&(src instanceof FileList))){
     this.fromHTML5File(src,funk);
   } else if (typeof src == 'string' && (inNode)){
     this.fromFile(src);
