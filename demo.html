@@ -6,11 +6,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <title>Afterburner Demo</title>
-
-<!--    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"> -->
     <link rel="stylesheet" href="bootstrap/css/bootstrap.min.css"> 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pako/1.0.4/pako.min.js"></script>
+
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
-    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
     <!--[if lt IE 9]>
     <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
     <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
@@ -36,7 +35,6 @@
         overflow: auto;
       }
     </style>
-
   </head>
   <body>
 
@@ -76,10 +74,17 @@
     <div class="row">
       <div class="col-md-3">
         <label class="btn btn-default btn-file" href="#" data-toggle="tooltip" data-placement="bot" title="Load a database table from a local file">
-          Load table
-          <input type="file" id="fileInput" style="display: none;"> 
+          Load a table from local disk
+          <input type="file" id="fileInput" style="display: none;" multiple> 
         </label>
       </div>
+      <div class="col-md-3">
+        <label class="btn btn-default btn-file" href="#" data-toggle="tooltip" data-placement="bot" title="Load a demo database from web">
+          Load demo tables from web
+          <button tyle="display: none;" onclick="loadWeb()"> 
+        </label>
+      </div>
+
     </div>
 
     <div class="row">
@@ -91,23 +96,44 @@
       <div class="row">
         <div class="col-md-6">
           <h2>JavaScript</h2>
-		<textarea rows="11" id="TAASM" name="TAASM" class="prettyprint form-control animated" placeholder="" ></textarea>
-		<button type="button" onclick="runASM()" class="btn btn-default" href="#" data-toggle="tooltip" data-placement="bot" title="Run code (Query)">
-                  Run ASM</button>
+		<textarea rows="11" id="TACODE" name="TACODE" class="prettyprint form-control animated" placeholder="" ></textarea>
+		<button type="button" onclick="runCODE()" class="btn btn-default" href="#" data-toggle="tooltip" data-placement="bot" title="Run code (Query)">
+                  Run CODE</button>
        </div>
         <div class="col-md-6">
           <h2>Fluent SQL</h2>
 		<textarea rows="11" id="TAFluent" name="TAFluent" class="prettyprint form-control animated linenums language-css" placeholder="Type Fluent SQL or use example buttons.."></textarea>
-		<button type="button" onclick="fluentToASM()" class="btn btn-default" href="#" data-toggle="tooltip" data-placement="bot" title="Translate Fluent into JavaScript code">
-                  Fluent to ASM</button><br>
-		<button type="button" onclick="resetFluentASMq1()" class="btn btn-default" href="#" >
-                  Q1 Fluent</button>
-		<button type="button" onclick="resetFluentASMq2()" class="btn btn-default" href="#" >
-                  Q2 Fluent</button>
-		<button type="button" onclick="resetFluentASMq3()" class="btn btn-default" href="#" >
-                  Q3 Fluent</button>
-		<button type="button" onclick="resetFluentASMq4()" class="btn btn-default" href="#" data-toggle="tooltip" data-placement="bot" title="Load Fluent SQL for Q4">
-                  Q4 Fluent</button>
+                <div class="dropdown" onchange="alert(123)">
+                  <button class="btn btn-default dropdown-toggle" onchange="alert('boom')" type="button" id="menu1" data-toggle="dropdown">Insert TPC-H Query<span class="caret"></span></button>
+                  <ul class="dropdown-menu" role="menu" aria-labelledby="menu1">
+                    <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query1">Q1</a></li>
+                    <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query2">Q2</a></li>
+                    <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query3">Q3</a></li>
+                    <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query4">Q4</a></li>
+                    <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query5">Q5</a></li>
+                    <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query6">Q6</a></li>
+                    <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query7">Q7</a></li>
+                    <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query8">Q8</a></li>
+                    <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query9">Q9</a></li>
+                    <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query10">Q10</a></li>
+                    <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query11">Q11</a></li>
+                    <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query12">Q12</a></li>
+                    <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query13">Q13</a></li>
+                    <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query14">Q14</a></li>
+                    <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query15">Q15</a></li>
+                    <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query16">Q16</a></li>
+                    <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query17">Q17</a></li>
+                    <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query18">Q18</a></li>
+                    <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query19">Q19</a></li>
+                    <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query20">Q20</a></li>
+                    <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query21">Q21</a></li>
+                    <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query22">Q22</a></li>
+                  </ul>
+                </div>
+
+
+		<button type="button" onclick="fluentToCODE()" class="btn btn-default" href="#" data-toggle="tooltip" data-placement="bot" title="Translate Fluent into JavaScript code">
+                  Fluent to CODE</button><br>
         </div>
 
       </div>
@@ -147,6 +173,7 @@
 <script src="./src/core/dataSource.js"></script>
 <script src="./src/core/common.js"></script>
 <script src="./src/core/html5FileParser.js"></script>
+<script src="./src/core/urlParser.js"></script>
 <script src="./src/frontend/myJS.js"></script>
 <script src="./src/lib/explanation.js"></script>
 
@@ -206,75 +233,52 @@
 <script>
 function myOnLoad(){
   ABi = new Afterburner();
-  document.getElementById("TAASM").value="";
+  document.getElementById("TACODE").value="";
 }
 window.onload = function() {
   inNode=false;
   var fileInput = document.getElementById('fileInput');
   fileInput.addEventListener('change', function(e) {
-    var file = fileInput.files[0];
-    var ds= new dataSource(file, function(){newTable= new aTable(ds);});
+    $("#waitForFile").modal();
+    var files = fileInput.files;
+    var ds= new dataSource(files, function(){newTable= new aTable(ds);},0);
   });
   myOnLoad();
 }
-function runASM(){
-  asmcode=document.getElementById("TAASM").value;
-  document.getElementById("console").innerHTML = "ASM=" + asmcode
+function URLList(){
+  this.list=[];
+}
+function loadWeb(){
+  var urls= new URLList();
+  urls.list=[
+    "lineitem.6001215.tbl",
+    //"lineitem.1319015.tbl.gz",
+    "nation.25.tbl",
+    "orders.1500000.tbl",
+    "part.200000.tbl",
+    "partsupp.800000.tbl",
+    "region.5.tbl",
+    "supplier.10000.tbl",
+    "customer.150000.tbl"];
+  $("#waitForFile").modal();
+  var ds= new dataSource(urls, function(){newTable= new aTable(ds);},0);
+}
+function runCODE(){
+  codecode=document.getElementById("TACODE").value;
+  document.getElementById("console").innerHTML = "CODE=" + codecode
   tt0=window.performance.now();
-  runMyAdhocCode(asmcode);
+  runMyAdhocCode(codecode);
   tt1=window.performance.now();
-  console.log('time to run asm:'+ (tt1-tt0));
+  console.log('time to run code:'+ (tt1-tt0));
 }
+function fluentToCODE(){
+        strCODE="document.getElementById(\"TACODE\").value="
+        strCODE= strCODE + document.getElementById("TAFluent").value;
 
-function resetFluentASMq1(){
-  document.getElementById("TAFluent").value=`ABi.select()
-  .from("orders")
-  .field(count("o_totalprice"))
-  .where(lt("o_totalprice",1500))
-  .toString()`;
-  fluentToASM();
-}
-function resetFluentASMq2(){
-  document.getElementById("TAFluent").value=`ABi.select()
-  .from("lineitem").join("orders").on("l_orderkey","o_orderkey")
-  .field(sum('o_totalprice'))
-  .toString()`;
-  fluentToASM();
-}
-function resetFluentASMq3(){
-  document.getElementById("TAFluent").value=`ABi.select()
-  .field("o_orderdate")
-  .field(count('o_orderkey'))
-  .from("orders")
-  .group("o_orderdate")
-  .toString()`;
-  fluentToASM();
-}
-function resetFluentASMq4(){
-  document.getElementById("TAFluent").value=`ABi.select()
-  .from("lineitem").join("orders").on("l_orderkey","o_orderkey")
-  .field("l_orderkey")
-  .field(sum('l_extendedprice'))
-  .field("o_orderdate")
-  .field("o_shippriority")
-  .where(between('o_orderdate', date('1996-01-01'), date('1996-01-31')))
-  .group("l_orderkey")
-  .group("o_orderdate")
-  .group("o_shippriority")
-  .order([-1])
-  .limit(10)
-  .toString()`;
-  fluentToASM();
-}
-/*ABi.select().from("myview").field("l_orderkey").field("revenue").field("o_orderdate").field("o_shippriority").where(eq('o_orderdate',date('1996-01-06'))).order([-1]).limit(10).toString()*/
-function fluentToASM(){
-        strASM="document.getElementById(\"TAASM\").value="
-        strASM= strASM + document.getElementById("TAFluent").value;
-
-	document.getElementById("console").innerHTML = strASM;
+	document.getElementById("console").innerHTML = strCODE;
 
 	try {
-		runMyAdhocCode(strASM);
+		runMyAdhocCode(strCODE);
 	}
 	catch(err) {
 	    document.getElementById("console").innerHTML = err.message;
@@ -301,6 +305,8 @@ function fluentToASM(){
     $("body").tooltip({ selector: '[data-toggle=tooltip]', show: { effect: "blind", duration: 1500} });
 });
 
+
+jQuery("[id*='query']").click(function(e){document.getElementById("TAFluent").value=eval(e.currentTarget.id+".toString()");e.preventDefault();});
 </script>
 
 </body>

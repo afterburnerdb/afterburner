@@ -8,7 +8,6 @@ if(typeof module == 'undefined'){
 //////////////////////////////////////////////////////////////////////////////
 function html5FileParser(file,funk,n) {
     if (file instanceof FileList){
-      if (n<file.lenght)return;
       this.file=file[n];
       this.filelist=file;
       this.n=n;
@@ -26,17 +25,7 @@ function html5FileParser(file,funk,n) {
     this.buffer=null;
     this.rbptr=0;
     this.bptr=0;
-    this.noMoreChunks=false;
 
-    //this.nextChunk =function() {
-    //    if (this.noMoreChunks) {
-    //        return false;
-    //    }
-    //    this.readReady = false;
-    //    this.sought+=this.bptr;
-    //    //this.waitForRead();
-    //    return true;
-    //};
     this.waitForRead = function(){
       while(!this.readReady){
         alert("this.readReady"+this.readReady);
@@ -102,7 +91,7 @@ function html5FileParser(file,funk,n) {
   prsSrc=this;
 
   this.fr.onerror = function() {
-      alert('file reading error');
+      console.log('file reading error');
   };
   this.actualcs=this.file.size;
   this.buffer= new Uint8Array(this.file.size);

@@ -370,6 +370,16 @@ handyColTypes["upgrade"]=[
       this.useFnameHints(this.fname);
       this.parser=new html5FileParser(file,funk,n);
   }
+  this.fromURL= function(urls,funk){
+    console.log('@fromURL');
+    this.URL=urls.list[0];
+    this.fname=this.URL;
+    var lstslsh=this.fname.lastIndexOf('/') + 1;
+    this.fname=this.fname.substring(lstslsh,this.fname.length);
+    this.type='url';
+    this.useFnameHints(this.fname);
+    this.parser=new urlParser(urls,funk);
+  }
   this.fromFile = function(fname){
       var nodeFileParser= require('./nodeFileParser.js');
       this.type='realpath';
@@ -389,6 +399,8 @@ handyColTypes["upgrade"]=[
   } else if (((typeof File !=='undefined')&&(src instanceof File)) ||
              ((typeof FileList !=='undefined')&&(src instanceof FileList))){
     this.fromHTML5File(src,funk);
+  } else if (src instanceof URLList){
+    this.fromURL(src,funk);
   } else if (typeof src == 'string' && (inNode)){
     this.fromFile(src);
   } else if (typeof src == "object" && typeof src[0] == "object" && typeof src[0].data == 'object'){

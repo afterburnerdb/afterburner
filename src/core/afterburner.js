@@ -35,7 +35,7 @@ function Afterburner(){
 //////////////////////////////////////////////////////////////////////////////
 //API
   this.from = function(param, ...rest){
-    if (param instanceof fsql2sql){
+    if ((typeof fsql2sql !=='undefined') && param instanceof fsql2sql){
         var sql= new fsql2sql();
         return sql.select().from(param, ...rest);
     }

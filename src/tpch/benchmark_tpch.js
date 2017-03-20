@@ -52,7 +52,7 @@ if (inNode){
     query21=require("./llfsql_f2/q21");
     query22=require("./llfsql_f2/q22");
   }
-  query1_fsql =require("./fsql/q01");
+  query1_fsqy =require("./fsql/q01");
   query2_fsql =require("./fsql/q02");
   query3_fsql =require("./fsql/q03");
   query4_fsql =require("./fsql/q04");
@@ -124,6 +124,7 @@ query20,
 query21,
 query22
 ]
+if (typeof query1_fsql !== 'undefined'){
 queries_fsql=[query1_fsql,
 query2_fsql,
 query3_fsql,
@@ -146,7 +147,7 @@ query19_fsql,
 query20_fsql,
 query21_fsql,
 query22_fsql
-]
+]}
 answers=[ans1,
 ans2,
 ans3,
