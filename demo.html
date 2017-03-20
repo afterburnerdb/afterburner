@@ -96,9 +96,9 @@
       <div class="row">
         <div class="col-md-6">
           <h2>JavaScript</h2>
-		<textarea rows="11" id="TACODE" name="TACODE" class="prettyprint form-control animated" placeholder="" ></textarea>
-		<button type="button" onclick="runCODE()" class="btn btn-default" href="#" data-toggle="tooltip" data-placement="bot" title="Run code (Query)">
-                  Run CODE</button>
+		<textarea rows="11" id="TAcode" name="TAcode" class="prettyprint form-control animated" placeholder="" ></textarea>
+		<button type="button" onclick="runcode()" class="btn btn-default" href="#" data-toggle="tooltip" data-placement="bot" title="Run code (Query)">
+                  Run code</button>
        </div>
         <div class="col-md-6">
           <h2>Fluent SQL</h2>
@@ -132,8 +132,8 @@
                 </div>
 
 
-		<button type="button" onclick="fluentToCODE()" class="btn btn-default" href="#" data-toggle="tooltip" data-placement="bot" title="Translate Fluent into JavaScript code">
-                  Fluent to CODE</button><br>
+		<button type="button" onclick="fluentTocode()" class="btn btn-default" href="#" data-toggle="tooltip" data-placement="bot" title="Translate Fluent into JavaScript code">
+                  Fluent to code</button><br>
         </div>
 
       </div>
@@ -233,7 +233,7 @@
 <script>
 function myOnLoad(){
   ABi = new Afterburner();
-  document.getElementById("TACODE").value="";
+  document.getElementById("TAcode").value="";
 }
 window.onload = function() {
   inNode=false;
@@ -251,7 +251,6 @@ function URLList(){
 function loadWeb(){
   var urls= new URLList();
   urls.list=[
-    //"lineitem.6001215.tbl.gz",
     "https://github.com/lintool/afterburner-data/raw/master/lineitem.1319015.tbl.gz",
     "https://github.com/lintool/afterburner-data/raw/master/nation.25.tbl.gz",
     "https://github.com/lintool/afterburner-data/raw/master/orders.1500000.tbl.gz",
@@ -263,26 +262,26 @@ function loadWeb(){
   $("#waitForFile").modal();
   var ds= new dataSource(urls, function(){newTable= new aTable(ds);},0);
 }
-function runCODE(){
-  codecode=document.getElementById("TACODE").value;
-  document.getElementById("console").innerHTML = "CODE=" + codecode
+function runcode(){
+  codecode=document.getElementById("TAcode").value;
+  document.getElementById("console").innerHTML = "code=" + codecode;
   tt0=window.performance.now();
   runMyAdhocCode(codecode);
   tt1=window.performance.now();
   console.log('time to run code:'+ (tt1-tt0));
 }
-function fluentToCODE(){
-        strCODE="document.getElementById(\"TACODE\").value="
-        strCODE= strCODE + document.getElementById("TAFluent").value;
-
-	document.getElementById("console").innerHTML = strCODE;
-
-	try {
-		runMyAdhocCode(strCODE);
-	}
-	catch(err) {
-	    document.getElementById("console").innerHTML = err.message;
-	}
+function fluentTocode(){
+  var strcode="document.getElementById(\"TAcode\").value=";
+  strcode= strcode + document.getElementById("TAFluent").value;
+  
+  document.getElementById("console").innerHTML = strcode;
+  
+  try {
+  	runMyAdhocCode(strcode);
+  }
+  catch(err) {
+      document.getElementById("console").innerHTML = err.message;
+  }
 }
 </script>
 

@@ -131,6 +131,13 @@ app.get(/.*html$/, function (req, res) {
 app.get(/.*bootstrap.*/, function (req, res) {
    res.sendFile(req.originalUrl,{root:'../..'});
 })
+app.get(/.*gz$/, function (req, res) {
+   res.sendFile(req.originalUrl,{root:'../..'});
+})
+app.get(/.*tbl$/, function (req, res) {
+   res.sendFile(req.originalUrl,{root:'../..'});
+})
+
 
 app.use(function(req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");

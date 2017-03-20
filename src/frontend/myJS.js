@@ -354,7 +354,6 @@ function mycompstr(str1,str2){
   return (mem8[(str1+i)|0]-mem8[(str2+i)|0]);
  }
 
-
 function create_order(colname,tabname){
   ptr=daSchema.getColPByName(colname,[tabname]);
   type=daSchema.getColTypByName(colname,[tabname]);
@@ -390,29 +389,10 @@ function mystrcmplit( str1 , str2){
   }while (true);
 }
 
-/*
-function strToString(str){
-  str=str|0;
-  ret="";
-  var i = i|0;
-  while (mem8[(str+i)|0]){
-    ret+=String.fromCharCode(mem8[(str+i)|0]|0);
-    i=(i+1)|0;
-  }
-  return ret;
-}*/
-
-//tabToLoad=['/home/kelgebaly/data/1gb/lineitem.6001215.tbl',
-//             '/home/kelgebaly/data/1gb/orders.1500000.tbl'];
-
 function loadTables(tabToLoad){
 if (inNode){
   var aTable=require('aTable.js');
   var dataSource=require('dataSource.js');
-
-//  tabToLoad=['/home/kelgebaly/data/100gb/myview.1934396.tbl'];
-//  tabToLoad=['./data/lineitem.100.tbl',
-//             './data/orders.100.tbl'];
   for (var i=0;i<tabToLoad.length;i++){
     var ds = new dataSource(tabToLoad[i]);
     newTable= new aTable(ds);

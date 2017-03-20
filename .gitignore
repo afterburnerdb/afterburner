@@ -4,5 +4,6 @@
 *.blg
 *.bak
 *.zip
+*.gz
 node_modules
 src/node_modules/
