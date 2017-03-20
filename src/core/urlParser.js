@@ -82,7 +82,6 @@ function urlParser(urls,funk) {
   }
 
   prsSrc=this;
-
   this.req.open("GET", this.url, true);
   this.req.responseType = "arraybuffer";
 
@@ -94,7 +93,7 @@ function urlParser(urls,funk) {
   //
   if (this.url.match("tar.gz$") || this.url.match(".gz$")){
     this.req.onload = function (event) {
-      if((prsSrc.req.response.byteLength==0) || (presSrc.req.readyState == 4)){
+      if((prsSrc.req.response.byteLength==0) || (prsSrc.req.readyState != 4)){
         //console.log("Error @urlParse deadlink? url:"+prsSrc.url);
         //prsSrc.cleanUp();
         return;
@@ -105,7 +104,7 @@ function urlParser(urls,funk) {
     }
   }else{
     this.req.onload = function (event){
-      if((prsSrc.req.response.byteLength==0) || (presSrc.req.readyState == 4)){
+      if((prsSrc.req.response.byteLength==0) || (prsSrc.req.readyState != 4)){
         //console.log("Error @urlParse deadlink? url:"+prsSrc.url);
         //prsSrc.cleanUp();
         return;

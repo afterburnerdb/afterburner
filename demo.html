@@ -251,14 +251,14 @@ function URLList(){
 function loadWeb(){
   var urls= new URLList();
   urls.list=[
-    "https://github.com/lintool/afterburner-data/raw/master/lineitem.1319015.tbl.gz",
-    "https://github.com/lintool/afterburner-data/raw/master/nation.25.tbl.gz",
-    "https://github.com/lintool/afterburner-data/raw/master/orders.1500000.tbl.gz",
-    "https://github.com/lintool/afterburner-data/raw/master/part.200000.tbl.gz",
-    "https://github.com/lintool/afterburner-data/raw/master/partsupp.800000.tbl.gz",
-    "https://github.com/lintool/afterburner-data/raw/master/region.5.tbl.gz",
-    "https://github.com/lintool/afterburner-data/raw/master/supplier.10000.tbl.gz",
-    "https://github.com/lintool/afterburner-data/raw/master/customer.150000.tbl.gz"];
+    "https://lintool.github.io/afterburner-data/lineitem.1319015.tbl.gz",
+    "https://lintool.github.io/afterburner-data/nation.25.tbl.gz",
+    "https://lintool.github.io/afterburner-data/orders.1500000.tbl.gz",
+    "https://lintool.github.io/afterburner-data/part.200000.tbl.gz",
+    "https://lintool.github.io/afterburner-data/partsupp.800000.tbl.gz",
+    "https://lintool.github.io/afterburner-data/region.5.tbl.gz",
+    "https://lintool.github.io/afterburner-data/supplier.10000.tbl.gz",
+    "https://lintool.github.io/afterburner-data/customer.150000.tbl.gz"];
   $("#waitForFile").modal();
   var ds= new dataSource(urls, function(){newTable= new aTable(ds);},0);
 }
