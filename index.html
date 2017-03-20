@@ -5,17 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <title>Afterburner Demo</title>
-
-<!--    <link rel="stylesheet" href="bootstrap/bootstrap.min.css">-->
-<!--    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"> -->
     <link rel="stylesheet" href="bootstrap/css/bootstrap.min.css"> 
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
-    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
     <!--[if lt IE 9]>
     <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
     <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
     <![endif]-->
-
   </head>
   <body>
     <nav class="navbar navbar-inverse navbar-fixed-top">
@@ -46,13 +41,19 @@
         <h1>Afterburner</h1>
         <p class="lead">A proof-of-concept in-browser JavaScript-based Analytical RDBMS</p>
       </div>
-      <p>Afterburner is a proof-of-concept in-browser relational analytics system that explores the idea of implementing an analytical RDBMS in pure JavaScript so
-that it runs completely inside a browser with no external dependencies. 
-Afterburner, generates compiled query plans that exploit typed arrays and asm.js, two relatively recent advances in JavaScript. </p>
+      <p>Afterburner is a proof-of-concept in-browser relational analytics system that
+         explores the idea of implementing an analytical RDBMS in pure JavaScript so
+         that it runs completely inside a browser with no external dependencies.</p>
       <p>For more details, see:</p>
       <ul>
-       <li>Kareem El Gebaly and Jimmy Lin. <a href="http://arxiv.org/abs/1605.04035">Afterburner: The Case for In-Browser Analytics</a> <i>arXiv:1605.04035</i>, May 2016. </li>
+        <li>Kareem El Gebaly and Jimmy Lin. <a href="http://arxiv.org/abs/1605.04035">Afterburner: The Case for In-Browser Analytics</a> <i>arXiv:1605.04035</i>, May 2016. 
+        </li>
       </ul>
+      <ul>
+        <li>Kareem El Gebaly and Jimmy Lin. <a href="">In-Browser Interactive SQL Analytics with Afterburner</a> <i>Proceedings of the 2017 ACM SIGMOD International Conference on Management of Data (SIGMOD 2017)</i>, May 2017. (demo)
+        </li>
+      </ul>
+
       <hr>
       <p> In this <a href="./demo.html">demo</a> we have prepared for you two files for the TPC-H tables at 1GB scale.</p>
       <ul>
@@ -62,19 +63,13 @@ Afterburner, generates compiled query plans that exploit typed arrays and asm.js
      <p> We have tested Afterburner using the following web browsers:</p>
      <ul>
       <li><a href https://www.mozilla.org/en-US/firefox/all/>FireFox (64-bit)</a></li>
-      <li><a href http://www.opera.com/download/guide/?ver=12.17>Google Chrome (64-bit)</a></li>
-      <li><a href https://www.google.com/chrome/browser/thankyou.html?platform=win64&statcb=1&extra=betachannel&installdataindex=defaultbrowser>Opera (64-bit)</a></li>
+      <!--<li><a href http://www.opera.com/download/guide/?ver=12.17>Google Chrome (64-bit)</a></li>
+      <li><a href https://www.google.com/chrome/browser/thankyou.html?platform=win64&statcb=1&extra=betachannel&installdataindex=defaultbrowser>Opera (64-bit)</a></li>-->
      </ul>
-<!--     <p>We have tested Afterburner using the following Operating Systems:</p>
-     <ul>
-      <li>Mac (OS X)</li>
-      <li>Ubuntu Linux</li>
-      <li>Windows 10</li>
-     </ul>-->
 
-     <p>We recomend using clients with 6-8 GB of physical memory.</p>
+     <p>We recomend using clients with 4 GB of free memory.</p>
+     <p>We recomend using Firefox for asm.js support.</p>
     </div>
-<!--    </div> -->
   </div> <!-- /container -->
 
 
@@ -86,7 +81,6 @@ Afterburner, generates compiled query plans that exploit typed arrays and asm.js
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.2/jquery.min.js"></script>
 
 <script src="bootstrap/js/bootstrap.min.js"></script>
-<!--<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script> -->
 
 <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
 <script src="https://maxcdn.bootstrapcdn.com/js/ie10-viewport-bug-workaround.js"></script>

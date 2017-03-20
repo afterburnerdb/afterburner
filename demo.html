@@ -251,15 +251,15 @@ function URLList(){
 function loadWeb(){
   var urls= new URLList();
   urls.list=[
-    "lineitem.6001215.tbl",
-    //"lineitem.1319015.tbl.gz",
-    "nation.25.tbl",
-    "orders.1500000.tbl",
-    "part.200000.tbl",
-    "partsupp.800000.tbl",
-    "region.5.tbl",
-    "supplier.10000.tbl",
-    "customer.150000.tbl"];
+    //"lineitem.6001215.tbl.gz",
+    "https://github.com/lintool/afterburner-data/raw/master/lineitem.1319015.tbl.gz",
+    "https://github.com/lintool/afterburner-data/raw/master/nation.25.tbl.gz",
+    "https://github.com/lintool/afterburner-data/raw/master/orders.1500000.tbl.gz",
+    "https://github.com/lintool/afterburner-data/raw/master/part.200000.tbl.gz",
+    "https://github.com/lintool/afterburner-data/raw/master/partsupp.800000.tbl.gz",
+    "https://github.com/lintool/afterburner-data/raw/master/region.5.tbl.gz",
+    "https://github.com/lintool/afterburner-data/raw/master/supplier.10000.tbl.gz",
+    "https://github.com/lintool/afterburner-data/raw/master/customer.150000.tbl.gz"];
   $("#waitForFile").modal();
   var ds= new dataSource(urls, function(){newTable= new aTable(ds);},0);
 }
