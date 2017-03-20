@@ -87,18 +87,29 @@ function urlParser(urls,funk) {
   this.req.responseType = "arraybuffer";
 
   this.req.onerror = function() {
-      console.log('url reading error');
+    console.log("Error @urlParse can't read from url:"+prsSrc.url);
+    prsSrc.cleanUp();
   };
 
   //
   if (this.url.match("tar.gz$") || this.url.match(".gz$")){
     this.req.onload = function (event) {
+      if((prsSrc.req.response.byteLength==0) || (presSrc.req.readyState == 4)){
+        //console.log("Error @urlParse deadlink? url:"+prsSrc.url);
+        //prsSrc.cleanUp();
+        return;
+      }
       prsSrc.buffer=pako.ungzip(new Uint8Array(prsSrc.req.response));
       prsSrc.actualcs=prsSrc.buffer.byteLength;
       funk();
     }
   }else{
     this.req.onload = function (event){
+      if((prsSrc.req.response.byteLength==0) || (presSrc.req.readyState == 4)){
+        //console.log("Error @urlParse deadlink? url:"+prsSrc.url);
+        //prsSrc.cleanUp();
+        return;
+      }
       prsSrc.buffer=new Uint8Array(prsSrc.req.response);  
       prsSrc.actualcs=prsSrc.buffer.byteLength;
       funk();
