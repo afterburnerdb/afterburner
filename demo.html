@@ -93,14 +93,7 @@
         </div>
         <div>
       </div>
-      <div class="row">
-        <div class="col-md-6">
-          <h2>JavaScript</h2>
-		<textarea rows="11" id="TAcode" name="TAcode" class="prettyprint form-control animated" placeholder="" ></textarea>
-		<button type="button" onclick="runcode()" class="btn btn-default" href="#" data-toggle="tooltip" data-placement="bot" title="Run code (Query)">
-                  Run code</button>
-       </div>
-        <div class="col-md-6">
+        <div class="col-md-12">
           <h2>Fluent SQL</h2>
 		<textarea rows="11" id="TAFluent" name="TAFluent" class="prettyprint form-control animated linenums language-css" placeholder="Type Fluent SQL or use example buttons.."></textarea>
                 <div class="dropdown" onchange="alert(123)">
@@ -132,8 +125,8 @@
                 </div>
 
 
-		<button type="button" onclick="fluentTocode()" class="btn btn-default" href="#" data-toggle="tooltip" data-placement="bot" title="Translate Fluent into JavaScript code">
-                  Fluent to code</button><br>
+		<button type="button" onclick="runcode()" class="btn btn-default" href="#" data-toggle="tooltip" data-placement="bot" title="Run code (Query)">
+                  Run code</button>
         </div>
 
       </div>
@@ -147,7 +140,7 @@
     <br>
     <div class="row" id="divconsole">
       <div class="col-md-12">
-        <p id="console">Console area!</p>
+        <p id="console"></p>
       </div>
 <!--    </div> -->
   </div> <!-- /container -->
@@ -175,7 +168,6 @@
 <script src="./src/core/html5FileParser.js"></script>
 <script src="./src/core/urlParser.js"></script>
 <script src="./src/frontend/myJS.js"></script>
-<script src="./src/lib/explanation.js"></script>
 
 <!-- TPC-H -->
 
@@ -233,7 +225,6 @@
 <script>
 function myOnLoad(){
   ABi = new Afterburner();
-  document.getElementById("TAcode").value="";
 }
 window.onload = function() {
   inNode=false;
@@ -263,25 +254,19 @@ function loadWeb(){
   var ds= new dataSource(urls, function(){newTable= new aTable(ds);},0);
 }
 function runcode(){
-  codecode=document.getElementById("TAcode").value;
-  document.getElementById("console").innerHTML = "code=" + codecode;
-  tt0=window.performance.now();
+  var codecode=document.getElementById("TAFluent").value;
+//  document.getElementById("console").innerHTML = "code=" + codecode;
+  var tt0=window.performance.now();
   runMyAdhocCode(codecode);
-  tt1=window.performance.now();
-  console.log('time to run code:'+ (tt1-tt0));
+  var tt1=window.performance.now();
+  var ttot=tt1-tt0;
+  document.getElementById("console").innerHTML = "Total time to run (ms)=" + (ttot);
+  console.log('time to run code:'+ (ttot));
 }
-function fluentTocode(){
-  var strcode="document.getElementById(\"TAcode\").value=";
-  strcode= strcode + document.getElementById("TAFluent").value;
-  
-  document.getElementById("console").innerHTML = strcode;
-  
-  try {
-  	runMyAdhocCode(strcode);
-  }
-  catch(err) {
-      document.getElementById("console").innerHTML = err.message;
-  }
+function printtable(htmltable){
+  divcons=document.getElementById("divcons");
+  clearElement(divcons);
+  divcons.appendChild(htmltable);
 }
 </script>
 
@@ -305,7 +290,11 @@ function fluentTocode(){
 });
 
 
-jQuery("[id*='query']").click(function(e){document.getElementById("TAFluent").value=eval(e.currentTarget.id+".toString()");e.preventDefault();});
+jQuery("[id*='query']").click(function(e){
+                                var toeval=e.currentTarget.id+".toString().replace(/;/g,'').replace(/noasm/g,'').replace('\"q_sums\",300','\"q_sums\",200').replace(/}\w*/,'').replace('return','').replace(/function query.*{/,'')";
+                                document.getElementById("TAFluent")
+                                  .value=eval(toeval)+"  .materialize();\nprinttable(res.toHTMLTableN(100))";
+                                  e.preventDefault();});
 </script>
 
 </body>
