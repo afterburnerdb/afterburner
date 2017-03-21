@@ -135,7 +135,7 @@ function queryResult(tempsptr) {
     };
     this.toHTMLTableN = function(num) {
       var table=document.createElement('table');
-      table.setAttribute('class',"table table-bordered table-condensed table-nonfluid");
+      table.setAttribute('class',"table table-bordered table-condensed table-nonfluid table-striped table-hover");
 
       var thead = table.createTHead();
       thead.setAttribute('class',"thead-default");
@@ -156,7 +156,7 @@ function queryResult(tempsptr) {
             td.appendChild(document.createTextNode(""+mem32[(this.cols[ii] + (i<<2))>>2]));
             td.align="right";
           } else if (this.coltypes[ii]==1){
-            td.appendChild(document.createTextNode(""+memF32[(this.cols[ii] + (i<<2))>>2]/*.toFixed(10)*/));
+            td.appendChild(document.createTextNode(""+memF32[(this.cols[ii] + (i<<2))>>2].toFixed(2)));
             td.align="right";
           } else if (this.coltypes[ii]==2){
             td.appendChild(document.createTextNode(strToString(mem32[(this.cols[ii] + (i<<2))>>2])));
