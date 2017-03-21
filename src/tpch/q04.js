@@ -17,7 +17,7 @@ function query4(noasm){
   
   return ABi.select()
     .from("orders").join(distinct_orders).on("o_orderkey","l_orderkey")
-    .field("o_orderpriority", _count("o_orderpriority"))
+    .field("o_orderpriority", _as(_count("o_orderpriority"),'order_count'))
     .where(
       _gte("o_orderdate", _date("1993-07-01")),
       _lt("o_orderdate", _date( "1993-10-01")))

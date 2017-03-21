@@ -38,7 +38,7 @@ function query9(noasm){
   
   return ABi.select()
    .from(profit)
-   .field("nation","o_year",_sum("amount"))
+   .field("nation","o_year",_as(_sum("amount"),'sum_profit'))
    .group("nation","o_year")
    .order("nation","-o_year")
 }

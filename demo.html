@@ -31,10 +31,15 @@
         width: auto !important;
       }
       .table-responsive {
-        max-height: 150px;
         overflow: auto;
       }
+
     </style>
+<!--      .table-responsive {
+        max-height: 150px;
+        overflow: auto;
+      }-->
+
   </head>
   <body>
 
@@ -84,64 +89,62 @@
           <button tyle="display: none;" onclick="loadWeb()"> 
         </label>
       </div>
-
     </div>
 
-    <div class="row">
-        <div class="col-md-12">
-        <div id="sconsole" class="table-responsive">
-        </div>
-        <div>
-      </div>
-        <div class="col-md-12">
-          <h2>Fluent SQL</h2>
-		<textarea rows="11" id="TAFluent" name="TAFluent" class="prettyprint form-control animated linenums language-css" placeholder="Type Fluent SQL or use example buttons.."></textarea>
-                <div class="dropdown" onchange="alert(123)">
-                  <button class="btn btn-default dropdown-toggle" onchange="alert('boom')" type="button" id="menu1" data-toggle="dropdown">Insert TPC-H Query<span class="caret"></span></button>
-                  <ul class="dropdown-menu" role="menu" aria-labelledby="menu1">
-                    <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query1">Q1</a></li>
-                    <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query2">Q2</a></li>
-                    <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query3">Q3</a></li>
-                    <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query4">Q4</a></li>
-                    <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query5">Q5</a></li>
-                    <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query6">Q6</a></li>
-                    <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query7">Q7</a></li>
-                    <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query8">Q8</a></li>
-                    <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query9">Q9</a></li>
-                    <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query10">Q10</a></li>
-                    <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query11">Q11</a></li>
-                    <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query12">Q12</a></li>
-                    <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query13">Q13</a></li>
-                    <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query14">Q14</a></li>
-                    <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query15">Q15</a></li>
-                    <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query16">Q16</a></li>
-                    <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query17">Q17</a></li>
-                    <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query18">Q18</a></li>
-                    <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query19">Q19</a></li>
-                    <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query20">Q20</a></li>
-                    <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query21">Q21</a></li>
-                    <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query22">Q22</a></li>
-                  </ul>
-                </div>
-
-
-		<button type="button" onclick="runcode()" class="btn btn-default" href="#" data-toggle="tooltip" data-placement="bot" title="Run code (Query)">
-                  Run code</button>
-        </div>
-
-      </div>
-       <div class="row"><div class="col-xs-12" style="height:50px;"></div></div>
-       <div class="row">
-        <div class="col-md-12">
-          <div id="divcons" class="table-responsive"> </div>
-        </div>
-      </div>
+    <div class="col-md-12">
+      <h2>Fluent SQL</h2>
+    	<textarea rows="11" id="TAFluent" name="TAFluent" class="prettyprint form-control animated linenums language-css" placeholder="Type Fluent SQL or use example buttons.."></textarea>
+            <div class="dropdown">
+              <button class="btn btn-default dropdown-toggle" onchange="alert('boom')" type="button" id="menu1" data-toggle="dropdown">Insert TPC-H Query<span class="caret"></span></button>
+              <ul class="dropdown-menu" role="menu" aria-labelledby="menu1">
+                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query1">Q1</a></li>
+                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query2">Q2</a></li>
+                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query3">Q3</a></li>
+                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query4">Q4</a></li>
+                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query5">Q5</a></li>
+                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query6">Q6</a></li>
+                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query7">Q7</a></li>
+                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query8">Q8</a></li>
+                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query9">Q9</a></li>
+                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query10">Q10</a></li>
+                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query11">Q11</a></li>
+                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query12">Q12</a></li>
+                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query13">Q13</a></li>
+                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query14">Q14</a></li>
+                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query15">Q15</a></li>
+                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query16">Q16</a></li>
+                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query17">Q17</a></li>
+                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query18">Q18</a></li>
+                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query19">Q19</a></li>
+                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query20">Q20</a></li>
+                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query21">Q21</a></li>
+                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query22">Q22</a></li>
+              </ul>
+            </div>
+            <button type="button" onclick="runcode()" class="btn btn-default" href="#" data-toggle="tooltip" data-placement="bot" title="Run code (Query)"> Run code</button>
+    </div>
 
     <br>
     <div class="row" id="divconsole">
       <div class="col-md-12">
         <p id="console"></p>
       </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-12">
+        <div id="divcons" class="table-responsive">
+        </div>
+      </div>
+    </div>
+
+<!--    <div class="row">
+        <div class="col-md-12">
+        <div id="sconsole" class="table-responsive">
+        </div>
+        <div>
+      </div> -->
+
 <!--    </div> -->
   </div> <!-- /container -->
 

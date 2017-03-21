@@ -10,7 +10,7 @@ if(typeof module == 'undefined'){
 function query19(noasm){
   return ABi.select()
    .from("lineitem").join("part").on("l_partkey","p_partkey")
-   .field(_sum(_mul("l_extendedprice",_sub(1,"l_discount"))))
+   .field(_as(_sum(_mul("l_extendedprice",_sub(1,"l_discount"))),'revenue'))
    .where(_or(
      _and(_eq("p_brand",'Brand#12'),
      _isin("p_container",['SM CASE', 'SM BOX', 'SM PACK', 'SM PKG']),

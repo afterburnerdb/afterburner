@@ -11,8 +11,8 @@ function query14(noasm){
 
   return ABi.select()
   .from("lineitem").join("part").on("l_partkey","p_partkey")
-  .field(_postdiv(_sumif(_mul("l_extendedprice", _sub(1,"l_discount")),_like("p_type", 'PROMO%')), 
-         _sum(_mul("l_extendedprice", _sub(1,"l_discount")))))
+  .field(_as(_postdiv(_sumif(_mul("l_extendedprice", _sub(1,"l_discount")),_like("p_type", 'PROMO%')), 
+         _sum(_mul("l_extendedprice", _sub(1,"l_discount")))),'promo_revenue'))
   .where(_gte("l_shipdate", _date('1995-09-01')),
          _lt("l_shipdate", _date('1995-10-01')));
 }

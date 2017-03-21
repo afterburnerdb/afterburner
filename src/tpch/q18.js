@@ -28,7 +28,7 @@ function query18(noasm){
 
   return ABi.select()
     .from("lineitem").join(ord_cus).on("l_orderkey","o_orderkey")
-    .field("c_name","c_custkey","o_orderkey","o_orderdate","o_totalprice",_sum("l_quantity"))
+    .field("c_name","c_custkey","o_orderkey","o_orderdate","o_totalprice",_as(_sum("l_quantity"),'sum_qty'))
     .group("c_name","c_custkey","o_orderkey","o_orderdate","o_totalprice")
     .order("-o_totalprice","o_orderdate")
     .limit(100)

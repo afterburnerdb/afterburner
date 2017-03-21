@@ -154,14 +154,17 @@ function queryResult(tempsptr) {
           var td = document.createElement('td');
           if (this.coltypes[ii]==0){
             td.appendChild(document.createTextNode(""+mem32[(this.cols[ii] + (i<<2))>>2]));
+            td.align="right";
           } else if (this.coltypes[ii]==1){
-            td.appendChild(document.createTextNode(""+memF32[(this.cols[ii] + (i<<2))>>2]));
+            td.appendChild(document.createTextNode(""+memF32[(this.cols[ii] + (i<<2))>>2]/*.toFixed(10)*/));
+            td.align="right";
           } else if (this.coltypes[ii]==2){
             td.appendChild(document.createTextNode(strToString(mem32[(this.cols[ii] + (i<<2))>>2])));
           } else if (this.coltypes[ii]==3){
             td.appendChild(document.createTextNode(""+int_to_strdate(mem32[(this.cols[ii] + (i<<2))>>2])));
           } else if (this.coltypes[ii]==4){
             td.appendChild(document.createTextNode(""+int_to_strchar(mem32[(this.cols[ii] + (i<<2))>>2])));
+            td.align="right";
           } else{
             alert("unknown type");
           }
