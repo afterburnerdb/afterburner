@@ -9,7 +9,7 @@ if(typeof module == 'undefined'){
 
 function query14(noasm){
 
-  return ABi.select()
+  return abdb.select()
   .from("lineitem").join("part").on("l_partkey","p_partkey")
   .field(_postdiv(_sumif(_mul("l_extendedprice", _sub(1,"l_discount")),_like("p_type", 'PROMO%')), 
          _sum(_mul("l_extendedprice", _sub(1,"l_discount")))))

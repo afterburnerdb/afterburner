@@ -91,7 +91,8 @@ function aSchema(){
 
   this.toHTMLTable = function() {
     var table=document.createElement('table');
-    table.setAttribute('class',"table table-bordered table-condensed table-nonfluid");
+    table.setAttribute('id',"schemaTab");
+    table.setAttribute('class',"table table-bordered table-condensed table-nonfluid table-striped table-hover");
 
     var thead = table.createTHead();
     thead.setAttribute('class',"thead-default");

@@ -315,7 +315,7 @@
 
 <script>
 function myOnLoad(){
-  ABi = new Afterburner();
+  abdb = new Afterburner();
   FSi = new fsql2sql();
   document.getElementById("TAASM").value="";
 }
@@ -339,7 +339,7 @@ function runASM(){
 }
 
 function resetFluentASMq1(){
-  document.getElementById("TAFluent").value=`ABi.select()
+  document.getElementById("TAFluent").value=`abdb.select()
   .from("orders")
   .field(count("o_totalprice"))
   .where(lt("o_totalprice",1500))
@@ -347,14 +347,14 @@ function resetFluentASMq1(){
   fluentToASM();
 }
 function resetFluentASMq2(){
-  document.getElementById("TAFluent").value=`ABi.select()
+  document.getElementById("TAFluent").value=`abdb.select()
   .from("lineitem").join("orders").on("l_orderkey","o_orderkey")
   .field(sum('o_totalprice'))
   .toString()`;
   fluentToASM();
 }
 function resetFluentASMq3(){
-  document.getElementById("TAFluent").value=`ABi.select()
+  document.getElementById("TAFluent").value=`abdb.select()
   .field("o_orderdate")
   .field(count('o_orderkey'))
   .from("orders")
@@ -363,7 +363,7 @@ function resetFluentASMq3(){
   fluentToASM();
 }
 function resetFluentASMq4(){
-  document.getElementById("TAFluent").value=`ABi.select()
+  document.getElementById("TAFluent").value=`abdb.select()
   .from("lineitem").join("orders").on("l_orderkey","o_orderkey")
   .field("l_orderkey")
   .field(sum('l_extendedprice'))
@@ -378,7 +378,7 @@ function resetFluentASMq4(){
   .toString()`;
   fluentToASM();
 }
-/*ABi.select().from("myview").field("l_orderkey").field("revenue").field("o_orderdate").field("o_shippriority").where(eq('o_orderdate',date('1996-01-06'))).order([-1]).limit(10).toString()*/
+/*abdb.select().from("myview").field("l_orderkey").field("revenue").field("o_orderdate").field("o_shippriority").where(eq('o_orderdate',date('1996-01-06'))).order([-1]).limit(10).toString()*/
 function fluentToASM(){
         strASM="document.getElementById(\"TAASM\").value="
         strASM= strASM + document.getElementById("TAFluent").value;

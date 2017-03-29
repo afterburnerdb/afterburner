@@ -8,23 +8,23 @@ if(typeof module == 'undefined'){
 //////////////////////////////////////////////////////////////////////////////
 
 function query11(noasm){
-  sup_nat=ABi.select()
+  sup_nat=abdb.select()
     .from("supplier").join("nation").on("s_nationkey","n_nationkey")
     .field("s_suppkey")
     .where(_eq("n_name",'UNITED KINGDOM'))
     .materialize(noasm);
 
-  ps_sup=ABi.select()
+  ps_sup=abdb.select()
     .from("partsupp").join(sup_nat).on("ps_suppkey","s_suppkey")
     .field("ps_partkey",_as(_sum(_mul("ps_supplycost","ps_availqty")),"value"))
     .group("ps_partkey")
     .materialize(noasm);
 
-  thresh=ABi.select()
+  thresh=abdb.select()
     .from(ps_sup)
     .field(_sum("value")).eval(noasm);
 
-  return ABi.select()
+  return abdb.select()
     .from(ps_sup)
     .field("ps_partkey","value")
     .where(_gt("value",thresh*0.0001))

@@ -38,9 +38,16 @@ function printSchema(){
   if(inNode){
     console.log(daSchema.toString());
   } else {
-    scons=document.getElementById("sconsole");
+    var scons=document.getElementById("sconsole");
     clearElement(scons);
     scons.appendChild(daSchema.toHTMLTable());
+  }
+}
+
+function unPrintSchema(){
+  if(!inNode){
+    scons=document.getElementById("sconsole");
+    clearElement(scons);
   }
 }
 function get_time_ms(){

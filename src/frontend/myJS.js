@@ -3,7 +3,7 @@ var inBrowser=!inNode;
 var newTable;
 var indices;
 var orders;
-var ABi;
+var abdb;
 var ptr2srt = ptr2srt |0;
 
 
@@ -12,10 +12,10 @@ if (inNode){
   var aSchema=require('aSchema');
   var Afterburner=require('afterburner.js').Afterburner;
   global.queryResult=require('queryResult.js');
-  ABi = new Afterburner();
+  abdb = new Afterburner();
   FSi = new fsql2sql();
   global.daSchema = new aSchema();
-  global.ABi=ABi;
+  global.abdb=abdb;
   printSchema=require('common.js').printSchema;
   alert=function(x){console.log(x);};
 }else{

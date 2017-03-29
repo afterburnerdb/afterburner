@@ -8,7 +8,7 @@ if(typeof module == 'undefined'){
 //////////////////////////////////////////////////////////////////////////////
 
 function query1(noasm){
-return ABi.select()
+return abdb.select()
   .from('lineitem')
   .field('l_returnflag',
     'l_linestatus',

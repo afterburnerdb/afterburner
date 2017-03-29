@@ -33,7 +33,7 @@ I*Cii -> Not supported!   , , select(femav)....materialize_be() <- should throw 
 II*A  -> SQL , BE  , FE   , ,  select()...[materialize_fe()|toArray()|eval()|toArray2()|materialize()]
 II*B  -> SQL , BE  , FE   , ,  femav=select().open(..)...materialize_fe()
 II*Ci -> SQL , BE  , FE   , ,  select(bemav)....[materialize_fe()|toArray()|eval()|toArray2()|materialize()]
-II*Cii-> ABi , FE  , FE   , ,  select(femav)....[materialize_fe()|toArray()|eval()|toArray2()|materialize()]
+II*Cii-> abdb , FE  , FE   , ,  select(femav)....[materialize_fe()|toArray()|eval()|toArray2()|materialize()]
 
 ///////
 Human version:
@@ -44,7 +44,7 @@ I * C -> fsql2sql, (case against mav@BE) generates closed SQL, runs in against B
 II * A -> fsql2sql, generates colsed SQL, execSQL and pull results, associates with run query @BE..
 II * B -> fsql2sql, generates mav definition in closed SQL, execSQL and pull result, FE materializion used to accelerate quries running against @FE (II * C)..
 II * C -> fsql2sql, (case against mav@BE) generates closed SQL to run against BE mav, then pull results into FE table 
-                    (case against mav@FE) generates closed ABi to run against FE mav..
+                    (case against mav@FE) generates closed abdb to run against FE mav..
 ///////
 ******/
 

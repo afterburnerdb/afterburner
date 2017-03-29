@@ -81,11 +81,10 @@ function html5FileParser(file,funk,n) {
     }
   this.cleanUp = function(){
     delete this.buffer;
+    PTi.onTableLoad(this.filelist[this.n]);
     this.n++;
     if (this.n<this.filelist.length)
-      var ds= new dataSource(this.filelist, function(){newTable= new aTable(ds);},this.n);
-    else
-      $("#waitForFile").modal('hide');
+      var ds= new dataSource(this.filelist, function(){this.table= new aTable(ds);},this.n);
   }
 
   prsSrc=this;
@@ -99,7 +98,9 @@ function html5FileParser(file,funk,n) {
   this.fr.readAsArrayBuffer(this.file.slice(0,this.CHUNK_SIZE));
   //
   this.fname=this.file.name;
+  this.ofname=this.file.name;
   if (this.fname.match("tar.gz$") || this.fname.match(".gz$")){
+    PTi.onFileLoad(prsSrc.fname);
     this.fname=this.fname.replace(/.tar.gz$/,""); 
     this.fname=this.fname.replace(/.gz$/,"");
     this.fr.onload = function(event) {
@@ -110,6 +111,7 @@ function html5FileParser(file,funk,n) {
         prsSrc.readReady=true;
       if (prsSrc.rbptr>= prsSrc.actualcs){
         prsSrc.buffer=pako.ungzip(prsSrc.buffer);
+        PTi.onFileUncompress(prsSrc.ofname);
         prsSrc.actualcs=prsSrc.buffer.byteLength;
         funk();
       } else {
@@ -119,6 +121,8 @@ function html5FileParser(file,funk,n) {
   }else{
     this.fr.onload = function(event) {
       //
+      PTi.onFileLoad(prsSrc.fname);
+      PTi.onFileUncompress(prsSrc.fname);
       var tmp = new Uint8Array(prsSrc.fr.result);
       for (var i=0;i<tmp.byteLength;i++)
         prsSrc.buffer[prsSrc.rbptr++] = tmp[i];

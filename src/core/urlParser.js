@@ -73,12 +73,10 @@ function urlParser(urls,funk) {
 
   this.cleanUp = function(){
     delete this.buffer;
+    PTi.onTableLoad(this.urllist.list[0]);
     this.urllist.list=this.urllist.list.slice(1);
-    
     if (this.urllist.list.length>0)
-      var ds= new dataSource(this.urllist, function(){newTable= new aTable(ds);});
-    else
-      $("#waitForFile").modal('hide');
+      var ds= new dataSource(this.urllist, function(){this.table= new aTable(ds);});
   }
 
   prsSrc=this;
@@ -93,17 +91,21 @@ function urlParser(urls,funk) {
   //
   if (this.url.match("tar.gz$") || this.url.match(".gz$")){
     this.req.onload = function (event) {
+      PTi.onFileLoad(prsSrc.url);
       if((prsSrc.req.response.byteLength==0) || (prsSrc.req.readyState != 4)){
         //console.log("Error @urlParse deadlink? url:"+prsSrc.url);
         //prsSrc.cleanUp();
         return;
       }
       prsSrc.buffer=pako.ungzip(new Uint8Array(prsSrc.req.response));
+      PTi.onFileUncompress(prsSrc.url);
       prsSrc.actualcs=prsSrc.buffer.byteLength;
       funk();
     }
   }else{
     this.req.onload = function (event){
+      PTi.onFileLoad(prsSrc.url);
+      PTi.onFileUncompress(prsSrc.url);
       if((prsSrc.req.response.byteLength==0) || (prsSrc.req.readyState != 4)){
         //console.log("Error @urlParse deadlink? url:"+prsSrc.url);
         //prsSrc.cleanUp();

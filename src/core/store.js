@@ -6,22 +6,55 @@ if(typeof module == 'undefined'){
 }//store
 if (inNode)
   global.storedB=0;
+var hipstore=null;
+var confmemmax=null;
+var conftmpstrStorageMB=null;
+var confbufPoolMB=null;
+var confhashBits=null;
+var confbukpoolMB=null;
+if (typeof window !== 'undefined'){
+  if (window.location.search.indexOf('hip')>-1){
+    console.log("using hip store");
+    hipstore=true;
+  }
+  if (window.location.search.indexOf('sml')>-1){
+    console.log("using small store");
+    confmemmax=(512*1024*1024)-(16*1024*1024);
+    conftmpstrStorageMB=64;
+    confbufPoolMB=50;
+    //confhashBits=22;
+    confbukpoolMB=50;
+  }
+  if (window.location.search.indexOf('med')>-1){
+    console.log("using medium store");
+    confmemmax=(1*1024*1024*1024)-(32*1024*1024);
+    conftmpstrStorageMB=256;
+    confbufPoolMB=100;
+  }
+  if (window.location.search.indexOf('lrg')>-1){
+    console.log("using large store");
+    confmemmax=(2*1024*1024*1024)-(64*1024*1024);
+    conftmpstrStorageMB=512;
+    confbufPoolMB=200;
+  }
+}
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
-var memmax=(2*1024*1024*1024)-(64*1024*1024);
+var memmax=confmemmax||(2*1024*1024*1024)-(64*1024*1024);
 var mem=new ArrayBuffer(memmax);
 var mem8=new Int8Array(mem);
 var mem16=new Int16Array(mem);
 var mem32=new Int32Array(mem);
 var memF32=new Float32Array(mem);
 var storedB=0;
+var storedBpct=0;
 //input buffer
-var tmpstrStorageMB=512;
+var tmpstrStorageMB=conftmpstrStorageMB||512;
 var tmpstrStore= new ArrayBuffer(tmpstrStorageMB * 1024 * 1024);
 var tmpstrStore8= new Int8Array(tmpstrStore);
 var tmpstrStoredB=0;
 //bpool
-var bufPoolMB=200;
+var bufPoolMB=confbufPoolMB||200;
 var temps=memmax-(bufPoolMB*1024*1024);
 var storemax=temps;
 //Hash tables
@@ -32,7 +65,8 @@ var hash1BucketSize=5;
 var hash2BucketSize=29;
 var hash3BucketSize=1021;
 
-var bukpool=100*1024*1024;
+var bukpoolMB=confbukpoolMB||100;
+var bukpool=bukpoolMB*1024*1024;
 var hbbsize=((hashBitFilter+1)*4);
 var htbsize=bukpool;
 var hdbsize=hashBitFilter>>3;
@@ -47,7 +81,7 @@ var h2db=h2bb-hdbsize;
 var h3tb=h2db-htbsize;
 var h3bb=h3tb-hbbsize;
 var h3db=h3bb-hdbsize;
-storemax=h3db;
+storemax=h2db;
 //
 function malloctmpstr(size){
   size=size|0;
@@ -74,6 +108,20 @@ function malloc_ff(size){
   ret=storedB;
   storedB= (storedB+ size4b)|0;
   return ret|0;
+}
+if (hipstore){
+  malloc_ff = function(size){
+    size=size|0;
+    if (size<1) return storedB;
+    size4b=((((size-1)/4)|0)+1)*4;
+    ret=storedB;
+    storedB= (storedB+ size4b)|0;
+    var newstoreBcpt=((storedB/storemax).toFixed(2)*100)|0;
+    if (newstoreBcpt>storedBpct){
+      PTi.onMemTick(storedBpct=newstoreBcpt);
+    }
+    return ret|0;
+  }  
 }
 function malloc_v8(size){
   size=size|0;

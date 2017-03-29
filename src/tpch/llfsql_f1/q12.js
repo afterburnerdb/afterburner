@@ -8,7 +8,7 @@ if(typeof module == 'undefined'){
 //////////////////////////////////////////////////////////////////////////////
 
 function query12(noasm){
-  return ABi.select()
+  return abdb.select()
 	  .from("lineitem").join("orders").on("l_orderkey","o_orderkey")
 	  .field("l_shipmode",
 			  _as(_countif("*",_or(_eq("o_orderpriority",'1-URGENT'),_eq("o_orderpriority",'2-HIGH'))),"high_line_count"),

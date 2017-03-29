@@ -8,13 +8,13 @@ if(typeof module == 'undefined'){
 //////////////////////////////////////////////////////////////////////////////
 
 function query20(noasm){
-  ps_part=ABi.select()
+  ps_part=abdb.select()
     .from("partsupp").infrom("part").isin("ps_partkey","p_partkey")
     .where(_like("p_name",'forest%'))
     .field("ps_availqty","ps_partkey","ps_suppkey")
     .materialize(noasm);
   
-  ps_line=ABi.select()
+  ps_line=abdb.select()
     .from("lineitem").join(ps_part).on("l_partkey","ps_partkey")
     .field("l_partkey", _as(_sum("l_quantity"), "sumq"),"ps_availqty","ps_suppkey")
     .where(_gte("l_shipdate", _date('1994-01-01')),
@@ -23,13 +23,13 @@ function query20(noasm){
     .group("l_partkey","ps_availqty","ps_suppkey")
     .materialize(noasm);
     
-  sup_nat=ABi.select()
+  sup_nat=abdb.select()
     .from("supplier").join("nation").on("s_nationkey","n_nationkey")
     .field("s_name","s_address","s_suppkey")
     .where(_eq("n_name",'CANADA'))
     .materialize(noasm);
     
-  return ABi.select()
+  return abdb.select()
     .from(sup_nat).infrom(ps_line).isin("s_suppkey","ps_suppkey")
     .where(_gt("ps_availqty",_mul(0.5,"sumq")))
     .field("s_name","s_address")

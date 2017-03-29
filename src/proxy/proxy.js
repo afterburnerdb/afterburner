@@ -13,9 +13,9 @@ var dataSource=require('../core/dataSource.js');
 var printSchema=require('../core/common.js').printSchema
 var proxyConf = require('./proxyConf');
 console.log(proxyConf);
-ABi = new Afterburner();
+abdb = new Afterburner();
 global.daSchema = new aSchema();
-global.ABi=ABi;
+global.abdb=abdb;
 
 var fs = require('fs');
 var monetdb = require('monetdb')();

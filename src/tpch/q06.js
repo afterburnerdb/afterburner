@@ -8,7 +8,7 @@ if(typeof module == 'undefined'){
 //////////////////////////////////////////////////////////////////////////////
 
 function query6(){
-  return  ABi.select()
+  return  abdb.select()
     .from("lineitem")
     .field(_as(_sum(_mul("l_extendedprice","l_discount")),"revenue"))
     .where(_gte("l_shipdate",_date('1994-01-01')),

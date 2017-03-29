@@ -8,7 +8,7 @@ if(typeof module == 'undefined'){
 //////////////////////////////////////////////////////////////////////////////
 
 function query19_fsql(against){
-  return ABi.select(against)
+  return abdb.select(against)
    .from("@lineitem","@part")
    .field(sum(mul("@l_extendedprice",sub(1,"@l_discount"))))
    .where(eq("@l_partkey","@p_partkey"),

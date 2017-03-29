@@ -8,7 +8,7 @@ if(typeof module == 'undefined'){
 //////////////////////////////////////////////////////////////////////////////
 
 function query19(noasm){
-  return ABi.select()
+  return abdb.select()
    .from("part").join("lineitem").on("p_partkey","l_partkey")
    .field(_sum(_mul("l_extendedprice",_sub(1,"l_discount"))))
    .where(_or(

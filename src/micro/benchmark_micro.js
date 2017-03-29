@@ -110,7 +110,7 @@ function micro1(scale){
   var runtimesASMA=[];
   daSchema.getTable('orders10g').numrows=scale;
   if (typeof o_totalpriceA == 'undefined')
-    o_totalpriceA=ABi.select().from('orders10g').field('o_totalprice').toArray();
+    o_totalpriceA=abdb.select().from('orders10g').field('o_totalprice').toArray();
 //  for (var i=0;i<iters;i++){
 //    micro1_JSO(scale,o_totalpriceA);
 //    micro1_TA(scale);
@@ -234,7 +234,7 @@ function micro2(scale){
   var runtimesASMA=[];
   daSchema.getTable('orders10g').numrows=scale;
   if (typeof o_shippriorityA == 'undefined')
-    o_shippriorityA=ABi.select().from('orders10g').field('o_shippriority').toArray();
+    o_shippriorityA=abdb.select().from('orders10g').field('o_shippriority').toArray();
 
 //  for (var i=0;i<iters;i++){
 //    micro2_JSO(scale,o_shippriorityA);
@@ -364,7 +364,7 @@ function micro3(scale){
   var runtimesASMA=[];
   daSchema.getTable('orders10g').numrows=scale;
   if (typeof o_orderpriorityA == 'undefined')
-    o_orderpriorityA=ABi.select().from('orders10g').field('o_orderpriority').toArray();
+    o_orderpriorityA=abdb.select().from('orders10g').field('o_orderpriority').toArray();
 //  for (var i=0;i<iters;i++){
 //    micro3_JSO(scale,o_orderpriorityA);
 //    micro3_TA(scale);
@@ -517,7 +517,7 @@ function micro3ASM(){
 //  return count;
 //}
 //function micro4_JSO(scale){
-//  var o_orders10gtatusA=ABi.select().from('orders').field('o_orderstatus').toArray();
+//  var o_orders10gtatusA=abdb.select().from('orders').field('o_orderstatus').toArray();
 //  var count = 0;
 //  handle=Function('scale','o_orders10gtatusA',micro4_JSO_.toSource().replace(/function.*?\(.*?\)/i,''));
 //  if (inNode)

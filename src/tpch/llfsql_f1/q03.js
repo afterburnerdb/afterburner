@@ -8,14 +8,14 @@ if(typeof module == 'undefined'){
 //////////////////////////////////////////////////////////////////////////////
 
 function query3(noasm){
-  cus_ord=ABi.select()
+  cus_ord=abdb.select()
     .from("customer").join("orders").on("c_custkey","o_custkey")
     .where(_eq("c_mktsegment", "HOUSEHOLD"),
       _lt("o_orderdate", _date("1995-03-04")))
     .field("o_orderkey","o_orderdate","o_shippriority")
     .materialize(noasm);
   
-  return ABi.select()
+  return abdb.select()
    .from("lineitem").join(cus_ord).on("l_orderkey","o_orderkey")
    .where(_gt("l_shipdate", _date("1995-03-04")))
    .field("l_orderkey", _as(_sum( _mul("l_extendedprice", _sub(1,"l_discount"))),"revenue"),"o_orderdate","o_shippriority")

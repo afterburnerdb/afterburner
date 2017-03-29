@@ -15,26 +15,24 @@
     <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
     <![endif]-->
 
-   <style type="text/css">
-      body {
-        padding-top: 50px;
-      }
-      .modal {
-        text-align: left;
-      }
-      pre.prettyprint {
-        border: 1px solid #ccc;
-        margin-bottom: 0;
-        padding: 9.5px;
-      }
-      .table-nonfluid {
-        width: auto !important;
-      }
-      .table-responsive {
-        overflow: auto;
-      }
+  <style type="text/css">
+    body {
+      padding-top: 50px;
+    }
+    pre.prettyprint {
+      border: 1px solid #ccc;
+      margin-bottom: 0;
+      padding: 9.5px;
+    }
+    .table-nonfluid {
+      width: auto !important;
+    }
+    .table-responsive {
+      overflow: auto;
+    }
 
-    </style>
+  </style>
+       <!-- width: 80%; -->
 <!--      .table-responsive {
         max-height: 150px;
         overflow: auto;
@@ -57,7 +55,10 @@
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
             <li><a href="./index.html">Home</a></li>
-            <li class="active"><a href="./demo.html">Demo</a></li>
+            <li class="active"><a href="./demo.html?hip">Demo</a></li>
+            <li class="active"><a href="./demo.html?hip&med">Demo (medium)</a></li>
+            <li class="active"><a href="./demo.html?hip&sml">Demo (small)</a></li>
+
             <li><a href="https://github.com/lintool/afterburner/">Code (GitHub)</a></li>
           </ul>
 
@@ -78,52 +79,63 @@
   <div class="container">
     <div class="row">
       <div class="col-md-3">
-        <label class="btn btn-default btn-file" href="#" data-toggle="tooltip" data-placement="bot" title="Load a database table from a local file">
+        <label class="btn btn-default btn-file" href="#" data-placement="bot">
           Load a table from local disk
           <input type="file" id="fileInput" style="display: none;" multiple> 
         </label>
       </div>
       <div class="col-md-3">
-        <label class="btn btn-default btn-file" href="#" data-toggle="tooltip" data-placement="bot" title="Load a demo database from web" onclick="loadWeb()" >
+        <label class="btn btn-default btn-file" href="#" data-placement="bot" onclick="loadWeb()" >
           Load demo tables from web
           <!--<button tyle="display: none;" onclick="loadWeb()">Load demo tables from web</button>-->
         </label>
       </div>
+      <div class="col-md-3">
+        <label class="btn btn-default btn-file" id="schmbtn" href="#" data-toggle="tooltip" data-placement="bot" onclick="togSchema(this)" >
+          Show tables
+        </label>
+      </div>
     </div>
-
-    <div class="col-md-12">
-      <h2>Fluent SQL</h2>
-    	<textarea rows="11" id="TAFluent" name="TAFluent" class="prettyprint form-control animated linenums language-css" placeholder="Type Fluent SQL or use example buttons.."></textarea>
-            <div class="dropdown">
-              <button class="btn btn-default dropdown-toggle" onchange="alert('boom')" type="button" id="menu1" data-toggle="dropdown">Insert TPC-H Query<span class="caret"></span></button>
-              <ul class="dropdown-menu" role="menu" aria-labelledby="menu1">
-                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query1">Q1</a></li>
-                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query2">Q2</a></li>
-                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query3">Q3</a></li>
-                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query4">Q4</a></li>
-                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query5">Q5</a></li>
-                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query6">Q6</a></li>
-                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query7">Q7</a></li>
-                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query8">Q8</a></li>
-                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query9">Q9</a></li>
-                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query10">Q10</a></li>
-                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query11">Q11</a></li>
-                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query12">Q12</a></li>
-                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query13">Q13</a></li>
-                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query14">Q14</a></li>
-                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query15">Q15</a></li>
-                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query16">Q16</a></li>
-                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query17">Q17</a></li>
-                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query18">Q18</a></li>
-                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query19">Q19</a></li>
-                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query20">Q20</a></li>
-                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query21">Q21</a></li>
-                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query22">Q22</a></li>
-              </ul>
-            </div>
-            <button type="button" onclick="runcode()" class="btn btn-default" href="#" data-toggle="tooltip" data-placement="bot" title="Run code (Query)"> Run code</button>
+    <div class="row">
+      <div class="col-md-12">
+        <div id="sconsole" class="table-responsive">
+        </div>
+      <div>
     </div>
-
+    <div class="row">
+      <div class="col-md-12">
+        <h2>Fluent SQL</h2>
+      	<textarea rows="11" id="TAFluent" name="TAFluent" class="prettyprint form-control animated linenums language-css" placeholder="Type Fluent SQL or use example buttons.."></textarea>
+              <div class="dropdown">
+                <button class="btn btn-default dropdown-toggle" onchange="alert('boom')" type="button" id="menu1" data-toggle="dropdown">Insert TPC-H Query<span class="caret"></span></button>
+                <ul class="dropdown-menu" role="menu" aria-labelledby="menu1">
+                  <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query1">Q1</a></li>
+                  <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query2">Q2</a></li>
+                  <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query3">Q3</a></li>
+                  <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query4">Q4</a></li>
+                  <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query5">Q5</a></li>
+                  <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query6">Q6</a></li>
+                  <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query7">Q7</a></li>
+                  <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query8">Q8</a></li>
+                  <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query9">Q9</a></li>
+                  <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query10">Q10</a></li>
+                  <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query11">Q11</a></li>
+                  <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query12">Q12</a></li>
+                  <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query13">Q13</a></li>
+                  <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query14">Q14</a></li>
+                  <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query15">Q15</a></li>
+                  <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query16">Q16</a></li>
+                  <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query17">Q17</a></li>
+                  <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query18">Q18</a></li>
+                  <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query19">Q19</a></li>
+                  <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query20">Q20</a></li>
+                  <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query21">Q21</a></li>
+                  <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query22">Q22</a></li>
+                </ul>
+              </div>
+              <button type="button" onclick="runcode()" class="btn btn-default" href="#" data-placement="bot"> Run code</button>
+      </div>
+    </div>
     <br>
     <div class="row" id="divconsole">
       <div class="col-md-12">
@@ -137,26 +149,23 @@
         </div>
       </div>
     </div>
-
-<!--    <div class="row">
-        <div class="col-md-12">
-        <div id="sconsole" class="table-responsive">
-        </div>
-        <div>
-      </div> -->
-
-<!--    </div> -->
   </div> <!-- /container -->
 
-  <div id="waitForFile" class="modal fade" role="dialog">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-body">
-          <p>Loading.. Please wait..</p>
-        </div>
+<div id="waitForPT" class="modal fade" style="left" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+      </div>
+      <div class="modal-body">
+      </div>
+      <div class="modal-footer">
+          <div class='col-md-1'>
+            <button id="modalgate" type="button" onclick="$('#waitForPT').modal('hide');$('#schmbtn').click();" class="btn btn-default" disabled>Got it..</button>
+          </div>
       </div>
     </div>
   </div>
+</div>
 
 <!-- Afterburner -->
 
@@ -171,6 +180,9 @@
 <script src="./src/core/html5FileParser.js"></script>
 <script src="./src/core/urlParser.js"></script>
 <script src="./src/frontend/myJS.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.2/jquery.min.js"></script>
+<script src="./src/frontend/web.js"></script>
+<script src="./src/frontend/progressTracker.js"></script>
 
 <!-- TPC-H -->
 
@@ -227,13 +239,13 @@
   
 <script>
 function myOnLoad(){
-  ABi = new Afterburner();
+  abdb = new Afterburner();
 }
 window.onload = function() {
   inNode=false;
   var fileInput = document.getElementById('fileInput');
   fileInput.addEventListener('change', function(e) {
-    $("#waitForFile").modal();
+    PTi.trackFiles(fileInput.files);
     var files = fileInput.files;
     var ds= new dataSource(files, function(){newTable= new aTable(ds);},0);
   });
@@ -253,8 +265,8 @@ function loadWeb(){
     "https://lintool.github.io/afterburner-data/region.5.tbl.gz",
     "https://lintool.github.io/afterburner-data/supplier.10000.tbl.gz",
     "https://lintool.github.io/afterburner-data/customer.150000.tbl.gz"];
-  $("#waitForFile").modal();
-  var ds= new dataSource(urls, function(){newTable= new aTable(ds);},0);
+  PTi.trackURLs(urls.list);
+  var ds= new dataSource(urls, function(){newTable= new aTable(ds);});
 }
 function runcode(){
   var codecode=document.getElementById("TAFluent").value;
@@ -263,7 +275,7 @@ function runcode(){
   runMyAdhocCode(codecode);
   var tt1=window.performance.now();
   var ttot=tt1-tt0;
-  document.getElementById("console").innerHTML = "Total time to run (ms)=" + (ttot);
+  document.getElementById("console").innerHTML = "Total time to run (ms)=" + (ttot.toFixed(2));
   console.log('time to run code:'+ (ttot));
 }
 function printtable(htmltable){
@@ -279,7 +291,6 @@ function printtable(htmltable){
 <!-- Placed at the end of the document so the pages load faster -->
 <!-- <script src="bootstrap/jquery.min.js"></script>-->
   <!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script> -->
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.2/jquery.min.js"></script>
 
 <!-- <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script> -->
 <script src="bootstrap/js/bootstrap.min.js"></script>
@@ -288,10 +299,6 @@ function printtable(htmltable){
 <script src="https://maxcdn.bootstrapcdn.com/js/ie10-viewport-bug-workaround.js"></script>
 
 <script type="text/javascript">
-  $(document).ready(function() {
-    $("body").tooltip({ selector: '[data-toggle=tooltip]', show: { effect: "blind", duration: 1500} });
-});
-
 
 jQuery("[id*='query']").click(function(e){
                                 var toeval=e.currentTarget.id+".toString().replace(/;/g,'').replace(/noasm/g,'').replace('\"q_sums\",300','\"q_sums\",200').replace(/}\w*/,'').replace('return','').replace(/function query.*{/,'')";

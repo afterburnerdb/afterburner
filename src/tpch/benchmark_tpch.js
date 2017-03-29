@@ -462,7 +462,7 @@ function benchmark(warmup,rounds,noasm,backend){
 //micro1
 /*
 function micro1_JSO(scale, iters){
-  var o_totalpriceA=ABi.select().from('orders').field('o_totalprice').toArray();
+  var o_totalpriceA=abdb.select().from('orders').field('o_totalprice').toArray();
   var count = 0;
   if (inNode)
     t0= process.hrtime();
@@ -581,7 +581,7 @@ function micro1(){
 }
 //micro2
 function micro2_JSO(scale, iters){
-  var o_shippriorityA=ABi.select().from('orders').field('o_shippriority').toArray();
+  var o_shippriorityA=abdb.select().from('orders').field('o_shippriority').toArray();
   var count = 0;
   if (inNode)
     t0= process.hrtime();
@@ -703,7 +703,7 @@ function micro2(){
 }
 //micro3
 function micro3_JSO(scale, iters){
-  var o_shippriorityA=ABi.select().from('orders').field('o_orderpriority').toArray();
+  var o_shippriorityA=abdb.select().from('orders').field('o_orderpriority').toArray();
   var count = 0;
   if (inNode)
     t0= process.hrtime();

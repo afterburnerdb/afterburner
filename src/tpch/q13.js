@@ -8,14 +8,14 @@ if(typeof module == 'undefined'){
 //////////////////////////////////////////////////////////////////////////////
 
 function query13(noasm){
-  c_orders=ABi.select()
+  c_orders=abdb.select()
     .from("customer").ljoin("orders").on("c_custkey","o_custkey")
     .field("c_custkey",_as(_count("o_orderkey"),"c_count"))
     .where(_not(_like("o_comment",'%special%requests%')))
     .group("c_custkey")
     .materialize(noasm);
 
-  return ABi.select()
+  return abdb.select()
    .from(c_orders)
    .field("c_count",_as(_count("*"),"custdist"))
    .group("c_count")

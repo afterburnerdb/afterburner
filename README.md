@@ -23,7 +23,7 @@ To load data inside browser click [Browse] to pick a file that matches the forma
     > eval(fs.readFileSync('./src/frontend/myJS.js')+"");
     > var tabsToLoad=['<path>/data/lineitem.6001215.tbl','<path>/data/orders.1500000.tbl']; //(e.g.)
     > loadTables(tabsToLoad); // when using 1GB scale.. data loading will take minutes..
-    > asmcode=ABi.select().from("orders").field(count("o_totalprice")).where(lt("o_totalprice",1500)).toString()
+    > asmcode=abdb.select().from("orders").field(count("o_totalprice")).where(lt("o_totalprice",1500)).toString()
     > eval(asmcode)
   
 ##Loading tables:
