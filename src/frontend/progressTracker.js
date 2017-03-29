@@ -18,33 +18,6 @@ function progressTracker(){
   }
 
   this.trackFiles = function(flist){
-  //  this.list=[];
-  //  for (var i=0;i<flist.length;i++)
-  //   this.list.push(flist[i]);
-  //  clearElement(this.mh);
-  //  $("#waitForPT").modal();
-  //  this.disableModalGate();
-
-  //  var cont=newHTMLContainer();
-  //  var row=newHTMLRow();
-  //  var col1=newHTMLCol('md',3,{'style':'background-color:#e8fcf9'});
-  //  var a=newHTMLA('URL',{'style':'font-size:16px font-weight:bold'});
-  //  col1.appendChild(a);
-  //  var col2=newHTMLCol('md',1);
-  //  var a=newHTMLA("state",{'style':'font-size:16px font-weight:bold'});
-  //  col2.appendChild(a);
-  //  var col3=newHTMLCol('md',4);
-  //  var a=newHTMLA("progress",{'style':'font-size:16px font-weight:bold'});
-  //  col3.appendChild(a);
-  //  row.appendChild(col1);
-  //  row.appendChild(col2);
-  //  row.appendChild(col3);
-  //  cont.appendChild(row)
-
-  //  for (var i=0;i<flist.length;i++){
-  //    this.mh.appendChild(newHTMLProgressBar(flist[i].name,flist[i].name));
-  //  }
-  //  this.startTimes=[get_time_ms()];
     var tmplist=[];
     for (var i=0;i<flist.length;i++)
      tmplist.push(flist[i].name);
@@ -53,11 +26,9 @@ function progressTracker(){
   this.trackURLs = function(ulist,local){
     this.list=ulist;
     clearElement(this.mh);
-    //clearElement(this.mb);
     $("#waitForPT").modal();
     this.disableModalGate();
 
-    //var cont=newHTMLContainer();
     var row=newHTMLRow();
     var col1=newHTMLCol('md',6,{'style':'background-color:#e8fcf9'});
     var a=newHTMLP('File/URL',{'style':'font-size:16px font-weight:bold'});
@@ -71,7 +42,6 @@ function progressTracker(){
     row.appendChild(col1);
     row.appendChild(col2);
     row.appendChild(col3);
-    //cont.appendChild(row)
     this.mh.appendChild(row);
 
     for (var i=0;i<ulist.length;i++){
@@ -97,14 +67,6 @@ function progressTracker(){
     }
     this.startTimes=[get_time_ms()];
   }
-//  this.trackLoadFiles = function(filelist){
-//    this.list=filelist;
-//    $("#waitForPT").modal();
-//  }
-//  this.trackLoadURLs = function(urllist){
-//    this.list=urllist;
-//    $("#waitForPT").modal();
-//  }
   this.onFileLoad=function(done){
     var fid=this.list.indexOf(done);
     $('#trkurlcol1'+fid).text('uncompress..');
@@ -139,7 +101,6 @@ function progressTracker(){
     $('#trkmempb')[0].setAttribute('style','width:'+memusgpct+"%");
     $('#trkmempb').text(memusgpct+"%");
     $('#trkmemtxt').text('Stored/Total (memory):'+((storedB/(1024*1024))|0)+'/'+((storemax/(1024*1024))|0)+" (mb)");
-    console.log("@onMemTick:",);
   }
   this.disableModalGate=function(){
     this.mg.prop('disabled',true);
