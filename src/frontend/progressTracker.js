@@ -92,8 +92,13 @@ function progressTracker(){
     }
     $('#trkurlcol1'+fid).text('done..');
     clearElement($('#trkurlcol3'+fid)[0]);
-    var ttload=(get_time_ms()-this.startTimes[fid]).toFixed(0);
-    var a=newHTMLP('time to load: '+ttload+' (ms)');
+    var ttloadms=(get_time_ms()-this.startTimes[fid]).toFixed(0);
+    var ttloads=(ttloadms/1000).toFixed(0);
+    var a;
+    if (ttloads==0)
+      a=newHTMLP('time to load: '+ttloadms+' (ms)');
+    else
+      a=newHTMLP('time to load: '+ttloadms+' (s)');
     $('#trkurlcol3'+fid)[0].appendChild(a);
 
   }

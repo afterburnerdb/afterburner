@@ -42,10 +42,7 @@
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
             <li><a href="./index.html">Home</a></li>
-            <li class="active"><a href="./demo.html?hip">Demo</a></li>
-            <li class="active"><a href="./demo.html?hip&med">Demo (medium)</a></li>
-            <li class="active"><a href="./demo.html?hip&sml">Demo (small)</a></li>
-
+            <li class="active"><a href="./demo.html">Demo</a></li>
             <li><a href="https://github.com/lintool/afterburner/">Code (GitHub)</a></li>
           </ul>
 
@@ -56,21 +53,39 @@
   <div class="container">
     <div class="row">
       <div class="col-md-3">
-        <label class="btn btn-default btn-file" href="#" data-placement="bot">
+        <label class="btn btn-default btn-file disabled" id="loaddbtn" data-placement="bot">
           Load a table from local disk
           <input type="file" id="fileInput" style="display: none;" multiple> 
         </label>
       </div>
       <div class="col-md-3">
-        <label class="btn btn-default btn-file" href="#" data-placement="bot" onclick="loadWeb()" >
+        <label class="btn btn-default btn-file disabled" id="loadwbtn" data-placement="bot" onclick="loadWeb()" >
           Load demo tables from web
           <!--<button tyle="display: none;" onclick="loadWeb()">Load demo tables from web</button>-->
         </label>
       </div>
       <div class="col-md-3">
-        <label class="btn btn-default btn-file" id="schmbtn" href="#" data-toggle="tooltip" data-placement="bot" onclick="togSchema(this)" >
+        <label class="btn btn-default btn-file disabled" id="schmbtn" data-toggle="tooltip" data-placement="bot" onclick="togSchema(this)" >
           Show tables
         </label>
+      </div>
+      <div class="col-md-3">
+        <!-- <label class="btn btn-default btn-file btn-warning"  data-toggle="tooltip" data-placement="bot" onclick="initStore(this)">
+        </label>
+      </div> -->
+
+        <div class="dropdown"  id="initmenu">
+          <button class="btn dropdown-toggle btn-warning" id="initbtn" type="button" data-toggle="dropdown">
+           <!--btn-primary-->
+            Initialize Afterburner!
+          <!--<span class="caret"></span>-->
+          </button>
+          <ul class="dropdown-menu">
+            <li><a href="#">small</a></li>
+            <li><a href="#">medium</a></li>
+            <li><a href="#">large</a></li>
+          </ul>
+        </div>
       </div>
     </div>
     <div class="row">
@@ -259,13 +274,30 @@ function printtable(htmltable){
   clearElement(divcons);
   divcons.appendChild(htmltable);
 }
+function initStore(){
+  
+}
+
+
+$("#initmenu").on("click", "li a", function() {
+  console.log("will store with size:"+$(this).text());
+  init_store($(this).text());
+  $("#initbtn").removeClass("btn-warning");
+  $("#initbtn").addClass("disabled");
+  $("#initbtn").text($(this).text());
+  $("#schmbtn").removeClass("disabled");
+  $("#loaddbtn").removeClass("disabled");
+  $("#loadwbtn").removeClass("disabled");
+});    
+
+
 </script>
 
 
 <script type="text/javascript">
 
 jQuery("[id*='query']").click(function(e){
-                                var toeval=e.currentTarget.id+".toString().replace(/;/g,'').replace(/noasm/g,'').replace('\"q_sums\",300','\"q_sums\",200').replace(/}\w*/,'').replace('return','').replace(/function query.*{/,'')";
+                                var toeval=e.currentTarget.id+".toString().replace(/;/g,'').replace(/noasm/g,'').replace('\"q_sums\",300','\"q_sums\",200').replace(/}\w*/,'').replace('return','').replace(/function query.*{/,'/*"+e.currentTarget.id+"*/')";
                                 document.getElementById("TAFluent")
                                   .value=eval(toeval)+"  .materialize();\nprinttable(res.toHTMLTableN(100))";
                                   e.preventDefault();});
