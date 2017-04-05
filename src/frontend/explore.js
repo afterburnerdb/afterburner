@@ -37,20 +37,39 @@ function Explore(tabname){
     $('.dropdown-toggle').dropdown('toggle');
 
     $("#bcellmenu").on("click", "li a", function() {
-      Ei.bcello(this,cell.cellIndex,cell);
+      Ei.bcello(this,cell.cellIndex,cell,colname);
 //      init_store($(this).text());
 //      $("#initbtn").text($(this).text());
     });
   }
-  this.bcello=function(menuitem,remember,cell){
+  this.bcello=function(menuitem,remember,cell,colname){
     expose=menuitem;
     console.log("menuitem:"+menuitem+" remember:"+remember);
     clearElement(cell);
     cell.appendChild(newHTMLA(menuitem.text));
+    this.selColVals[remember]=menuitem.text;
     this.onQchange();
   }
   this.onQchange=function(){
-    console.log('query changed')
+    console.log('query changed');
+    var gby=[];
+    var filt=[];
+    var filtp=[];
+    var filtc=[];
+
+    var gbyStr="";
+    var filtStr="";
+
+    for (var i=0;i<this.selColVals.length;i++){
+      if (this.selColVals[i] == 'ALL')
+        gby.push(this.selColNames[i]);
+      else if (this.selColVals[i] == '*')
+        var donothing;
+      else {
+        filt.push("_eq("+this.selColNames[i]+","+this.selColVals[i]+")");
+      }   
+    }
+    console.log("abdb.select().from("+this.tabname+").field(_count('*')).where("+filt.join(',')+").group("+gby.join(',')+").toArray()");
   }
 //
   this.toHTMLTable=function(){
