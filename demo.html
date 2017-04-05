@@ -50,6 +50,42 @@
     </nav>
 
   <div class="container">
+
+      <div class="page-header">
+        <h1>Afterburner: Demo</h1>
+        <p class="lead">Interactive SQL analytics in your browser!</p>
+      </div>
+
+<p>In this online demo we've prepared a sample data warehouse based on
+the <a href="http://www.tpc.org/tpch/">TPC-H</a> schema. For best
+performance, we recommend using <a href
+https://www.mozilla.org/en-US/firefox/all/>FireFox (64-bit)</a> and running on a client with 4GB memory.</p>
+
+<p>Begin by clicking on the "initialize" button below and select a memory configuration (how much memory on the client to allocate.</p>
+
+        <div class="dropdown"  id="initmenu">
+          <button class="btn dropdown-toggle btn-warning" id="initbtn" type="button" data-toggle="dropdown">
+           <!--btn-primary-->
+            Initialize Afterburner!
+          </button>
+          <ul class="dropdown-menu">
+            <li><a>small (~0.75 GB)</a></li>
+            <li><a>medium (~1.5 GB)</a></li>
+            <li><a>large (~3.0 GB)</a></li>
+          </ul>
+        </div>
+
+<p>
+        <label class="btn btn-default btn-file disabled" id="loadwbtn" data-placement="bot" onclick="loadWeb()" >
+          Load data!
+        </label>
+
+        <label class="btn btn-default btn-file disabled" id="schmbtn" data-toggle="tooltip" data-placement="bot" onclick="togSchema(this)">
+          Show Tables
+        </label>
+</p>
+
+<!--
     <div class="row">
       <div class="col-md-3">
         <label class="btn btn-default btn-file disabled" id="loaddbtn" data-placement="bot">
@@ -67,20 +103,10 @@
           Show tables
         </label>
       </div>
-      <div class="col-md-3">
-        <div class="dropdown"  id="initmenu">
-          <button class="btn dropdown-toggle btn-warning" id="initbtn" type="button" data-toggle="dropdown">
-           <!--btn-primary-->
-            Initialize Afterburner!
-          </button>
-          <ul class="dropdown-menu">
-            <li><a>small</a></li>
-            <li><a>medium</a></li>
-            <li><a>large</a></li>
-          </ul>
-        </div>
-      </div>
     </div>
+
+-->
+
     <div class="row">
       <div class="col-md-12">
         <div id="sconsole" class="table-responsive">
