@@ -2,6 +2,12 @@
 function setAtts(obj,opts){
   Object.keys(opts).forEach((x)=>{obj.setAttribute(x,opts[x])});
 }
+function newHTMLDIV(opts){
+  opts=opts||{};
+  var div = document.createElement('div');
+  setAtts(div,opts);
+  return div;
+}
 function newHTMLTable(opts){
   opts=opts||{};
   var table=document.createElement('table');
@@ -23,6 +29,14 @@ function newHTMLThead(table,opts){
 function newHTMLTD(text,opts){
   opts=opts||{};
   var td = document.createElement('td');
+  //Object.keys(opts).forEach((x)=>{td.setAttribute(x,opts[x])});
+  setAtts(td,opts);
+  td.appendChild(document.createTextNode(""+text));
+  return td;
+}
+function newHTMLTH(text,opts){
+  opts=opts||{};
+  var td = document.createElement('th');
   //Object.keys(opts).forEach((x)=>{td.setAttribute(x,opts[x])});
   setAtts(td,opts);
   td.appendChild(document.createTextNode(""+text));
@@ -58,7 +72,6 @@ function newHTMLP(text,opts){
   p.appendChild(document.createTextNode(""+text));
   return p;
 }
-
 function newHTMLProgressBar(pbid,opts){
   opts=opts||{};
   opts['class']='progress';
@@ -72,7 +85,6 @@ function newHTMLProgressBar(pbid,opts){
 //  div.appendChild(newHTMLA(text));
   return div;
 }
-
 function newHTMLContainer(opts){
   opts=opts||{};
   opts['class']= 'container';
@@ -93,6 +105,12 @@ function newHTMLCol(size,width,opts){
   var div = document.createElement('div');
   setAtts(div,opts);
   return div;
+}
+function newHTMLH4(opts){
+  opts=opts||{};
+  var h4 = document.createElement('h4');
+  setAtts(h4,opts);
+  return h4;
 }
 //
 function drawSchema(abutton){
