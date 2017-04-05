@@ -37,35 +37,44 @@
     <div class="container">
       <div class="page-header">
         <h1>Afterburner</h1>
-        <p class="lead">A proof-of-concept in-browser JavaScript-based Analytical RDBMS</p>
+        <p class="lead">Interactive SQL analytics in your browser!</p>
       </div>
-      <p>Afterburner is a proof-of-concept in-browser relational analytics system that
-         explores the idea of implementing an analytical RDBMS in pure JavaScript so
-         that it runs completely inside a browser with no external dependencies.</p>
-      <p>For more details, see:</p>
+
+<p>The advent of online <a href="http://jupyter.org/">notebooks</a> and
+complex browser-based interactive visualizations means that the
+browser has, in essence, become the "shell". However, in all
+implementations that we are aware of, the browser is simply a dumb
+rendering endpoint. However, modern browsers are capable of so much
+more: they embed powerful JavaScript engines capable of running
+real-time collaborative tools, online multi-player games, rendering
+impressive 3D scenes, supporting complex, interactive visualizations,
+and even <a href="http://www.quakejs.com/">running first-person
+shooters</a>.</p>
+
+<p>We asked ourselves: Is it possible to exploit modern JavaScript
+engines and build a high-performance data management system that runs
+<i>completely in the browser</i>? Our answer is Afterburner, a
+prototype analytical RDBMS implemented in JavaScript that executes
+completely inside a web browser, is standards compliant, and has no
+external dependencies.  Afterburner generates compiled query plans
+that exploit two JavaScript features: typed arrays and asm.js, which
+we explain below.</p>
+
+<p>For more details, see:</p>
+
       <ul>
-        <li>Kareem El Gebaly and Jimmy Lin. <a href="http://arxiv.org/abs/1605.04035">Afterburner: The Case for In-Browser Analytics</a> <i>arXiv:1605.04035</i>, May 2016. 
+        <li>Kareem El Gebaly and Jimmy Lin. <a href="https://cs.uwaterloo.ca/~jimmylin/publications/ElGebaly_Lin_SIGMOD2017.pdf">In-Browser Interactive SQL Analytics with Afterburner.</a> <i>Proceedings of the 2017 ACM SIGMOD International Conference on Management of Data (SIGMOD 2017)</i>, May 2017, Chicago, Illinois.</li>
         </li>
-      </ul>
-      <ul>
-        <li>Kareem El Gebaly and Jimmy Lin. <a href="">In-Browser Interactive SQL Analytics with Afterburner</a> <i>Proceedings of the 2017 ACM SIGMOD International Conference on Management of Data (SIGMOD 2017)</i>, May 2017. (demo)
+
+        <li>Kareem El Gebaly and Jimmy Lin. <a href="http://arxiv.org/abs/1605.04035">Afterburner: The Case for In-Browser Analytics.</a> <i>arXiv:1605.04035</i>, May 2016. 
         </li>
+
       </ul>
 
-      <hr>
-      <p>In a demo page (<a href="./demo.html">demo</a>) we prepared for you a scenario that allows for loading a database based on the 
-         <a href="http://www.tpc.org/tpch/">TPC-H</a> schema.
-         In the demo page, you can either load the TPC-H database from your local disk or download the tables we have prepared for you.</p>
-     <p> We have tested Afterburner using the following web browsers:</p>
-     <ul>
-      <li><a href https://www.mozilla.org/en-US/firefox/all/>FireFox (64-bit)</a></li>
-      <!--<li><a href http://www.opera.com/download/guide/?ver=12.17>Google Chrome (64-bit)</a></li>
-      <li><a href https://www.google.com/chrome/browser/thankyou.html?platform=win64&statcb=1&extra=betachannel&installdataindex=defaultbrowser>Opera (64-bit)</a></li>-->
-     </ul>
+<p style="padding-top: 20px">
+<a href="demo.html" class="btn btn-primary btn-large">Show me the demo!</a>
+</p>
 
-     <p>We recomend using clients with 4 GB of free memory.</p>
-     <p>We recomend using Firefox for asm.js support.</p>
-    </div>
   </div> <!-- /container -->
 
 <script type="text/javascript">
