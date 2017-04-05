@@ -50,19 +50,18 @@
     </nav>
 
   <div class="container">
-
-      <div class="page-header">
-        <h1>Afterburner: Demo</h1>
-        <p class="lead">Interactive SQL analytics in your browser!</p>
-      </div>
-
-<p>In this online demo we've prepared a sample data warehouse based on
-the <a href="http://www.tpc.org/tpch/">TPC-H</a> schema. For best
-performance, we recommend using <a href
-https://www.mozilla.org/en-US/firefox/all/>FireFox (64-bit)</a> and running on a client with 4GB memory.</p>
-
-<p>Begin by clicking on the "initialize" button below and select a memory configuration (how much memory on the client to allocate.</p>
-
+    <div class="page-header">
+      <h1>Afterburner: Demo</h1>
+      <p class="lead">Interactive SQL analytics in your browser!</p>
+    </div>
+    <p>In this online demo we've prepared a sample data warehouse based on the <a href="http://www.tpc.org/tpch/">TPC-H</a> schema. 
+      For best performance, we recommend using <a href https://www.mozilla.org/en-US/firefox/all/>FireFox (64-bit)</a> and running on
+      a client with 4GB memory.
+    </p>
+    
+    <p>Begin by clicking on the "initialize" button below and select a memory configuration (how much memory on the client to allocate.</p>
+    <div class="row">
+      <div class="col-md-3">
         <div class="dropdown"  id="initmenu">
           <button class="btn dropdown-toggle btn-warning" id="initbtn" type="button" data-toggle="dropdown">
            <!--btn-primary-->
@@ -74,39 +73,31 @@ https://www.mozilla.org/en-US/firefox/all/>FireFox (64-bit)</a> and running on a
             <li><a>large (~3.0 GB)</a></li>
           </ul>
         </div>
-
-<p>
-        <label class="btn btn-default btn-file disabled" id="loadwbtn" data-placement="bot" onclick="loadWeb()" >
-          Load data!
-        </label>
-
+      </div>
+      <div class="col-md-3">
         <label class="btn btn-default btn-file disabled" id="schmbtn" data-toggle="tooltip" data-placement="bot" onclick="togSchema(this)">
           Show Tables
         </label>
-</p>
 
-<!--
-    <div class="row">
-      <div class="col-md-3">
-        <label class="btn btn-default btn-file disabled" id="loaddbtn" data-placement="bot">
-          Load a table from local disk
-          <input type="file" id="fileInput" style="display: none;" multiple> 
-        </label>
       </div>
+      
       <div class="col-md-3">
-        <label class="btn btn-default btn-file disabled" id="loadwbtn" data-placement="bot" onclick="loadWeb()" >
-          Load demo tables from web
-        </label>
-      </div>
-      <div class="col-md-3">
-        <label class="btn btn-default btn-file disabled" id="schmbtn" data-toggle="tooltip" data-placement="bot" onclick="togSchema(this)">
-          Show tables
-        </label>
+        <div class="dropdown"  id="initmenu">
+          <button class="btn dropdown-toggle disabled" id="loadwbtn" type="button" data-toggle="dropdown">
+            Load data!
+          </button>
+          <ul class="dropdown-menu">
+            <li><a onclick="loadWeb()">Download demo data</a></li>
+            <li>
+                <label class="btn btn-default btn-file disabled" id="loaddbtn" data-placement="bot">
+                  Load a table from local disk
+                  <input type="file" id="fileInput" style="display: none;" multiple> 
+                </label>
+            </li>
+          </ul>
+        </div>
       </div>
     </div>
-
--->
-
     <div class="row">
       <div class="col-md-12">
         <div id="sconsole" class="table-responsive">
@@ -295,7 +286,8 @@ function printtable(htmltable){
 }
 $("#initmenu").on("click", "li a", function() {
   console.log("will store with size:"+$(this).text());
-  init_store($(this).text());
+  var size=$(this).text().split(" ")[0];
+  init_store(size);
   $("#initbtn").removeClass("btn-warning");
   $("#initbtn").addClass("disabled");
   $("#initbtn").text($(this).text());
