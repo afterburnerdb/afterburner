@@ -23,7 +23,9 @@
     .table-responsive {
       overflow: auto;
     }
-
+    .rowspc{ 
+      margin-top:20px; 
+    }
   </style>
   </head>
   <body>
@@ -75,13 +77,6 @@
         </div>
       </div>
       <div class="col-md-3">
-        <label class="btn btn-default btn-file disabled" id="schmbtn" data-toggle="tooltip" data-placement="bot" onclick="togSchema(this)">
-          Show Tables
-        </label>
-
-      </div>
-      
-      <div class="col-md-3">
         <div class="dropdown"  id="initmenu">
           <button class="btn dropdown-toggle disabled" id="loadwbtn" type="button" data-toggle="dropdown">
             Load data!
@@ -89,7 +84,7 @@
           <ul class="dropdown-menu">
             <li><a onclick="loadWeb()">Download demo data</a></li>
             <li>
-                <label class="btn btn-default btn-file disabled" id="loaddbtn" data-placement="bot">
+                <label class="btn btn-default btn-file" id="loaddbtn" data-placement="bot">
                   Load a table from local disk
                   <input type="file" id="fileInput" style="display: none;" multiple> 
                 </label>
@@ -97,8 +92,13 @@
           </ul>
         </div>
       </div>
+      <div class="col-md-3">
+        <label class="btn btn-default btn-file" id="schmbtn" data-toggle="tooltip" data-placement="bot" onclick="togSchema(this)">
+          Show Tables
+        </label>
+      </div>
     </div>
-    <div class="row">
+    <div class="row rowspc">
       <div class="col-md-12">
         <div id="sconsole" class="table-responsive">
         </div>
@@ -108,6 +108,8 @@
       <div class="col-md-12">
         <h2>Fluent SQL</h2>
       	<textarea rows="11" id="TAFluent" name="TAFluent" class="prettyprint form-control animated linenums language-css" placeholder="Type Fluent SQL or use example buttons.."></textarea>
+        <div class="row">
+          <div class="col-md-3">
               <div class="dropdown">
                 <button class="btn btn-default dropdown-toggle" onchange="alert('boom')" type="button" id="menu1" data-toggle="dropdown">Insert TPC-H Query<span class="caret"></span></button>
                 <ul class="dropdown-menu" role="menu" aria-labelledby="menu1">
@@ -135,7 +137,11 @@
                   <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query22">Q22</a></li>
                 </ul>
               </div>
-              <button type="button" onclick="runcode()" class="btn btn-default" href="#" data-placement="bot"> Run code</button>
+          </div>
+          <div class="col-md-3">
+              <button type="button" onclick="runcode()" class="btn btn-default" href="#" data-placement="bot">Run code</button>
+          </div>
+        </div>
       </div>
     </div>
     <br>
@@ -290,10 +296,9 @@ $("#initmenu").on("click", "li a", function() {
   init_store(size);
   $("#initbtn").removeClass("btn-warning");
   $("#initbtn").addClass("disabled");
-  $("#initbtn").text($(this).text());
-  $("#schmbtn").removeClass("disabled");
-  $("#loaddbtn").removeClass("disabled");
+  $("#initbtn").text("Initialized: "+$(this).text());
   $("#loadwbtn").removeClass("disabled");
+  $("#loadwbtn").addClass("btn-success");
 });    
 </script>
 
