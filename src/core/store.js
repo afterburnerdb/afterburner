@@ -120,6 +120,12 @@ function init_store(size){
   mem16=new Int16Array(mem);
   mem32=new Int32Array(mem);
   memF32=new Float32Array(mem);
+  if (typeof mem8 == 'undefined'){
+    if (size=='large') 
+      return init_store('medium');
+    if (size=='medium') 
+      return init_store('small');
+  }
   storedB=0;
   storedBpct=0;
   //input buffer

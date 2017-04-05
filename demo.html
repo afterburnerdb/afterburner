@@ -12,7 +12,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pako/1.0.4/pako.min.js"></script>
     <a href="https://github.com/lintool/afterburner/"><img style="position: absolute; top: 0; right: 0; border: 0; z-index:9999;" src="https://camo.githubusercontent.com/652c5b9acfaddf3a9c326fa6bde407b87f7be0f4/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6f72616e67655f6666373630302e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_orange_ff7600.png"></a>
-
+ 
   <style type="text/css">
     body {
       padding-top: 50px;
@@ -43,7 +43,6 @@
           <ul class="nav navbar-nav">
             <li><a href="./index.html">Home</a></li>
             <li class="active"><a href="./demo.html">Demo</a></li>
-            <li><a href="https://github.com/lintool/afterburner/">Code (GitHub)</a></li>
           </ul>
 
         </div><!--/.navbar-collapse -->
@@ -61,29 +60,23 @@
       <div class="col-md-3">
         <label class="btn btn-default btn-file disabled" id="loadwbtn" data-placement="bot" onclick="loadWeb()" >
           Load demo tables from web
-          <!--<button tyle="display: none;" onclick="loadWeb()">Load demo tables from web</button>-->
         </label>
       </div>
       <div class="col-md-3">
-        <label class="btn btn-default btn-file disabled" id="schmbtn" data-toggle="tooltip" data-placement="bot" onclick="togSchema(this)" >
+        <label class="btn btn-default btn-file disabled" id="schmbtn" data-toggle="tooltip" data-placement="bot" onclick="togSchema(this)">
           Show tables
         </label>
       </div>
       <div class="col-md-3">
-        <!-- <label class="btn btn-default btn-file btn-warning"  data-toggle="tooltip" data-placement="bot" onclick="initStore(this)">
-        </label>
-      </div> -->
-
         <div class="dropdown"  id="initmenu">
           <button class="btn dropdown-toggle btn-warning" id="initbtn" type="button" data-toggle="dropdown">
            <!--btn-primary-->
             Initialize Afterburner!
-          <!--<span class="caret"></span>-->
           </button>
           <ul class="dropdown-menu">
-            <li><a href="#">small</a></li>
-            <li><a href="#">medium</a></li>
-            <li><a href="#">large</a></li>
+            <li><a>small</a></li>
+            <li><a>medium</a></li>
+            <li><a>large</a></li>
           </ul>
         </div>
       </div>
@@ -274,11 +267,6 @@ function printtable(htmltable){
   clearElement(divcons);
   divcons.appendChild(htmltable);
 }
-function initStore(){
-  
-}
-
-
 $("#initmenu").on("click", "li a", function() {
   console.log("will store with size:"+$(this).text());
   init_store($(this).text());
@@ -289,10 +277,7 @@ $("#initmenu").on("click", "li a", function() {
   $("#loaddbtn").removeClass("disabled");
   $("#loadwbtn").removeClass("disabled");
 });    
-
-
 </script>
-
 
 <script type="text/javascript">
 
