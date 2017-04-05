@@ -60,19 +60,21 @@ of our roadmap.</p>
  <div class="panel-heading">SQL</div>
   <div class="panel-body">
 <pre>
-select name, salary 
-from employees 
-where salary > 100000 
-order by salary
-limit 10;
+SELECT name, salary 
+FROM employees 
+WHERE salary > 100000 
+ORDER BY salary
+LIMIT 10;
 </pre>
 
 <pre>
-select department, average(salary)
-from employees
-where location = 'Waterloo'
-group by department;
+SELECT d.name, AVG(e.salary)
+FROM employees e
+JOIN departments d ON e.deptId = d.id
+WHERE e.location = 'Waterloo'
+GROUP BY d.name;
 </pre>
+
   </div>
 </div>
 </div>
@@ -91,9 +93,10 @@ abdb.select().from('employees')
 
 <pre>
 abdb.select().from('employees')
-  .field('department', _avg('salary'))
-  .where(_eq('location', "Waterloo")
-  .group('department');
+ .join('departments').on('employees.deptId', 'departments.id')
+ .field('departments.name', _avg('employees.salary'))
+ .where(_eq('location', 'Waterloo')
+ .group('departments.name');
 </pre>
   </div>
 </div>
