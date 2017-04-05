@@ -27,8 +27,8 @@
         </div>
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
-            <li class="active"><a href="./index.html">Home</a></li>
-            <li><a href="./about.html">About</a></li>
+            <li><a href="./index.html">Home</a></li>
+            <li class="active"><a href="./about.html">About</a></li>
             <li><a href="./demo.html">Demo</a></li>
           </ul>
         </div><!--/.navbar-collapse -->
@@ -41,40 +41,77 @@
         <p class="lead">Interactive SQL analytics in your browser!</p>
       </div>
 
-<p>The advent of online <a href="http://jupyter.org/">notebooks</a> and
-complex browser-based interactive visualizations means that the
-browser has, in essence, become the "shell". However, in all
-implementations that we are aware of, the browser is simply a dumb
-rendering endpoint. However, modern browsers are capable of so much
-more: they embed powerful JavaScript engines capable of running
-real-time collaborative tools, online multi-player games, rendering
-impressive 3D scenes, supporting complex, interactive visualizations,
-and even <a href="http://www.quakejs.com/">running first-person
-shooters</a>.</p>
 
-<p>We asked ourselves: Is it possible to exploit modern JavaScript
-engines and build a high-performance data management system that runs
-<i>completely in the browser</i>? Our answer is Afterburner, a
-prototype analytical RDBMS implemented in JavaScript that executes
-completely inside a web browser, is standards compliant, and has no
-external dependencies.  Afterburner generates compiled query plans
-that exploit two JavaScript features: typed arrays and asm.js, which
-we explain below.</p>
+<p>At present, Afterburner takes as input SQL queries in the form of
+what we refer to as "fluent" SQL, based on a method-chaining
+notation. This was inspired
+by <a href="https://hiddentao.com/squel/">squel.js</a> and we took
+this route to save ourselves from having to write yet-another SQL
+parser. There is a straightforward mapping from SQL queries to our
+"fluent" SQL representation, so this is simply syntactic sugar.
+However, biting the bullet and actually writing a SQL parser is part
+of our roadmap.</p>
 
-<p>For more details, see:</p>
+<p>Here are some examples:</p>
 
-      <ul>
-        <li>Kareem El Gebaly and Jimmy Lin. <a href="https://cs.uwaterloo.ca/~jimmylin/publications/ElGebaly_Lin_SIGMOD2017.pdf">In-Browser Interactive SQL Analytics with Afterburner.</a> <i>Proceedings of the 2017 ACM SIGMOD International Conference on Management of Data (SIGMOD 2017)</i>, May 2017, Chicago, Illinois.</li>
-        </li>
+<div class="row">
+  <div class="col-xs-6">
+<div class="panel panel-success">
+ <div class="panel-heading">SQL</div>
+  <div class="panel-body">
+<pre>
+select name, salary 
+from employees 
+where salary > 100000 
+order by salary
+limit 10;
+</pre>
 
-        <li>Kareem El Gebaly and Jimmy Lin. <a href="http://arxiv.org/abs/1605.04035">Afterburner: The Case for In-Browser Analytics.</a> <i>arXiv:1605.04035</i>, May 2016. 
-        </li>
+<pre>
+select department, average(salary)
+from employees
+where location = 'Waterloo'
+group by department;
+</pre>
+  </div>
+</div>
+</div>
+  <div class="col-xs-6">
 
-      </ul>
+<div class="panel panel-info">
+ <div class="panel-heading">"Fluent" SQL</div>
+  <div class="panel-body">
+<pre>
+abdb.select().from('employees')
+  .field('name','salary')
+  .where(_gt('salary',100000))
+  .order('salary')
+  .limit(10)
+</pre>
 
-<p style="padding-top: 20px">
-<a href="demo.html" class="btn btn-primary btn-large">Show me the demo!</a>
-</p>
+<pre>
+abdb.select().from('employees')
+  .field('department', _avg('salary'))
+  .where(_eq('location', "Waterloo")
+  .group('department');
+</pre>
+  </div>
+</div>
+
+</div>
+</div>
+
+<h3>Comparisons</h3>
+
+<p>Other points of comparison with Afterburner:</p>
+
+<ul>
+  <li><a href="https://github.com/agershun/alasql">AlaSQL.js</a>: JavaScript SQL database for browser and Node.js.</li>
+  <li><a href="https://github.com/google/lovefield">Lovefield</a>: a relational database for web apps. Written in JavaScript, works cross-browser. Provides SQL-like APIs that are fast, safe, and easy to use.</li>
+  <li><a href="https://github.com/kripken/sql.js">sql.js</a>: SQLite compiled to JavaScript through Emscripten</li>
+</ul>
+
+<p style="padding-top: 40px"/>
 
   </div> <!-- /container -->
 
