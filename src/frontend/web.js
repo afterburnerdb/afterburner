@@ -94,18 +94,186 @@ function newHTMLCol(size,width,opts){
   setAtts(div,opts);
   return div;
 }
+function newHTMLBut(text,opts){
+  opts=opts||{};
+  opts['class']="btn dropdown-toggle " + (opts['class']||"");
+  opts['type']="button";
+  opts['data-toggle']="dropdown";
+  var but = document.createElement('button');
+  but.innerHTML =text;
+  setAtts(but,opts);
+  return but;
+}
+
+
+function newHTMLDD(items, opts){
+  opts=opts||{};
+  opts['class']='dropdown';
+  var div = document.createElement('div');
+  setAtts(div,opts);
+  var but=newHTMLBut('Select!',{'class':'btn-sm'});
+  div.appendChild(but); 
 //
-function drawSchema(abutton){
+  var ul = newHTMLUL({class:'dropdown-menu', role:'menu'});
+  items.forEach((x)=> {
+    var li = document.createElement('li');
+    li.appendChild(newHTMLA(x));
+    ul.appendChild(li);
+  });
+  div.appendChild(ul); 
+  return div;
+}
+//
+function drawSchema(abutton,exp){
   printSchema();
   abutton.innerText='Hide tables';
+  if (typeof exp !='undefined'){
+    console.log('init context menu');
+    $("#schemaTab td").schCM({
+      menuSelector: "#schCM",
+      menuSelected: function (invokedOn, selectedMenu) {
+        var tabid= Math.floor((invokedOn[0].parentNode.rowIndex-1)/2);
+        var tabname=daSchema.tables[tabid].name;
+        exploreTable(tabname);
+      }
+    });
+  }
   togSchema=hideSchema;
 }
-function hideSchema(abutton){
+function hideSchema(abutton,exp){
   unPrintSchema();
   abutton.innerText='Show tables';
   togSchema=drawSchema;
 }
-function togSchema(abutton){
-  drawSchema(abutton);
+function togSchema(abutton,exp){
+  drawSchema(abutton,exp);
+}
+//Explore
+function exploreTable(tabname){
+  Ei= new Explore(tabname);
+  var scons=document.getElementById("sconsole");
+  clearElement(scons);
+  scons.appendChild(Ei.toHTMLTable());
+  $('#exploreTab tbody').on("click","td",function(e){Ei.bcell(this)});
+  //$("#exploreTab td").expCM({
+  //  menuSelector: "#expCM",
+  //  menuSelected: function (invokedOn, selectedMenu) {
+  //    console.log('invokedOn:'+invokedOn);
+  //    console.log('selectedMenu:'+selectedMenu);
+  //    console.log('selectedMenu.onclick:'+selectedMenu);
+  //    if(selectedMenu.text()== 'Add column')
+  //      Ei.cpAddDomCol(invokedOn[0].parentNode.columnIndex);
+  //    else if (selectedMenu.text() == 'Remove column')
+  //      Ei.cpRmvDomCol(invokedOn[0].parentNode.columnIndex);
+  //    var scons=document.getElementById("sconsole");
+  //    clearElement(scons);
+  //    scons.appendChild(Ei.toHTMLTable());
+  //  }
+  //});
 }
 
+function initCMs(){
+  var ul = newHTMLUL({id:'schCM', class:'dropdown-menu', role:'menu', style:'display:none'});
+  var li = document.createElement('li');
+  var a = newHTMLA("Explore");
+  li.appendChild(a);
+  ul.appendChild(li);
+  document.getElementById("thevoidcons").appendChild(ul);
+//  var ul = newHTMLUL({id:'expCM', class:'dropdown-menu', role:'menu', style:'display:none'});
+//  var li = document.createElement('li');
+//  li.appendChild(newHTMLA("Add column"))
+//  ul.appendChild(li);
+//  li = document.createElement('li');
+//  li.appendChild(newHTMLA("Remove column"))
+////..
+//  var ul2 = newHTMLUL({id:'expCM', class:'dropdown-menu', role:'menu', style:'display:none'});
+//  var li = document.createElement('li');
+//  li.appendChild(newHTMLA("Subatom"))
+//  var li2 = document.createElement('li');
+//  li2.appendChild(newHTMLA("Subatom2"))
+//  ul2.appendChild(li);
+//  ul.appendChild(ul2);
+//  ul.appendChild(li2);
+////..
+//  ul.appendChild(li);
+//  document.getElementById("thevoidcons").appendChild(ul);
+  initCM();
+}
+
+function initCM(){
+//Adapted from: Kyle Mitofsky's @http://jsfiddle.net/KyleMit/X9tgY/
+  (function ($, window) {
+    $.fn.schCM = function (settings) {
+      return this.each(function () {
+        $(this).on("contextmenu", function (e) {
+          if (e.ctrlKey) return;
+          var $menu = $(settings.menuSelector)
+            .data("invokedOn", $(e.target))
+            .show()
+            .css({
+              position: "absolute",
+              left: getMenuPosition(e.clientX, 'width', 'scrollLeft'),
+              top: getMenuPosition(e.clientY, 'height', 'scrollTop')
+            })
+            .off('click')
+            .on('click', 'a', function (e) {
+              $menu.hide();
+              var $invokedOn = $menu.data("invokedOn");
+              var $selectedMenu = $(e.target);
+              settings.menuSelected.call(this, $invokedOn, $selectedMenu);
+            });
+          return false;
+        });
+        $('body').click(function () {
+            $(settings.menuSelector).hide();
+        });
+      });
+      function getMenuPosition(mouse, direction, scrollDir) {
+          var win = $(window)[direction](),
+              scroll = $(window)[scrollDir](),
+              menu = $(settings.menuSelector)[direction](),
+              position = mouse + scroll;
+          if (mouse + menu > win && menu < mouse) 
+              position -= menu;
+          return position;
+      }
+    };
+  })(jQuery, window);
+//  (function ($, window) {
+//    $.fn.expCM = function (settings) {
+//      return this.each(function () {
+//        $(this).on("contextmenu", function (e) {
+//          if (e.ctrlKey) return;
+//          var $menu = $(settings.menuSelector)
+//            .data("invokedOn", $(e.target))
+//            .show()
+//            .css({
+//              position: "absolute",
+//              left: getMenuPosition(e.clientX, 'width', 'scrollLeft'),
+//              top: getMenuPosition(e.clientY, 'height', 'scrollTop')
+//            })
+//            .off('click')
+//            .on('click', 'a', function (e) {
+//              $menu.hide();
+//              var $invokedOn = $menu.data("invokedOn");
+//              var $selectedMenu = $(e.target);
+//              settings.menuSelected.call(this, $invokedOn, $selectedMenu);
+//            });
+//          return false;
+//        });
+//        $('body').click(function () {
+//            $(settings.menuSelector).hide();
+//        });
+//      });
+//      function getMenuPosition(mouse, direction, scrollDir) {
+//          var win = $(window)[direction](),
+//              scroll = $(window)[scrollDir](),
+//              menu = $(settings.menuSelector)[direction](),
+//              position = mouse + scroll;
+//          if (mouse + menu > win && menu < mouse) 
+//              position -= menu;
+//          return position;
+//      }
+//    };
+//  })(jQuery, window);
+}
