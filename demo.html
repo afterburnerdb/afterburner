@@ -43,7 +43,6 @@
           <ul class="nav navbar-nav">
             <li><a href="./index.html">Home</a></li>
             <li class="active"><a href="./demo.html">Demo</a></li>
-            <li><a href="https://github.com/lintool/afterburner/">Code (GitHub)</a></li>
           </ul>
 
         </div><!--/.navbar-collapse -->
@@ -61,29 +60,23 @@
       <div class="col-md-3">
         <label class="btn btn-default btn-file disabled" id="loadwbtn" data-placement="bot" onclick="loadWeb()" >
           Load demo tables from web
-          <!--<button tyle="display: none;" onclick="loadWeb()">Load demo tables from web</button>-->
         </label>
       </div>
       <div class="col-md-3">
-        <label class="btn btn-default btn-file disabled" id="schmbtn" data-toggle="tooltip" data-placement="bot" onclick="togSchema(this)" >
+        <label class="btn btn-default btn-file disabled" id="schmbtn" data-toggle="tooltip" data-placement="bot" onclick="togSchema(this)">
           Show tables
         </label>
       </div>
       <div class="col-md-3">
-        <!-- <label class="btn btn-default btn-file btn-warning"  data-toggle="tooltip" data-placement="bot" onclick="initStore(this)">
-        </label>
-      </div> -->
-
         <div class="dropdown"  id="initmenu">
           <button class="btn dropdown-toggle btn-warning" id="initbtn" type="button" data-toggle="dropdown">
            <!--btn-primary-->
             Initialize Afterburner!
-          <!--<span class="caret"></span>-->
           </button>
           <ul class="dropdown-menu">
-            <li><a href="#">small</a></li>
-            <li><a href="#">medium</a></li>
-            <li><a href="#">large</a></li>
+            <li><a>small</a></li>
+            <li><a>medium</a></li>
+            <li><a>large</a></li>
           </ul>
         </div>
       </div>
@@ -274,11 +267,6 @@ function printtable(htmltable){
   clearElement(divcons);
   divcons.appendChild(htmltable);
 }
-function initStore(){
-  
-}
-
-
 $("#initmenu").on("click", "li a", function() {
   console.log("will store with size:"+$(this).text());
   init_store($(this).text());
@@ -289,10 +277,7 @@ $("#initmenu").on("click", "li a", function() {
   $("#loaddbtn").removeClass("disabled");
   $("#loadwbtn").removeClass("disabled");
 });    
-
-
 </script>
-
 
 <script type="text/javascript">
 
