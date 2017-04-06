@@ -41,6 +41,7 @@ function printSchema(){
     var scons=document.getElementById("sconsole");
     clearElement(scons);
     scons.appendChild(daSchema.toHTMLTable());
+    $('.panel-collapse.in').collapse('hide');
   }
 }
 

@@ -23,7 +23,9 @@
     .table-responsive {
       overflow: auto;
     }
-
+    .rowspc{ 
+      margin-top:20px; 
+    }
   </style>
   </head>
   <body>
@@ -42,6 +44,7 @@
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
             <li><a href="./index.html">Home</a></li>
+            <li><a href="./about.html">About</a></li>
             <li class="active"><a href="./demo.html">Demo</a></li>
           </ul>
 
@@ -54,15 +57,16 @@
       <h1>Afterburner: Demo</h1>
       <p class="lead">Interactive SQL analytics in your browser!</p>
     </div>
+
     <p>In this online demo we've prepared a sample data warehouse based on the <a href="http://www.tpc.org/tpch/">TPC-H</a> schema. 
-      For best performance, we recommend using <a href https://www.mozilla.org/en-US/firefox/all/>FireFox (64-bit)</a> and running on
-      a client with 4GB memory.
-    </p>
-    
-    <p>Begin by clicking on the "initialize" button below and select a memory configuration (how much memory on the client to allocate.</p>
+      For best performance, we recommend using <a href="https://www.mozilla.org/en-US/firefox/all/">FireFox (64-bit)</a> 
+      (for asm.js support) and running on a client with at least 4GB memory.
+      Begin by clicking on the "initialize" button below and select a memory configuration (how much memory on the client to allocate).
+      Then load some data and you'll be ready to start issuing SQL queries!</p>
+
     <div class="row">
-      <div class="col-md-3">
-        <div class="dropdown"  id="initmenu">
+      <div class="container">
+        <div class="dropdown"  id="initmenu" style="float:left; margin:0 10px 10px 0;">
           <button class="btn dropdown-toggle btn-warning" id="initbtn" type="button" data-toggle="dropdown">
            <!--btn-primary-->
             Initialize Afterburner!
@@ -73,34 +77,32 @@
             <li><a>large (~3.0 GB)</a></li>
           </ul>
         </div>
-      </div>
-      <div class="col-md-3">
-        <label class="btn btn-default btn-file disabled" id="schmbtn" data-toggle="tooltip" data-placement="bot" onclick="togSchema(this)">
-          Show Tables
-        </label>
-
-      </div>
-      
-      <div class="col-md-3">
-        <div class="dropdown"  id="initmenu">
+        <div class="dropdown" style="float:left; margin:0 10px 10px 0;" >
           <button class="btn dropdown-toggle disabled" id="loadwbtn" type="button" data-toggle="dropdown">
             Load data!
           </button>
           <ul class="dropdown-menu">
-            <li><a onclick="loadWeb()">Download demo data</a></li>
+            <li><label class="btn btn-default btn-file" onclick="loadWeb()"
+                       style="border: none; border-color: transparent;">
+                  Load demo data (136 MB compressed)
+                </label>
             <li>
-                <label class="btn btn-default btn-file disabled" id="loaddbtn" data-placement="bot">
-                  Load a table from local disk
+                <label class="btn btn-default btn-file" id="loaddbtn" data-placement="bot"
+                       style="border: none; border-color: transparent;">
+                  Load tables from local disk
                   <input type="file" id="fileInput" style="display: none;" multiple> 
                 </label>
             </li>
           </ul>
         </div>
+        <label class="btn btn-default btn-file" id="schmbtn" data-toggle="tooltip" data-placement="bot" onclick="togSchema(this)" style="float:left; margin:0 10px 10px 0;">
+          Show Tables
+        </label>
       </div>
     </div>
-    <div class="row">
+    <div class="row rowspc">
       <div class="col-md-12">
-        <div id="sconsole" class="table-responsive">
+        <div id="sconsole">
         </div>
       <div>
     </div>
@@ -108,34 +110,43 @@
       <div class="col-md-12">
         <h2>Fluent SQL</h2>
       	<textarea rows="11" id="TAFluent" name="TAFluent" class="prettyprint form-control animated linenums language-css" placeholder="Type Fluent SQL or use example buttons.."></textarea>
-              <div class="dropdown">
-                <button class="btn btn-default dropdown-toggle" onchange="alert('boom')" type="button" id="menu1" data-toggle="dropdown">Insert TPC-H Query<span class="caret"></span></button>
-                <ul class="dropdown-menu" role="menu" aria-labelledby="menu1">
-                  <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query1">Q1</a></li>
-                  <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query2">Q2</a></li>
-                  <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query3">Q3</a></li>
-                  <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query4">Q4</a></li>
-                  <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query5">Q5</a></li>
-                  <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query6">Q6</a></li>
-                  <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query7">Q7</a></li>
-                  <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query8">Q8</a></li>
-                  <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query9">Q9</a></li>
-                  <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query10">Q10</a></li>
-                  <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query11">Q11</a></li>
-                  <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query12">Q12</a></li>
-                  <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query13">Q13</a></li>
-                  <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query14">Q14</a></li>
-                  <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query15">Q15</a></li>
-                  <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query16">Q16</a></li>
-                  <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query17">Q17</a></li>
-                  <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query18">Q18</a></li>
-                  <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query19">Q19</a></li>
-                  <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query20">Q20</a></li>
-                  <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query21">Q21</a></li>
-                  <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query22">Q22</a></li>
-                </ul>
-              </div>
-              <button type="button" onclick="runcode()" class="btn btn-default" href="#" data-placement="bot"> Run code</button>
+        <div class="row"> 
+          &nbsp; 
+        </div>
+        <div class="row">
+          <div class="container">
+            <div class="dropdown">
+              <button class="btn btn-default dropdown-toggle" onchange="alert('boom')" type="button" id="menu1" data-toggle="dropdown" style="float:left; margin:0 10px 10px 0;">Insert TPC-H Query<span class="caret"></span></button>
+              <ul class="dropdown-menu" role="menu" aria-labelledby="menu1">
+                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query1">Q1</a></li>
+                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query2">Q2</a></li>
+                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query3">Q3</a></li>
+                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query4">Q4</a></li>
+                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query5">Q5</a></li>
+                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query6">Q6</a></li>
+                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query7">Q7</a></li>
+                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query8">Q8</a></li>
+                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query9">Q9</a></li>
+                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query10">Q10</a></li>
+                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query11">Q11</a></li>
+                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query12">Q12</a></li>
+                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query13">Q13</a></li>
+                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query14">Q14</a></li>
+                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query15">Q15</a></li>
+                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query16">Q16</a></li>
+                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query17">Q17</a></li>
+                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query18">Q18</a></li>
+                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query19">Q19</a></li>
+                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query20">Q20</a></li>
+                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query21">Q21</a></li>
+                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query22">Q22</a></li>
+              </ul>
+            </div>
+            <button type="button" onclick="runcode()" class="btn btn-default" href="#" data-placement="bot">
+              Run Query
+            </button>
+          </div>
+        </div>
       </div>
     </div>
     <br>
@@ -162,7 +173,7 @@
       </div>
       <div class="modal-footer">
           <div class='col-md-1'>
-            <button id="modalgate" type="button" onclick="$('#waitForPT').modal('hide');$('#schmbtn').click();" class="btn btn-default" disabled>Got it..</button>
+            <button id="modalgate" type="button" onclick="$('#waitForPT').modal('hide');$('#schmbtn').click();" class="btn btn-default" disabled>Dismiss</button>
           </div>
       </div>
     </div>
@@ -276,7 +287,7 @@ function runcode(){
   runMyAdhocCode(codecode);
   var tt1=window.performance.now();
   var ttot=tt1-tt0;
-  document.getElementById("console").innerHTML = "Total time to run (ms)=" + (ttot.toFixed(2));
+  document.getElementById("console").innerHTML = "Query completed in " + (ttot.toFixed(2))+"ms" ;
   console.log('time to run code:'+ (ttot));
 }
 function printtable(htmltable){
@@ -290,10 +301,9 @@ $("#initmenu").on("click", "li a", function() {
   init_store(size);
   $("#initbtn").removeClass("btn-warning");
   $("#initbtn").addClass("disabled");
-  $("#initbtn").text($(this).text());
-  $("#schmbtn").removeClass("disabled");
-  $("#loaddbtn").removeClass("disabled");
+  $("#initbtn").text("Initialized: "+$(this).text());
   $("#loadwbtn").removeClass("disabled");
+  $("#loadwbtn").addClass("btn-success");
 });    
 </script>
 

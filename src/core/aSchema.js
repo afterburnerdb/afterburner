@@ -90,66 +90,57 @@ function aSchema(){
   }
 
   this.toHTMLTable = function() {
-    var table=document.createElement('table');
-    table.setAttribute('id',"schemaTab");
-    table.setAttribute('class',"table table-bordered table-condensed table-nonfluid table-striped table-hover");
-
-    var thead = table.createTHead();
-    thead.setAttribute('class',"thead-default");
-    var tr = thead.insertRow(0);
-
-    var th = document.createElement('th');
-    th.appendChild(document.createTextNode('Table Name'));
-    tr.appendChild(th);
-    var th = document.createElement('th');
-    th.appendChild(document.createTextNode('Columns'));
-    th.setAttribute('colspan', 100);
-    tr.appendChild(th);
-
-    thead.appendChild(tr);
-    var tbody = table.createTBody();
-
+    var pg=newHTMLDIV({class:"panel-group", id:"accordion", role:"tablist", 'aria-multiselectable':"true"});
     for (var i=0;i<this.tables.length;i++){
+      var ppd=newHTMLDIV({class:"panel panel-default"});
+      var ph=newHTMLDIV({class:"panel-heading"});
+      var h4=newHTMLH4({class:"panel-title"});
+      var a=newHTMLA(this.tables[i].name+" ("+this.tables[i].numrows+" rows)",{role:"button", 'data-toggle':"collapse", 'data-parent':"#accordion", 'aria-expanded':"true",href:"#schmclps"+i, 'aria-controls':"schmclps"+i});
+      h4.appendChild(a);
+      ph.appendChild(h4);
+      ppd.appendChild(ph);
 
-      var trname = document.createElement('tr');
-      var trtype = document.createElement('tr');
-      
-      var td = document.createElement('td');
-      td.appendChild(document.createTextNode(""+ this.tables[i].name));
-      trname.appendChild(td);
- 
-      var td = document.createElement('td');
-      td.appendChild(document.createTextNode(""));
-      trtype.appendChild(td);
-
+      var pcc=newHTMLDIV({id:"schmclps"+i,class:"panel-collapse collapse in", role:"tabpanel",'aria-labelledby':"headingOne"});
+      var pb=newHTMLDIV({class:"panel-body"});
+      var htmlTab=newHTMLTable({class:"table table-bordered table-condensed table-nonfluid table-striped table-hover"});
+      var thead = newHTMLThead(htmlTab);
+      var tbody = newHTMLTBody(htmlTab);
+      var tr = thead.insertRow(0);
+      tr.appendChild(newHTMLTH("Name"));
+      tr.appendChild(newHTMLTH("Type"));
       for (var ii=0;ii<this.tables[i].numcols;ii++){
-        var td = document.createElement('td');
-        td.appendChild(document.createTextNode(""+this.tables[i].colnames[ii]));
-        trname.appendChild(td);
+        var tr = tbody.insertRow(-1);
+        tr.appendChild(newHTMLTD(this.tables[i].colnames[ii]));
+        if (this.tables[i].coltypes[ii]==0){
+          tr.appendChild(newHTMLTD("Int"));
+        } else if (this.tables[i].coltypes[ii]==1){
+          tr.appendChild(newHTMLTD("Float"));
+        } else if (this.tables[i].coltypes[ii]==2){
+          tr.appendChild(newHTMLTD("String"));
+        } else if (this.tables[i].coltypes[ii]==3){
+          tr.appendChild(newHTMLTD("Date"));
+        } else if (this.tables[i].coltypes[ii]==4){
+          tr.appendChild(newHTMLTD("Char"));
+        } else{
+          td.appendChild(document.createTextNode("unknown type"));
+        }
       }
-      tbody.appendChild(trname);
-
-      for (var ii=0;ii<this.tables[i].numcols;ii++){
-        var td = document.createElement('td');
-          if (this.tables[i].coltypes[ii]==0){
-            td.appendChild(document.createTextNode("Int"));
-          } else if (this.tables[i].coltypes[ii]==1){
-            td.appendChild(document.createTextNode("Float"));
-          } else if (this.tables[i].coltypes[ii]==2){
-            td.appendChild(document.createTextNode("String"));
-          } else if (this.tables[i].coltypes[ii]==3){
-            td.appendChild(document.createTextNode("Date"));
-          } else if (this.tables[i].coltypes[ii]==4){
-            td.appendChild(document.createTextNode("Char"));
-          } else{
-            alert("unknown type");
-          }
-        trtype.appendChild(td);
-      }
-      tbody.appendChild(trtype);
-
+      pb.appendChild(htmlTab);
+      pcc.appendChild(pb);
+      ppd.appendChild(pcc);
+      pg.appendChild(ppd);
     }
-    return table;
+    if (this.tables.length==0){
+      var ph=newHTMLDIV({class:"panel-heading",style:"background-color: orange!important"});
+      var h4=newHTMLH4({class:"panel-title"});
+      var ppd=newHTMLDIV({class:"panel panel-default"});
+      var a=newHTMLA("No tables loaded yet.. Load data! first..",{role:"button", 'data-toggle':"collapse", 'data-parent':"#accordion", 'aria-expanded':"true", 'aria-controls':"collapseOne"});
+      h4.appendChild(a);
+      ph.appendChild(h4);
+      ppd.appendChild(ph);
+      pg.appendChild(ppd);
+    }
+    return pg;
   };
 };
 //////////////////////////////////////////////////////////////////////////////

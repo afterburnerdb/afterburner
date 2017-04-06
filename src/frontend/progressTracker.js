@@ -112,6 +112,7 @@ function progressTracker(){
   }
   this.enableModalGate=function(){
     this.mg.prop('disabled',false);
+    this.mg.addClass('btn-success');
   }
 }
 PTi = new progressTracker();
