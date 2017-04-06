@@ -224,6 +224,10 @@ if (hipstore){
     if (newstoreBcpt>storedBpct){
       PTi.onMemTick(storedBpct=newstoreBcpt);
     }
+    if (storedB>=storemax){
+      alert("Afterburner ran out of memory, please reload page and use smaller tables or a larger memory configuration.\nHint: Use medium or large memory configurations with demo data.");
+      return -1;
+    }
     return ret|0;
   }  
 }
