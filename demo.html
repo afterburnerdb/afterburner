@@ -83,10 +83,10 @@
             Load data!
           </button>
           <ul class="dropdown-menu">
-            <li><a onclick="loadWeb()">Load demo data (300 MB compressed)</a></li>
+            <li><a onclick="loadWeb()" style="align:left">Load demo data (300 MB compressed)</a></li>
             <li>
                 <label class="btn btn-default btn-file" id="loaddbtn" data-placement="bot">
-                  Load a table from local disk
+                  Load tables from local disk
                   <input type="file" id="fileInput" style="display: none;" multiple> 
                 </label>
             </li>
@@ -109,6 +109,7 @@
       <div class="col-md-12">
         <h2>Fluent SQL</h2>
       	<textarea rows="11" id="TAFluent" name="TAFluent" class="prettyprint form-control animated linenums language-css" placeholder="Type Fluent SQL or use example buttons.."></textarea>
+        <div class="row"> &nbsp; </div>
         <div class="row">
           <div class="col-md-3">
               <div class="dropdown">
