@@ -6,8 +6,8 @@ function Explore(tabname){
   this.selColNames=this.tab.colnames.slice(0);
   this.selColVals=[];
   this.selColNames.forEach((x)=>{this.selColVals.push('*')});
-  this.aggA=['_count(*)','new'];
-  this.valA=[this.tab.numrows,''];
+  this.aggA=["_count('*')"];
+  this.valA=[this.tab.numrows];
 
 //Control panel
   this.cpAddDomCol=function(col){
@@ -59,7 +59,13 @@ function Explore(tabname){
       return;
   }
   this.uncompute=function(){
-    $("[id=rcell]").text('');
+    $("[id^=rcell]").text('');
+  }
+  this.compute=function(){
+    $("[id^=rcell]").text('');
+    for (var i=0;i<this.valA.length-1;i++){
+      tr.appendChild(newHTMLTD(this.valA[i],{id:'rcell'+i}))
+    };
   }
   this.onQchange=function(){
     console.log('query changed');
@@ -71,16 +77,43 @@ function Explore(tabname){
     var gbyStr="";
     var filtStr="";
 
+    var fromstr =".from ('"+ this.tabname        +"')";
+
+
     for (var i=0;i<this.selColVals.length;i++){
       if (this.selColVals[i] == 'ALL')
-        gby.push(this.selColNames[i]);
+        gby.push("'"+this.selColNames[i]+"'");
       else if (this.selColVals[i] == '*')
         var donothing;
       else {
-        filt.push("_eq("+this.selColNames[i]+","+this.selColVals[i]+")");
+        filt.push("_eq('"+this.selColNames[i]+"','"+this.selColVals[i]+"')");
       }
     }
-    console.log("abdb.select().from("+this.tabname+").field(_count('*')).where("+filt.join(',')+").group("+gby.join(',')+").toArray()");
+
+    var fieldstr=".field( "+ gby.concat(this.aggA).join(',') +" )";
+
+    var wherestr=".where("+ filt.join(',')      +")";
+
+    var groupstr=(gby.length>0) ? ".group( "+ gby.join(',')       +" )" : "";
+
+    var qstr="abdb.select()"+
+             fromstr+
+             fieldstr+
+             wherestr.replace(".where()","")+
+             groupstr+
+             ".toArray2()";
+
+    var tt0=window.performance.now();
+    console.log("qstr:"+qstr);
+    var qeval=eval(qstr);
+    console.log("qeval:"+qeval);
+    var tt1=window.performance.now();
+    var ttot=tt1-tt0;
+    document.getElementById("console").innerHTML = "Query completed in " + (ttot.toFixed(2))+"ms<br>";
+    document.getElementById("console").innerHTML+= "qstr:"+ qstr + "<br>";
+    document.getElementById("console").innerHTML+= "qeval:"+ qeval;
+    console.log('time to run code:'+ (ttot));
+
   }
 //
   this.toHTMLTable=function(){
@@ -88,11 +121,18 @@ function Explore(tabname){
     var thead = newHTMLThead(table);
     var tr = thead.insertRow(0);
     this.selColNames.forEach((x)=>{tr.appendChild(newHTMLTH(x))});
-    this.aggA.forEach((x)=>{tr.appendChild(newHTMLTD(x))});
+    tr.appendChild(newHTMLTH("Add"));
+    this.aggA.forEach((x)=>{tr.appendChild(newHTMLTH(x))});
+    tr.appendChild(newHTMLTH("Add"));
     var body= newHTMLTBody(table);
     tr = body.insertRow(0);
     this.selColNames.forEach((x)=>{tr.appendChild(newHTMLTD('*'))});
-    this.valA.forEach((x)=>{tr.appendChild(newHTMLTD(x,{id:'rcell'}))});
+    tr.appendChild(newHTMLTD(''));
+
+    for (var i=0;i<this.valA.length;i++){
+      tr.appendChild(newHTMLTD(this.valA[i],{id:'rcell'+i}));
+    };
+    tr.appendChild(newHTMLTD(''));
     return table;
   }
 //Constructor:
