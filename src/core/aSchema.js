@@ -95,7 +95,7 @@ function aSchema(){
       var ppd=newHTMLDIV({class:"panel panel-default"});
       var ph=newHTMLDIV({class:"panel-heading"});
       var h4=newHTMLH4({class:"panel-title"});
-      var a=newHTMLA(this.tables[i].name+"("+this.tables[i].numrows+")",{role:"button", 'data-toggle':"collapse", 'data-parent':"#accordion", 'aria-expanded':"true",href:"#schmclps"+i, 'aria-controls':"schmclps"+i});
+      var a=newHTMLA(this.tables[i].name+" ("+this.tables[i].numrows+" rows)",{role:"button", 'data-toggle':"collapse", 'data-parent':"#accordion", 'aria-expanded':"true",href:"#schmclps"+i, 'aria-controls':"schmclps"+i});
       h4.appendChild(a);
       ph.appendChild(h4);
       ppd.appendChild(ph);
