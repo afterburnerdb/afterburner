@@ -57,12 +57,13 @@
       <h1>Afterburner: Demo</h1>
       <p class="lead">Interactive SQL analytics in your browser!</p>
     </div>
+
     <p>In this online demo we've prepared a sample data warehouse based on the <a href="http://www.tpc.org/tpch/">TPC-H</a> schema. 
-      For best performance, we recommend using <a href https://www.mozilla.org/en-US/firefox/all/>FireFox (64-bit)</a> and running on
-      a client with 4GB memory.
-    </p>
-    
-    <p>Begin by clicking on the "initialize" button below and select a memory configuration (how much memory on the client to allocate.</p>
+      For best performance, we recommend using <a href="https://www.mozilla.org/en-US/firefox/all/">FireFox (64-bit)</a> 
+      (for asm.js support) and running on a client with at least 4GB memory.
+      Begin by clicking on the "initialize" button below and select a memory configuration (how much memory on the client to allocate).
+      Then load some data and you'll be ready to start issuing SQL queries!</p>
+
     <div class="row">
       <div class="container">
         <div class="dropdown"  id="initmenu" style="float:left; margin:0 10px 10px 0;">
@@ -95,12 +96,7 @@
         </label>
       </div>
     </div>
-    <div class="row rowspc">
-      <div class="col-md-12">
-        <div id="sconsole">
-        </div>
-      <div>
-    </div>
+
     <div class="row">
       <div class="col-md-12">
         <h2>Fluent SQL</h2>
@@ -167,7 +163,7 @@
       </div>
       <div class="modal-footer">
           <div class='col-md-1'>
-            <button id="modalgate" type="button" onclick="$('#waitForPT').modal('hide');$('#schmbtn').click();" class="btn btn-default" disabled>Got it..</button>
+            <button id="modalgate" type="button" onclick="$('#waitForPT').modal('hide');$('#schmbtn').click();" class="btn btn-default" disabled>Dismiss</button>
           </div>
       </div>
     </div>
