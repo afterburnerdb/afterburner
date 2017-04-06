@@ -6,6 +6,8 @@ function Explore(tabname){
   this.selColNames=this.tab.colnames.slice(0);
   this.selColVals=[];
   this.selColNames.forEach((x)=>{this.selColVals.push('*')});
+  this.aggA=['_count(*)','new'];
+  this.valA=[this.tab.numrows,''];
 
 //Control panel
   this.cpAddDomCol=function(col){
@@ -29,8 +31,10 @@ function Explore(tabname){
   }
 //Events:
   this.bcell=function(cell){
-    clearElement(cell);
+    if (cell.cellIndex>=this.selColNames.length)
+      return;
     var colname=this.selColNames[cell.cellIndex];
+    clearElement(cell);
     console.log("abdb.select().from("+this.tabname+").field("+colname+").group("+colname+").toArray()");
     var distinct=abdb.select().from(this.tabname).field(colname).group(colname).toArray();
     cell.appendChild(newHTMLDD(['ALL','*'].concat(distinct),{id:'bcellmenu'}));
@@ -38,9 +42,8 @@ function Explore(tabname){
 
     $("#bcellmenu").on("click", "li a", function() {
       Ei.bcello(this,cell.cellIndex,cell,colname);
-//      init_store($(this).text());
-//      $("#initbtn").text($(this).text());
     });
+    this.uncompute();
   }
   this.bcello=function(menuitem,remember,cell,colname){
     expose=menuitem;
@@ -49,6 +52,14 @@ function Explore(tabname){
     cell.appendChild(newHTMLA(menuitem.text));
     this.selColVals[remember]=menuitem.text;
     this.onQchange();
+  }
+  this.hcell=function(cell){
+    console.log("@hcell");
+    if (cell.cellIndex>=this.selColNames.length)
+      return;
+  }
+  this.uncompute=function(){
+    $("[id=rcell]").text('');
   }
   this.onQchange=function(){
     console.log('query changed');
@@ -67,21 +78,22 @@ function Explore(tabname){
         var donothing;
       else {
         filt.push("_eq("+this.selColNames[i]+","+this.selColVals[i]+")");
-      }   
+      }
     }
     console.log("abdb.select().from("+this.tabname+").field(_count('*')).where("+filt.join(',')+").group("+gby.join(',')+").toArray()");
   }
 //
   this.toHTMLTable=function(){
     var table = newHTMLTable({id:"exploreTab"});
-    var tbody = newHTMLThead(table);
-    var tr = tbody.insertRow(0);
-    this.selColNames.forEach((x)=>{tr.appendChild(newHTMLTD(x))});
+    var thead = newHTMLThead(table);
+    var tr = thead.insertRow(0);
+    this.selColNames.forEach((x)=>{tr.appendChild(newHTMLTH(x))});
+    this.aggA.forEach((x)=>{tr.appendChild(newHTMLTD(x))});
     var body= newHTMLTBody(table);
     tr = body.insertRow(0);
     this.selColNames.forEach((x)=>{tr.appendChild(newHTMLTD('*'))});
+    this.valA.forEach((x)=>{tr.appendChild(newHTMLTD(x,{id:'rcell'}))});
     return table;
   }
 //Constructor:
-
 }

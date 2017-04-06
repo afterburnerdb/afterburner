@@ -12,27 +12,19 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pako/1.0.4/pako.min.js"></script>
     <a href="https://github.com/lintool/afterburner/"><img style="position: absolute; top: 0; right: 0; border: 0; z-index:9999;" src="https://camo.githubusercontent.com/652c5b9acfaddf3a9c326fa6bde407b87f7be0f4/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6f72616e67655f6666373630302e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_orange_ff7600.png"></a>
-
+ 
   <style type="text/css">
     body {
       padding-top: 50px;
     }
     .table-nonfluid {
       width: auto !important;
-      overflow: auto;
     }
     .table-responsive {
       overflow: auto;
     }
-    @media (max-width: 767px) {
-      .table-responsive .dropdown-menu {
-        position: static !important;
-      }
-    }
-    @media (min-width: 768px) {
-      .table-responsive {
-        overflow: visible;
-      }
+    .rowspc{ 
+      margin-top:20px; 
     }
   </style>
   </head>
@@ -52,6 +44,7 @@
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
             <li><a href="./index.html">Home</a></li>
+            <li><a href="./about.html">About</a></li>
             <li class="active"><a href="./demo.html">Demo</a></li>
           </ul>
 
@@ -60,44 +53,113 @@
     </nav>
 
   <div class="container">
+    <div class="page-header">
+      <h1>Afterburner: Demo</h1>
+      <p class="lead">Interactive SQL analytics in your browser!</p>
+    </div>
+
+    <p>In this online demo we've prepared a sample data warehouse based on the <a href="http://www.tpc.org/tpch/">TPC-H</a> schema. 
+      For best performance, we recommend using <a href="https://www.mozilla.org/en-US/firefox/all/">FireFox (64-bit)</a> 
+      (for asm.js support) and running on a client with at least 4GB memory.
+      Begin by clicking on the "initialize" button below and select a memory configuration (how much memory on the client to allocate).
+      Then load some data and you'll be ready to start issuing SQL queries!</p>
+
     <div class="row">
-      <div class="col-md-3">
-        <label class="btn btn-default btn-file disabled" id="loaddbtn" data-placement="bot">
-          Load a table from local disk
-          <input type="file" id="fileInput" style="display: none;" multiple> 
-        </label>
-      </div>
-      <div class="col-md-3">
-        <label class="btn btn-default btn-file disabled" id="loadwbtn" data-placement="bot" onclick="loadWeb()" >
-          Load demo tables from web
-        </label>
-      </div>
-      <div class="col-md-3">
-        <label class="btn btn-default btn-file disables" id="schmbtn" data-toggle="tooltip" data-placement="bot" onclick="togSchema(this,true)">
-          Show tables
-        </label>
-      </div>
-      <div class="col-md-3">
-        <div class="dropdown"  id="initmenu">
+      <div class="container">
+        <div class="dropdown"  id="initmenu" style="float:left; margin:0 10px 10px 0;">
           <button class="btn dropdown-toggle btn-warning" id="initbtn" type="button" data-toggle="dropdown">
            <!--btn-primary-->
             Initialize Afterburner!
           </button>
           <ul class="dropdown-menu">
-            <li><a>small</a></li>
-            <li><a>medium</a></li>
-            <li><a>large</a></li>
+            <li><a>small (~0.75 GB)</a></li>
+            <li><a>medium (~1.5 GB)</a></li>
+            <li><a>large (~3.0 GB)</a></li>
           </ul>
         </div>
+        <div class="dropdown" style="float:left; margin:0 10px 10px 0;" >
+          <button class="btn dropdown-toggle disabled" id="loadwbtn" type="button" data-toggle="dropdown">
+            Load data!
+          </button>
+          <ul class="dropdown-menu">
+            <li><label class="btn btn-default btn-file" onclick="loadWeb()"
+                       style="border: none; border-color: transparent;">
+                  Load demo data (136 MB compressed)
+                </label>
+            <li>
+                <label class="btn btn-default btn-file" id="loaddbtn" data-placement="bot"
+                       style="border: none; border-color: transparent;">
+                  Load tables from local disk
+                  <input type="file" id="fileInput" style="display: none;" multiple> 
+                </label>
+            </li>
+          </ul>
+        </div>
+        <label class="btn btn-default btn-file" id="schmbtn" data-toggle="tooltip" data-placement="bot" onclick="togSchema(this)" style="float:left; margin:0 10px 10px 0;">
+          Show Tables
+        </label>
+        <label class="btn btn-default btn-file" id="togexqu" data-toggle="tooltip" data-placement="bot" onclick="backToQuery()" style="float:left; margin:0 10px 10px 0;">
+          <span class="glyphicon glyphicon-arrow-left"></span> 
+          Back to Query
+        </label>
+
       </div>
     </div>
-    <div class="row">
+    <div class="row rowspc" id="">
       <div class="col-md-12">
-        <div id="sconsole" class="table-responsive">
+        <div id="sconsole">
         </div>
       <div>
     </div>
-
+    <div class="row rowspc" id="">
+      <div class="col-md-12">
+        <div id="econsole">
+        </div>
+      <div>
+    </div>
+    <div class="row" id="qconsole">
+      <div class="col-md-12">
+        <h2>Fluent SQL</h2>
+      	<textarea rows="11" id="TAFluent" name="TAFluent" class="prettyprint form-control animated linenums language-css" placeholder="Type Fluent SQL or use example buttons.."></textarea>
+        <div class="row"> 
+          &nbsp; 
+        </div>
+        <div class="row">
+          <div class="container">
+            <div class="dropdown">
+              <button class="btn btn-default dropdown-toggle" onchange="alert('boom')" type="button" id="menu1" data-toggle="dropdown" style="float:left; margin:0 10px 10px 0;">Insert TPC-H Query<span class="caret"></span></button>
+              <ul class="dropdown-menu" role="menu" aria-labelledby="menu1">
+                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query1">Q1</a></li>
+                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query2">Q2</a></li>
+                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query3">Q3</a></li>
+                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query4">Q4</a></li>
+                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query5">Q5</a></li>
+                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query6">Q6</a></li>
+                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query7">Q7</a></li>
+                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query8">Q8</a></li>
+                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query9">Q9</a></li>
+                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query10">Q10</a></li>
+                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query11">Q11</a></li>
+                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query12">Q12</a></li>
+                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query13">Q13</a></li>
+                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query14">Q14</a></li>
+                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query15">Q15</a></li>
+                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query16">Q16</a></li>
+                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query17">Q17</a></li>
+                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query18">Q18</a></li>
+                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query19">Q19</a></li>
+                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query20">Q20</a></li>
+                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query21">Q21</a></li>
+                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query22">Q22</a></li>
+              </ul>
+            </div>
+            <button type="button" onclick="runcode()" class="btn btn-default" href="#" data-placement="bot">
+              Run Query
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
     <br>
     <div class="row" id="divconsole">
       <div class="col-md-12">
@@ -111,7 +173,6 @@
         </div>
       </div>
     </div>
-<!--    </div> -->
   </div> <!-- /container -->
 
 <div id="waitForPT" class="modal fade" style="left" role="dialog">
@@ -123,17 +184,12 @@
       </div>
       <div class="modal-footer">
           <div class='col-md-1'>
-            <button id="modalgate" type="button" onclick="$('#waitForPT').modal('hide');$('#schmbtn').click();" class="btn btn-default" disabled>Got it..</button>
+            <button id="modalgate" type="button" onclick="$('#waitForPT').modal('hide');$('#schmbtn').click();" class="btn btn-default" disabled>Dismiss</button>
           </div>
       </div>
     </div>
   </div>
 </div>
-<!--  Explore -->
-<div id="thevoidcons" style="diplay:none"></div>
-
-
-<!-- /Explore -->
 
 <!-- Afterburner -->
 
@@ -203,10 +259,11 @@
 <script src="./src/tpch/benchmark_tpch.js"></script>
 <script src="./src/micro/benchmark_micro.js"></script>
 
+
+  
 <script>
 function myOnLoad(){
   abdb = new Afterburner();
-  initCMs();
 }
 window.onload = function() {
   inNode=false;
@@ -223,17 +280,26 @@ function URLList(){
 }
 function loadWeb(){
   var urls= new URLList();
-  urls.list=["https://lintool.github.io/afterburner-data/upgrade.5795.tbl.gz"];
+  urls.list=[
+    "https://lintool.github.io/afterburner-data/lineitem.1319015.tbl.gz",
+    "https://lintool.github.io/afterburner-data/nation.25.tbl.gz",
+    "https://lintool.github.io/afterburner-data/orders.1500000.tbl.gz",
+    "https://lintool.github.io/afterburner-data/part.200000.tbl.gz",
+    "https://lintool.github.io/afterburner-data/partsupp.800000.tbl.gz",
+    "https://lintool.github.io/afterburner-data/region.5.tbl.gz",
+    "https://lintool.github.io/afterburner-data/supplier.10000.tbl.gz",
+    "https://lintool.github.io/afterburner-data/customer.150000.tbl.gz"];
   PTi.trackURLs(urls.list);
   var ds= new dataSource(urls, function(){newTable= new aTable(ds);});
 }
 function runcode(){
   var codecode=document.getElementById("TAFluent").value;
+//  document.getElementById("console").innerHTML = "code=" + codecode;
   var tt0=window.performance.now();
   runMyAdhocCode(codecode);
   var tt1=window.performance.now();
   var ttot=tt1-tt0;
-  document.getElementById("console").innerHTML = "Total time to run (ms)=" + (ttot.toFixed(2));
+  document.getElementById("console").innerHTML = "Query completed in " + (ttot.toFixed(2))+"ms" ;
   console.log('time to run code:'+ (ttot));
 }
 function printtable(htmltable){
@@ -241,16 +307,45 @@ function printtable(htmltable){
   clearElement(divcons);
   divcons.appendChild(htmltable);
 }
+function prepExplore(){
+  console.log("@prepExplore");
+  $("#qconsole").hide();
+  $("#sconsole").hide();
+  $("#divconsole").hide();
+  $("#divcons").hide();
+  $("#togexqu").show();
+  $("#econsole").show();
+}
+function backToQuery(){
+  console.log("@prepQuery");
+  $("#qconsole").show();
+  $("#sconsole").show();
+  $("#econsole").show();
+  $("#divconsole").show();
+  $("#divcons").show();
+  $("#togexqu").hide();
+  $("#econsole").hide();
+}
+$("#togexqu").hide();
 $("#initmenu").on("click", "li a", function() {
   console.log("will store with size:"+$(this).text());
-  init_store($(this).text());
+  var size=$(this).text().split(" ")[0];
+  init_store(size);
   $("#initbtn").removeClass("btn-warning");
   $("#initbtn").addClass("disabled");
-  $("#initbtn").text($(this).text());
-  $("#schmbtn").removeClass("disabled");
-  $("#loaddbtn").removeClass("disabled");
+  $("#initbtn").text("Initialized: "+$(this).text());
   $("#loadwbtn").removeClass("disabled");
-});
+  $("#loadwbtn").addClass("btn-success");
+});    
+</script>
+
+<script type="text/javascript">
+
+jQuery("[id*='query']").click(function(e){
+                                var toeval=e.currentTarget.id+".toString().replace(/;/g,'').replace(/noasm/g,'').replace('\"q_sums\",300','\"q_sums\",200').replace(/}\w*/,'').replace('return','').replace(/function query.*{/,'/*"+e.currentTarget.id+"*/')";
+                                document.getElementById("TAFluent")
+                                  .value=eval(toeval)+"  .materialize();\nprinttable(res.toHTMLTableN(100))";
+                                  e.preventDefault();});
 </script>
 
 </body>
