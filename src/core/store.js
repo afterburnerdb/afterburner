@@ -91,8 +91,8 @@ function store_respond(size){
   size=size.toLowerCase();
   if (size == 'small'){
     console.log("using small store");
-    confmemmax=(512*1024*1024)-(16*1024*1024);
-    conftmpstrStorageMB=64;
+    confmemmax=603979776;
+    conftmpstrStorageMB=60;
     confbufPoolMB=50;
     //confhashBits=22;
     confbukpoolMB=50;
