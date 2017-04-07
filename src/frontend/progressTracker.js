@@ -98,7 +98,7 @@ function progressTracker(){
     if (ttloads==0)
       a=newHTMLP('time to load: '+ttloadms+' (ms)');
     else
-      a=newHTMLP('time to load: '+ttloadms+' (s)');
+      a=newHTMLP('time to load: '+ttloads+' (s)');
     $('#trkurlcol3'+fid)[0].appendChild(a);
 
   }
