@@ -84,7 +84,7 @@
           <ul class="dropdown-menu">
             <li><label class="btn btn-default btn-file" onclick="loadWeb()"
                        style="border: none; border-color: transparent;">
-                  Load demo data (1 MB compressed)
+                  Load demo data (12 MB compressed)
                 </label>
             <li>
                 <label class="btn btn-default btn-file" id="loaddbtn" data-placement="bot"
@@ -282,7 +282,8 @@ function loadWeb(){
   var urls= new URLList();
   urls.list=[
     "https://lintool.github.io/afterburner-data/upgrade.5795.tbl.gz",
-    "https://lintool.github.io/afterburner-data/customer.150000.tbl.gz"];
+    "https://lintool.github.io/afterburner-data/adult.32561.tbl.gz",
+    "https://lintool.github.io/afterburner-data/income.1487904.tbl.gz"];
   PTi.trackURLs(urls.list);
   var ds= new dataSource(urls, function(){newTable= new aTable(ds);});
 }
