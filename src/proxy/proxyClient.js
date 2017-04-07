@@ -7,12 +7,9 @@ if(typeof module == 'undefined'){
 if (inNode){
   var XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
 }
-pci= new proxyClient(proxyConf.proxy.webhost,proxyConf.proxy.webport);
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 function proxyClient(HOST,PORT){
-  this.HOST=HOST;
-  this.PORT=PORT;
   //
   this.get= function(urlrel,cBack){
    var xhttp = new XMLHttpRequest();
@@ -33,17 +30,13 @@ function proxyClient(HOST,PORT){
      return 0;
   }
   this.getJSON= function(uri,cBack){
-//    uri=encodeURIComponent(uri);
-//    uri= uri.replace('+','%2B');
-    var ret=$.ajax({  dataType: "json",  url: uri,async:false})
+    var ret=$.ajax({dataType: "json", url: uri, async:false})
     return ret;
   }
   this.execSQL= function(sql){
     var uri='/query?sql='+encodeURIComponent(sql);
-//    uri=encodeURIComponent(uri);
     uri= uri.replace('+','%2B');
 
-//    var uri='/query?sql='+sql;
     var web_resp=this.getJSON(uri);
     return web_resp.responseJSON;
   }
@@ -77,10 +70,12 @@ function proxyClient(HOST,PORT){
     return this.get(uri);
   }
   //constructor:
+  HOST=HOST||proxyConf.proxy.webhost;
+  PORT=PORT||proxyConf.proxy.webport;
   this.HOST=(HOST!=='undefined')?'127.0.0.1':HOST;
   this.PORT=(PORT!=='undefined')?'8081':PORT;
   console.log('proxy connection exists.. pulling schema from backend');
-  this.dropBE_MAVS();
+  //this.dropBE_MAVS();
   //pull/reg table names
   var be_tables_str=this.getRemoteTableNames();
   var be_tables_jsn=JSON.parse(be_tables_str);
@@ -92,7 +87,6 @@ function proxyClient(HOST,PORT){
     newTable.name=be_tables[i][0];
     daSchema.addTable(newTable);
   }
-
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////

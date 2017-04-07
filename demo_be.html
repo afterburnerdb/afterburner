@@ -7,36 +7,26 @@
 
     <title>Afterburner Demo</title>
 
-<!--    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"> -->
-    <link rel="stylesheet" href="bootstrap/css/bootstrap.min.css"> 
-    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
-    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
-    <!--[if lt IE 9]>
-    <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
-    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
-    <![endif]-->
-
-   <style type="text/css">
-      body {
-        padding-top: 50px;
-      }
-      .modal {
-        text-align: left;
-      }
-      pre.prettyprint {
-        border: 1px solid #ccc;
-        margin-bottom: 0;
-        padding: 9.5px;
-      }
-      .table-nonfluid {
-        width: auto !important;
-      }
-      .table-responsive {
-        max-height: 150px;
-        overflow: auto;
-      }
-    </style>
-
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.2/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pako/1.0.4/pako.min.js"></script>
+    <a href="https://github.com/lintool/afterburner/"><img style="position: absolute; top: 0; right: 0; border: 0; z-index:9999;" src="https://camo.githubusercontent.com/652c5b9acfaddf3a9c326fa6bde407b87f7be0f4/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6f72616e67655f6666373630302e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_orange_ff7600.png"></a>
+ 
+  <style type="text/css">
+    body {
+      padding-top: 50px;
+    }
+    .table-nonfluid {
+      width: auto !important;
+    }
+    .table-responsive {
+      overflow: auto;
+    }
+    .rowspc{ 
+      margin-top:20px; 
+    }
+  </style>
   </head>
   <body>
 
@@ -54,133 +44,184 @@
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
             <li><a href="./index.html">Home</a></li>
+            <li><a href="./about.html">About</a></li>
             <li class="active"><a href="./demo.html">Demo</a></li>
-            <li><a href="./viz_be.html">Viz</a></li>
-            <li><a href="https://github.com/lintool/afterburner/">Code (GitHub)</a></li>
           </ul>
 
         </div><!--/.navbar-collapse -->
       </div>
     </nav>
 
-    <!-- Main jumbotron for a primary marketing message or call to action -->
-
-<!--<div>
-      <a>Load a table from a file server.</a><br>
-     Server: <input type="text" name="fserverIP" value="127.0.0.1"><br>
-     Port: <input type="text" name="fserverPort" value="55443"><br>
-     <button submit="submit" id="loadserver">get table from server</button><hr>
-</div>-->
-
-<!-- <div class="jumbotron"> -->
   <div class="container">
+    <div class="page-header">
+      <h1>Afterburner: Demo</h1>
+      <p class="lead">Interactive SQL analytics in your browser!</p>
+    </div>
+
+    <p>In this online demo we've prepared a sample data warehouse based on the <a href="http://www.tpc.org/tpch/">TPC-H</a> schema. 
+      For best performance, we recommend using <a href="https://www.mozilla.org/en-US/firefox/all/">Firefox (64-bit)</a> 
+      (for <a href="http://asmjs.org/">asm.js</a> support) and running on a client with at least 4GB memory.
+      Begin by clicking on the "initialize" button below and select a memory configuration (how much memory on the client to allocate).
+      Then load some data and you'll be ready to start issuing SQL queries!</p>
+
     <div class="row">
-      <div class="col-md-3">
-        <label class="btn btn-default btn-file" href="#" data-toggle="tooltip" data-placement="bot" title="Load a database table from a local file">
-          Load table
-          <input type="file" id="fileInput" style="display: none;" multiple> 
+      <div class="container">
+        <div class="dropdown"  id="initmenu" style="float:left; margin:0 10px 10px 0;">
+          <button class="btn dropdown-toggle btn-warning" id="initbtn" type="button" data-toggle="dropdown">
+            <span class="glyphicon glyphicon-fire" id="initglyph"></span> 
+            Initialize Afterburner!
+          </button>
+          <ul class="dropdown-menu">
+            <li><a>small (~0.75 GB)</a></li>
+            <li><a>medium (~1.5 GB)</a></li>
+            <li><a>large (~3.0 GB)</a></li>
+          </ul>
+        </div>
+        <div class="dropdown" style="float:left; margin:0 10px 10px 0;" >
+          <button class="btn dropdown-toggle disabled" id="loadwbtn" type="button" data-toggle="dropdown">
+            Load data!
+          </button>
+          <ul class="dropdown-menu">
+            <li><label class="btn btn-default btn-file" onclick="loadWeb()"
+                       style="border: none; border-color: transparent;">
+                  Load demo data (136 MB compressed)
+                </label>
+            </li>
+            <li><label class="btn btn-default btn-file" onclick="loadWeb('small')"
+                       style="border: none; border-color: transparent;">
+                  Load demo data (95 MB compressed)
+                </label>
+            </li>
+            <li>
+                <label class="btn btn-default btn-file" id="loaddbtn" data-placement="bot"
+                       style="border: none; border-color: transparent;">
+                  Load tables from local disk
+                  <input type="file" id="fileInput" style="display: none;" multiple> 
+                </label>
+            </li>
+          </ul>
+        </div>
+        <label class="btn btn-default btn-file" id="schmbtn" data-placement="bot" onclick="togSchema(this,{'be':true})">
+          Show Tables
         </label>
       </div>
     </div>
-
     <div class="row">
-        <div class="col-md-12">
-        <div id="sconsole" class="table-responsive">
-        </div>
-        <div>
+      <div class="container">
+        <!--<div class="dropdown"  id="connmenu" style="float:left; margin:0 10px 10px 0;">-->
+        <button class="btn btn-default btn-file btn-primary" id="connbtn" data-placement="bot" onclick="connBE()"
+                style="float:left; margin:0 10px 10px 0;">
+          <span class="glyphicon glyphicon-flash" id="glypconn"></span> 
+          Conntect to Backend!
+        </button>
+        <!--</div>-->
+        <button class="btn dropdown-toggle disabled" id="loadbebtn" type="button" data-toggle="dropdown" onclick="pullBESchema()" >
+          Load table info from Backend
+        </button>
       </div>
-      <div class="row">
-        <div class="col-md-6">
-          <h2>JavaScript</h2>
-		<textarea rows="11" id="TAASM" name="TAASM" class="prettyprint form-control animated" placeholder="" ></textarea>
-		<button type="button" onclick="runASM()" class="btn btn-default" href="#" data-toggle="tooltip" data-placement="bot" title="Run code (Query)">
-                  Run ASM</button>
-       </div>
-        <div class="col-md-6">
-          <h2>Fluent SQL</h2>
-		<textarea rows="11" id="TAFluent" name="TAFluent" class="prettyprint form-control animated linenums language-css" placeholder="Type Fluent SQL or use example buttons.."></textarea>
-		<button type="button" onclick="fluentToASM()" class="btn btn-default" href="#" data-toggle="tooltip" data-placement="bot" title="Translate Fluent into JavaScript code">
-                  Fluent to ASM</button><br>
-		<button type="button" onclick="resetFluentASMq1()" class="btn btn-default" href="#" >
-                  Q1 Fluent</button>
-		<button type="button" onclick="resetFluentASMq2()" class="btn btn-default" href="#" >
-                  Q2 Fluent</button>
-		<button type="button" onclick="resetFluentASMq3()" class="btn btn-default" href="#" >
-                  Q3 Fluent</button>
-		<button type="button" onclick="resetFluentASMq4()" class="btn btn-default" href="#" data-toggle="tooltip" data-placement="bot" title="Load Fluent SQL for Q4">
-                  Q4 Fluent</button>
-        </div>
-
-      </div>
-       <div class="row"><div class="col-xs-12" style="height:50px;"></div></div>
-       <div class="row">
-        <div class="col-md-12">
-          <div id="divcons" class="table-responsive"> </div>
-        </div>
-      </div>
-
-    <br>
-    <div class="row" id="divconsole">
+    </div>
+    <div class="row rowspc">
       <div class="col-md-12">
-        <p id="console">Console area!</p>
-      </div>
-<!--    </div> -->
-  </div> <!-- /container -->
-
-  <div id="waitForFile" class="modal fade" role="dialog">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-body">
-          <p>Loading.. Please wait..</p>
+        <div id="sconsole">
+        </div>
+      <div>
+    </div>
+    <div class="row">
+      <div class="col-md-12">
+        <h2>Fluent SQL</h2>
+      	<textarea rows="11" id="TAFluent" name="TAFluent" class="prettyprint form-control animated linenums language-css" placeholder="Type Fluent SQL or use example buttons.."></textarea>
+        <div class="row"> 
+          &nbsp; 
+        </div>
+        <div class="row">
+          <div class="container">
+            <div class="dropdown">
+              <button class="btn btn-default dropdown-toggle" onchange="alert('boom')" type="button" id="menu1" data-toggle="dropdown" style="float:left; margin:0 10px 10px 0;">Insert TPC-H Query<span class="caret"></span></button>
+              <ul class="dropdown-menu" role="menu" aria-labelledby="menu1">
+                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query1">Q1</a></li>
+                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query2">Q2</a></li>
+                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query3">Q3</a></li>
+                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query4">Q4</a></li>
+                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query5">Q5</a></li>
+                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query6">Q6</a></li>
+                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query7">Q7</a></li>
+                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query8">Q8</a></li>
+                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query9">Q9</a></li>
+                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query10">Q10</a></li>
+                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query11">Q11</a></li>
+                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query12">Q12</a></li>
+                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query13">Q13</a></li>
+                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query14">Q14</a></li>
+                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query15">Q15</a></li>
+                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query16">Q16</a></li>
+                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query17">Q17</a></li>
+                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query18">Q18</a></li>
+                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query19">Q19</a></li>
+                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query20">Q20</a></li>
+                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query21">Q21</a></li>
+                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query22">Q22</a></li>
+              </ul>
+            </div>
+            <button type="button" onclick="runcode()" class="btn btn-default" href="#" data-placement="bot">
+              Run Query
+            </button>
+          </div>
         </div>
       </div>
     </div>
+    <br>
+    <div class="row" id="divconsole">
+      <div class="col-md-12">
+        <p id="console"></p>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-12">
+        <div id="divcons" class="table-responsive">
+        </div>
+      </div>
+    </div>
+  </div> <!-- /container -->
+
+<div id="waitForPT" class="modal fade" style="left" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+      </div>
+      <div class="modal-body">
+      </div>
+      <div class="modal-footer">
+          <div class='col-md-1'>
+            <button id="modalgate" type="button" onclick="$('#waitForPT').modal('hide');$('#schmbtn').click();" class="btn btn-default" disabled>Dismiss</button>
+          </div>
+      </div>
+    </div>
   </div>
+</div>
 
 <!-- Afterburner -->
-
 <script src="./src/core/afterburner.js"></script>
-<script src="./src/core/fsql2sql.js"></script>
 <script src="./src/core/store.js"></script>
-<script src="./src/core/aTable.js"></script>
 <script src="./src/core/aSchema.js"></script>
+<script src="./src/core/aTable.js"></script>
 <script src="./src/core/queryResult.js"></script>
 <script src="./src/core/hashIndex.js"></script>
 <script src="./src/core/dataSource.js"></script>
 <script src="./src/core/common.js"></script>
 <script src="./src/core/html5FileParser.js"></script>
-<script src="./src/core/monetJSONParser.js"></script>
+<script src="./src/core/urlParser.js"></script>
 <script src="./src/frontend/myJS.js"></script>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.2/jquery.min.js"></script>
+<script src="./src/frontend/web.js"></script>
+<script src="./src/frontend/progressTracker.js"></script>
+
+<! Afterburner BE -> 
+<script src="./src/core/fsql2sql.js"></script>
+<script src="./src/core/monetJSONParser.js"></script>
 <script src="./src/proxy/proxyConf.js"></script>
 <script src="./src/proxy/proxyClient.js"></script>
-<script src="./src/lib/explanation.js"></script>
 
 <!-- TPC-H -->
-
-<script src="./src/tpch/q01.js"></script>
-<script src="./src/tpch/q02.js"></script>
-<script src="./src/tpch/q03.js"></script>
-<script src="./src/tpch/q04.js"></script>
-<script src="./src/tpch/q05.js"></script>
-<script src="./src/tpch/q06.js"></script>
-<script src="./src/tpch/q07.js"></script>
-<script src="./src/tpch/q08.js"></script>
-<script src="./src/tpch/q09.js"></script>
-<script src="./src/tpch/q10.js"></script>
-<script src="./src/tpch/q11.js"></script>
-<script src="./src/tpch/q12.js"></script>
-<script src="./src/tpch/q13.js"></script>
-<script src="./src/tpch/q14.js"></script>
-<script src="./src/tpch/q15.js"></script>
-<script src="./src/tpch/q16.js"></script>
-<script src="./src/tpch/q17.js"></script>
-<script src="./src/tpch/q18.js"></script>
-<script src="./src/tpch/q19.js"></script>
-<script src="./src/tpch/q20.js"></script>
-<script src="./src/tpch/q21.js"></script>
-<script src="./src/tpch/q22.js"></script>
-
 <script src="./src/tpch/fsql/q01.js"></script>
 <script src="./src/tpch/fsql/q02.js"></script>
 <script src="./src/tpch/fsql/q03.js"></script>
@@ -246,173 +287,143 @@
 
 <script src="./src/tpch/q1allscen/benchmark_q1allscen.js"></script>
 <script src="./src/tpch/q1allscen/mav01a.js"></script>
-
 <script src="./src/tpch/q2allscen/benchmark_q2allscen.js"></script>
 <script src="./src/tpch/q2allscen/mav02a.js"></script>
 <script src="./src/tpch/q2allscen/mav02b.js"></script>
 <script src="./src/tpch/q2allscen/mav02c.js"></script>
-
 <script src="./src/tpch/q3allscen/benchmark_q3allscen.js"></script>
 <script src="./src/tpch/q3allscen/mav03a.js"></script>
 <script src="./src/tpch/q3allscen/mav03b.js"></script>
 <script src="./src/tpch/q3allscen/mav03c.js"></script>
-
 <script src="./src/tpch/q4allscen/benchmark_q4allscen.js"></script>
 <script src="./src/tpch/q4allscen/mav04a.js"></script>
-
 <script src="./src/tpch/q5allscen/benchmark_q5allscen.js"></script>
 <script src="./src/tpch/q5allscen/mav05a.js"></script>
 <script src="./src/tpch/q5allscen/mav05b.js"></script>
-
 <script src="./src/tpch/q6allscen/benchmark_q6allscen.js"></script>
 <script src="./src/tpch/q6allscen/mav06a.js"></script>
 <script src="./src/tpch/q6allscen/mav06b.js"></script>
 <script src="./src/tpch/q6allscen/mav06c.js"></script>
-
 <script src="./src/tpch/q7allscen/benchmark_q7allscen.js"></script>
 <script src="./src/tpch/q7allscen/mav07a.js"></script>
-
 <script src="./src/tpch/q8allscen/benchmark_q8allscen.js"></script>
 <script src="./src/tpch/q8allscen/mav08a.js"></script>
 <script src="./src/tpch/q8allscen/mav08b.js"></script>
 <script src="./src/tpch/q8allscen/mav08c.js"></script>
-
 <script src="./src/tpch/q9allscen/benchmark_q9allscen.js"></script>
 <script src="./src/tpch/q9allscen/mav09a.js"></script>
-
 <script src="./src/tpch/q10allscen/benchmark_q10allscen.js"></script>
 <script src="./src/tpch/q10allscen/mav10a.js"></script>
 <script src="./src/tpch/q10allscen/mav10b.js"></script>
-
-<!--<script src="./src/tpch/q11allscen/benchmark_q11allscen.js"></script>
-<script src="./src/tpch/q11allscen/mav11a.js"></script> -->
-
 <script src="./src/tpch/q12allscen/benchmark_q12allscen.js"></script>
 <script src="./src/tpch/q12allscen/mav12a.js"></script>
 <script src="./src/tpch/q12allscen/mav12b.js"></script>
-
-<!--<script src="./src/tpch/q13allscen/benchmark_q13allscen.js"></script>
-<script src="./src/tpch/q13allscen/mav13a.js"></script> -->
-
 <script src="./src/tpch/q14allscen/benchmark_q14allscen.js"></script>
 <script src="./src/tpch/q14allscen/mav14a.js"></script>
-
-<!--<script src="./src/tpch/q16allscen/benchmark_q16allscen.js"></script>
-<script src="./src/tpch/q16allscen/mav16a.js"></script>
-<script src="./src/tpch/q16allscen/mav16b.js"></script>
-<script src="./src/tpch/q16allscen/mav16c.js"></script>-->
-
 <script src="./src/tpch/q17allscen/benchmark_q17allscen.js"></script>
 <script src="./src/tpch/q17allscen/mav17a.js"></script>
 <script src="./src/tpch/q17allscen/mav17b.js"></script>
-
 <script src="./src/tpch/q20allscen/benchmark_q20allscen.js"></script>
 <script src="./src/tpch/q20allscen/mav20a.js"></script>
-
 <script src="./src/tpch/q21allscen/benchmark_q21allscen.js"></script>
 <script src="./src/tpch/q21allscen/mav21a.js"></script>
 <script src="./src/tpch/q21allscen/mav21b.js"></script>
-
+  
 <script>
 function myOnLoad(){
   abdb = new Afterburner();
   FSi = new fsql2sql();
-  document.getElementById("TAASM").value="";
 }
 window.onload = function() {
   inNode=false;
   var fileInput = document.getElementById('fileInput');
   fileInput.addEventListener('change', function(e) {
-    $("#waitForFile").modal();
+    PTi.trackFiles(fileInput.files);
     var files = fileInput.files;
     var ds= new dataSource(files, function(){newTable= new aTable(ds);},0);
   });
   myOnLoad();
 }
-function runASM(){
-  asmcode=document.getElementById("TAASM").value;
-  document.getElementById("console").innerHTML = "ASM=" + asmcode
-  tt0=window.performance.now();
-  runMyAdhocCode(asmcode);
-  tt1=window.performance.now();
-  console.log('time to run asm:'+ (tt1-tt0));
+function URLList(){
+  this.list=[];
 }
+function loadWeb(size){
+  var urls= new URLList();
+  if (size=='small'){
+  urls.list=[
+    "https://lintool.github.io/afterburner-data/lineitem.800000.tbl.gz",
 
-function resetFluentASMq1(){
-  document.getElementById("TAFluent").value=`abdb.select()
-  .from("orders")
-  .field(count("o_totalprice"))
-  .where(lt("o_totalprice",1500))
-  .toString()`;
-  fluentToASM();
-}
-function resetFluentASMq2(){
-  document.getElementById("TAFluent").value=`abdb.select()
-  .from("lineitem").join("orders").on("l_orderkey","o_orderkey")
-  .field(sum('o_totalprice'))
-  .toString()`;
-  fluentToASM();
-}
-function resetFluentASMq3(){
-  document.getElementById("TAFluent").value=`abdb.select()
-  .field("o_orderdate")
-  .field(count('o_orderkey'))
-  .from("orders")
-  .group("o_orderdate")
-  .toString()`;
-  fluentToASM();
-}
-function resetFluentASMq4(){
-  document.getElementById("TAFluent").value=`abdb.select()
-  .from("lineitem").join("orders").on("l_orderkey","o_orderkey")
-  .field("l_orderkey")
-  .field(sum('l_extendedprice'))
-  .field("o_orderdate")
-  .field("o_shippriority")
-  .where(between('o_orderdate', date('1996-01-01'), date('1996-01-31')))
-  .group("l_orderkey")
-  .group("o_orderdate")
-  .group("o_shippriority")
-  .order([-1])
-  .limit(10)
-  .toString()`;
-  fluentToASM();
-}
-/*abdb.select().from("myview").field("l_orderkey").field("revenue").field("o_orderdate").field("o_shippriority").where(eq('o_orderdate',date('1996-01-06'))).order([-1]).limit(10).toString()*/
-function fluentToASM(){
-        strASM="document.getElementById(\"TAASM\").value="
-        strASM= strASM + document.getElementById("TAFluent").value;
+    "https://lintool.github.io/afterburner-data/nation.25.tbl.gz",
+    "https://lintool.github.io/afterburner-data/orders.800000.tbl.gz",
+    "https://lintool.github.io/afterburner-data/part.200000.tbl.gz",
+    "https://lintool.github.io/afterburner-data/partsupp.800000.tbl.gz",
+    "https://lintool.github.io/afterburner-data/region.5.tbl.gz",
+    "https://lintool.github.io/afterburner-data/supplier.10000.tbl.gz",
+    "https://lintool.github.io/afterburner-data/customer.150000.tbl.gz"];
+  }else{
+  urls.list=[
+    "https://lintool.github.io/afterburner-data/lineitem.1319015.tbl.gz",
+    "https://lintool.github.io/afterburner-data/nation.25.tbl.gz",
+    "https://lintool.github.io/afterburner-data/orders.1500000.tbl.gz",
+    "https://lintool.github.io/afterburner-data/part.200000.tbl.gz",
+    "https://lintool.github.io/afterburner-data/partsupp.800000.tbl.gz",
+    "https://lintool.github.io/afterburner-data/region.5.tbl.gz",
+    "https://lintool.github.io/afterburner-data/supplier.10000.tbl.gz",
+    "https://lintool.github.io/afterburner-data/customer.150000.tbl.gz"];
+  }
 
-	document.getElementById("console").innerHTML = strASM;
+  PTi.trackURLs(urls.list);
+  var ds= new dataSource(urls, function(){newTable= new aTable(ds);});
+}
+function runcode(){
+  var codecode=document.getElementById("TAFluent").value;
+//  document.getElementById("console").innerHTML = "code=" + codecode;
+  var tt0=window.performance.now();
+  runMyAdhocCode(codecode);
+  var tt1=window.performance.now();
+  var ttot=tt1-tt0;
+  document.getElementById("console").innerHTML = "Query completed in " + (ttot.toFixed(2))+"ms" ;
+  console.log('time to run code:'+ (ttot));
+}
+function printtable(htmltable){
+  divcons=document.getElementById("divcons");
+  clearElement(divcons);
+  divcons.appendChild(htmltable);
+}
+$("#initmenu").on("click", "li a", function() {
+  console.log("will store with size:"+$(this).text());
+  var size=$(this).text().split(" ")[0];
+  init_store(size);
+  $("#initbtn").removeClass("btn-warning");
+  $("#initbtn").addClass("disabled");
+  $("#initbtn").text("Initialized: "+$(this).text());
+  $("#loadwbtn").removeClass("disabled");
+  $("#loadwbtn").addClass("btn-success");
+});
+function connBE(){
+  console.log("connecting to backend");
+  pci= new proxyClient();
+  //if success
+  $("#connbtn").removeClass("btn-primary");
+  $("#connbtn").addClass("disabled");
+  $("#connbtn").text("Connection succesful");
 
-	try {
-		runMyAdhocCode(strASM);
-	}
-	catch(err) {
-	    document.getElementById("console").innerHTML = err.message;
-	}
+  $("#loadbebtn").removeClass("disabled");
+  $("#loadbebtn").addClass("btn-success");
+}
+function pullBESchema(){
+  console.log("loading backend tables");
+  
 }
 </script>
 
-
-<!-- Bootstrap core JavaScript
-================================================== -->
-<!-- Placed at the end of the document so the pages load faster -->
-<!-- <script src="bootstrap/jquery.min.js"></script>-->
-  <!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script> -->
-
-<!-- <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script> -->
-<script src="bootstrap/js/bootstrap.min.js"></script>
-
-<!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
-<script src="https://maxcdn.bootstrapcdn.com/js/ie10-viewport-bug-workaround.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pako/1.0.4/pako.min.js"></script>
-
 <script type="text/javascript">
-  $(document).ready(function() {
-    $("body").tooltip({ selector: '[data-toggle=tooltip]', show: { effect: "blind", duration: 1500} });
-});
 
+jQuery("[id*='query']").click(function(e){
+                                var toeval=e.currentTarget.id+".toString().replace(/;/g,'').replace(/noasm/g,'').replace('\"q_sums\",300','\"q_sums\",200').replace(/}\w*/,'').replace('return','').replace(/function query.*{/,'/*"+e.currentTarget.id+"*/')";
+                                document.getElementById("TAFluent")
+                                  .value=eval(toeval)+"  .materialize();\nprinttable(res.toHTMLTableN(100))";
+                                  e.preventDefault();});
 </script>
 
 </body>
