@@ -112,18 +112,64 @@ function newHTMLH4(opts){
   setAtts(h4,opts);
   return h4;
 }
+function newHTMLBut(text,opts){
+  opts=opts||{};
+  opts['class']="btn dropdown-toggle " + (opts['class']||"");
+  opts['type']="button";
+  opts['data-toggle']="dropdown";
+  var but = document.createElement('button');
+  but.innerHTML =text;
+  setAtts(but,opts);
+  return but;
+}
+function newHTMLDD(items, opts){
+  opts=opts||{};
+  opts['class']='dropdown';
+  var div = document.createElement('div');
+  setAtts(div,opts);
+  var but=newHTMLBut('Select!',{'class':'btn-sm'});
+  div.appendChild(but); 
 //
-function drawSchema(abutton){
+  var ul = newHTMLUL({class:'dropdown-menu', role:'menu'});
+  items.forEach((x)=> {
+    var li = document.createElement('li');
+    li.appendChild(newHTMLA(x));
+    ul.appendChild(li);
+  });
+  div.appendChild(ul); 
+  return div;
+}
+//
+function drawSchema(abutton,exp){
   printSchema();
   abutton.innerText='Hide tables';
+  if (typeof exp !='undefined'){
+    console.log('init context menu');
+    $("#schemaTab td").schCM({
+      menuSelector: "#schCM",
+      menuSelected: function (invokedOn, selectedMenu) {
+        var tabid= Math.floor((invokedOn[0].parentNode.rowIndex-1)/2);
+        var tabname=daSchema.tables[tabid].name;
+        exploreTable(tabname);
+      }
+    });
+  }
   togSchema=hideSchema;
 }
-function hideSchema(abutton){
+function hideSchema(abutton,exp){
   unPrintSchema();
   abutton.innerText='Show tables';
   togSchema=drawSchema;
 }
-function togSchema(abutton){
-  drawSchema(abutton);
+function togSchema(abutton,exp){
+  drawSchema(abutton,exp);
 }
-
+//Explore
+function exploreTable(tabname){
+  Ei= new Explore(tabname);
+  var econs=document.getElementById("econsole");
+  clearElement(econs);
+  econs.appendChild(Ei.toHTMLTable());
+  $('#exploreTab tbody').on("click","td",function(e){Ei.bcell(this)});
+  $('#exploreTab thead').on("click","th",function(e){Ei.hcell(this)});
+}
