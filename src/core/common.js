@@ -44,13 +44,6 @@ function printSchema(){
     $('.panel-collapse.in').collapse('hide');
   }
 }
-
-function unPrintSchema(){
-  if(!inNode){
-    scons=document.getElementById("sconsole");
-    clearElement(scons);
-  }
-}
 function get_time_ms(){
     if (inNode)
       return process.hrtime();
