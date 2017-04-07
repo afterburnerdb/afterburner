@@ -46,7 +46,6 @@ function Explore(tabname){
     this.uncompute();
   }
   this.bcello=function(menuitem,remember,cell,colname){
-    expose=menuitem;
     console.log("menuitem:"+menuitem+" remember:"+remember);
     clearElement(cell);
     cell.appendChild(newHTMLA(menuitem.text));

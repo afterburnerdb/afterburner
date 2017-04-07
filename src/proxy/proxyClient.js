@@ -75,7 +75,7 @@ function proxyClient(HOST,PORT){
   this.HOST=(HOST!=='undefined')?'127.0.0.1':HOST;
   this.PORT=(PORT!=='undefined')?'8081':PORT;
   console.log('proxy connection exists.. pulling schema from backend');
-  //this.dropBE_MAVS();
+  this.dropBE_MAVS();
   //pull/reg table names
   var be_tables_str=this.getRemoteTableNames();
   var be_tables_jsn=JSON.parse(be_tables_str);

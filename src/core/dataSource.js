@@ -455,10 +455,12 @@ handyColTypes["fridge"]=[0,2,2,2,0];
     this.fromURL(src,funk);
   } else if (typeof src == 'string' && (inNode)){
     this.fromFile(src);
-  } else if (typeof src == "object" && typeof src[0] == "object" && typeof src[0].data == 'object'){
+  } else if ((typeof src == "object" && typeof src.data == "object") ||
+             (typeof src == "object" && typeof src[0] == "object" && typeof src[0].data == "object")){
     this.fromMonetJSON(src);
   } else {
     console.log('Unsupported DS type, typeof DS:'+ typeof DS);
+    expose=src;
   };
 }
 //////////////////////////////////////////////////////////////////////////////

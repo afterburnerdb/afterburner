@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<yDOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="utf-8">
@@ -77,6 +77,11 @@
             <li><a>large (~3.0 GB)</a></li>
           </ul>
         </div>
+        <button class="btn btn-default btn-file btn-primary" id="connbtn" data-placement="bot" onclick="connBE()"
+                style="float:left; margin:0 10px 10px 0;">
+          <span class="glyphicon glyphicon-flash" id="glypconn"></span> 
+          Conntect to Backend!
+        </button>
         <div class="dropdown" style="float:left; margin:0 10px 10px 0;" >
           <button class="btn dropdown-toggle disabled" id="loadwbtn" type="button" data-toggle="dropdown">
             Load data!
@@ -104,20 +109,12 @@
         <label class="btn btn-default btn-file" id="schmbtn" data-placement="bot" onclick="togSchema(this,{'be':true})">
           Show Tables
         </label>
-      </div>
-    </div>
-    <div class="row">
-      <div class="container">
         <!--<div class="dropdown"  id="connmenu" style="float:left; margin:0 10px 10px 0;">-->
-        <button class="btn btn-default btn-file btn-primary" id="connbtn" data-placement="bot" onclick="connBE()"
-                style="float:left; margin:0 10px 10px 0;">
-          <span class="glyphicon glyphicon-flash" id="glypconn"></span> 
-          Conntect to Backend!
-        </button>
-        <!--</div>-->
+        <!--
         <button class="btn dropdown-toggle disabled" id="loadbebtn" type="button" data-toggle="dropdown" onclick="pullBESchema()" >
           Load table info from Backend
         </button>
+        -->
       </div>
     </div>
     <div class="row rowspc">
@@ -128,42 +125,70 @@
     </div>
     <div class="row">
       <div class="col-md-12">
-        <h2>Fluent SQL</h2>
-      	<textarea rows="11" id="TAFluent" name="TAFluent" class="prettyprint form-control animated linenums language-css" placeholder="Type Fluent SQL or use example buttons.."></textarea>
+        <!-- <h2>Fluent SQL</h2> -->
+
+        <!-- pane -->
+        <ul  class="nav nav-pills">
+          <li class="active">
+            <a  href="#1b" data-toggle="tab">FSQL</a>
+          </li>
+          <li>
+            <a href="#2b" data-toggle="tab">SQL</a>
+          </li>
+          <li>
+            <a href="#3b" data-toggle="tab">Open?</a>
+          </li>
+        </ul>
+
+        <div class="tab-content clearfix">
+          <div class="tab-pane active" id="1b">
+            <textarea rows="11" id="TAFluent" name="TAFluent" class="prettyprint form-control animated linenums language-css" placeholder="Type Fluent SQL or use example buttons.."></textarea>
+          </div>
+          <div class="tab-pane" id="2b">
+            <textarea rows="11" id="TASQL" name="TASQL" class="prettyprint form-control animated linenums language-css disabled"  type="text" disabled="" placeholder="Type Fluent SQL or use example buttons.."></textarea>
+          </div>
+          <div class="tab-pane" id="3b">
+            <textarea rows="11" id="TASQL" name="TAOPEN" class="prettyprint form-control animated linenums language-css" placeholder="Type Fluent SQL or use example buttons.."></textarea>
+          </div>
+        </div>
+        <!-- end pane -->
         <div class="row"> 
           &nbsp; 
         </div>
         <div class="row">
           <div class="container">
             <div class="dropdown">
-              <button class="btn btn-default dropdown-toggle" onchange="alert('boom')" type="button" id="menu1" data-toggle="dropdown" style="float:left; margin:0 10px 10px 0;">Insert TPC-H Query<span class="caret"></span></button>
+              <button class="btn btn-default dropdown-toggle" type="button" id="menu1" data-toggle="dropdown" style="float:left; margin:0 10px 10px 0;">Insert TPC-H Query<span class="caret"></span></button>
               <ul class="dropdown-menu" role="menu" aria-labelledby="menu1">
-                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query1">Q1</a></li>
-                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query2">Q2</a></li>
-                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query3">Q3</a></li>
-                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query4">Q4</a></li>
-                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query5">Q5</a></li>
-                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query6">Q6</a></li>
-                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query7">Q7</a></li>
-                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query8">Q8</a></li>
-                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query9">Q9</a></li>
-                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query10">Q10</a></li>
-                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query11">Q11</a></li>
-                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query12">Q12</a></li>
-                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query13">Q13</a></li>
-                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query14">Q14</a></li>
-                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query15">Q15</a></li>
-                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query16">Q16</a></li>
-                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query17">Q17</a></li>
-                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query18">Q18</a></li>
-                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query19">Q19</a></li>
-                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query20">Q20</a></li>
-                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query21">Q21</a></li>
-                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query22">Q22</a></li>
+                <li role="presentation"><a role="menuitem" tabindex="-1" id="query1_fsql">Q1</a></li>
+                <li role="presentation"><a role="menuitem" tabindex="-1" id="query2_fsql">Q2</a></li>
+                <li role="presentation"><a role="menuitem" tabindex="-1" id="query3_fsql">Q3</a></li>
+                <li role="presentation"><a role="menuitem" tabindex="-1" id="query4_fsql">Q4</a></li>
+                <li role="presentation"><a role="menuitem" tabindex="-1" id="query5_fsql">Q5</a></li>
+                <li role="presentation"><a role="menuitem" tabindex="-1" id="query6_fsql">Q6</a></li>
+                <li role="presentation"><a role="menuitem" tabindex="-1" id="query7_fsql">Q7</a></li>
+                <li role="presentation"><a role="menuitem" tabindex="-1" id="query8_fsql">Q8</a></li>
+                <li role="presentation"><a role="menuitem" tabindex="-1" id="query9_fsql">Q9</a></li>
+                <li role="presentation"><a role="menuitem" tabindex="-1" id="query10_fsql">Q10</a></li>
+                <li role="presentation"><a role="menuitem" tabindex="-1" id="query11_fsql">Q11</a></li>
+                <li role="presentation"><a role="menuitem" tabindex="-1" id="query12_fsql">Q12</a></li>
+                <li role="presentation"><a role="menuitem" tabindex="-1" id="query13_fsql">Q13</a></li>
+                <li role="presentation"><a role="menuitem" tabindex="-1" id="query14_fsql">Q14</a></li>
+                <li role="presentation"><a role="menuitem" tabindex="-1" id="query15_fsql">Q15</a></li>
+                <li role="presentation"><a role="menuitem" tabindex="-1" id="query16_fsql">Q16</a></li>
+                <li role="presentation"><a role="menuitem" tabindex="-1" id="query17_fsql">Q17</a></li>
+                <li role="presentation"><a role="menuitem" tabindex="-1" id="query18_fsql">Q18</a></li>
+                <li role="presentation"><a role="menuitem" tabindex="-1" id="query19_fsql">Q19</a></li>
+                <li role="presentation"><a role="menuitem" tabindex="-1" id="query20_fsql">Q20</a></li>
+                <li role="presentation"><a role="menuitem" tabindex="-1" id="query21_fsql">Q21</a></li>
+                <li role="presentation"><a role="menuitem" tabindex="-1" id="query22_fsql">Q22</a></li>
               </ul>
             </div>
             <button type="button" onclick="runcode()" class="btn btn-default" href="#" data-placement="bot">
-              Run Query
+              Run Full Query Against Backend
+            </button>
+            <button type="button" onclick="runcode2()" class="btn btn-default distabled" href="#" data-placement="bot">
+              Run Full Query Against Front End
             </button>
           </div>
         </div>
@@ -281,7 +306,6 @@
 <script src="./src/tpch/answers/ans21.js"></script>
 <script src="./src/tpch/answers/ans22.js"></script>
 
-<script src="./src/tpch/benchmark_tpch.js"></script>
 <script src="./src/tpch/opendatesscen/benchmark_opendatescen.js"></script>
 <script src="./src/micro/benchmark_micro.js"></script>
 
@@ -377,6 +401,8 @@ function loadWeb(size){
 }
 function runcode(){
   var codecode=document.getElementById("TAFluent").value;
+  codecode=codecode+".materialize_fe().mata.toHTMLTableN(100)";
+  codecode="printtable("+codecode+")";
 //  document.getElementById("console").innerHTML = "code=" + codecode;
   var tt0=window.performance.now();
   runMyAdhocCode(codecode);
@@ -413,16 +439,18 @@ function connBE(){
 }
 function pullBESchema(){
   console.log("loading backend tables");
-  
 }
 </script>
 
 <script type="text/javascript">
 
 jQuery("[id*='query']").click(function(e){
-                                var toeval=e.currentTarget.id+".toString().replace(/;/g,'').replace(/noasm/g,'').replace('\"q_sums\",300','\"q_sums\",200').replace(/}\w*/,'').replace('return','').replace(/function query.*{/,'/*"+e.currentTarget.id+"*/')";
+                                var toeval=e.currentTarget.id+".toString().replace(/;/g,'').replace(/against/g,'').replace(/}\w*/,'').replace('return','').replace(/function query.*{/,'/*"+e.currentTarget.id+"*/')";
+                                var evaled=eval(toeval);
                                 document.getElementById("TAFluent")
-                                  .value=eval(toeval)+"  .materialize();\nprinttable(res.toHTMLTableN(100))";
+                                  .value=evaled;
+                                document.getElementById("TASQL")
+                                  .value=eval(evaled+".toSQL()");
                                   e.preventDefault();});
 </script>
 

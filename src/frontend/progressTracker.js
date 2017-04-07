@@ -80,7 +80,6 @@ function progressTracker(){
     $('#trkurlpb'+fid)[0].setAttribute('style','width:20%');
   }
   this.onTableLoad=function(done){
-    expose=done;
     if ((typeof File !== 'undefined') && (done instanceof File)) done = done.name;
     console.log("@onTableLoad:"+done);
     var fid=this.list.indexOf(done);

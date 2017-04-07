@@ -627,6 +627,7 @@ function fsql2sql(){
     } else {
       DEBUG("running closed query.. query not against anything..");
       var be_jsn=pci.execSQL(this.toSQL());
+      DEBUG("be_jsn"+be_jsn);
       var ds= new dataSource(be_jsn);
       var tab=new aTable(ds);
       if (this.openA.length>0)
