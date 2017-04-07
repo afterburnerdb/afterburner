@@ -89,7 +89,8 @@ function aSchema(){
     return table2.numrows;
   }
 
-  this.toHTMLTable = function() {
+  this.toHTMLTable = function(opts) {
+    opts=opts||{};
     var pg=newHTMLDIV({class:"panel-group", id:"accordion", role:"tablist", 'aria-multiselectable':"true"});
     for (var i=0;i<this.tables.length;i++){
       var ppd=newHTMLDIV({class:"panel panel-default"});
@@ -97,8 +98,10 @@ function aSchema(){
       var h4=newHTMLH4({class:"panel-title"});
       var a=newHTMLA(this.tables[i].name+" ("+this.tables[i].numrows+" rows)",{role:"button", 'data-toggle':"collapse", 'data-parent':"#accordion", 'aria-expanded':"true",href:"#schmclps"+i, 'aria-controls':"schmclps"+i});
       h4.appendChild(a);
-      a=newHTMLA("explore ",{role:"button", style:'float:right;', onclick:"prepExplore();exploreTable('"+this.tables[i].name+"')"});
-      h4.appendChild(a);
+      if (opts['exp']){
+        a=newHTMLA("explore ",{role:"button", style:'float:right;', onclick:"prepExplore();exploreTable('"+this.tables[i].name+"')"});
+        h4.appendChild(a);
+      }
 
       ph.appendChild(h4);
       ppd.appendChild(ph);

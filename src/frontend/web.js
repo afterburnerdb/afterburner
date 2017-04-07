@@ -140,29 +140,24 @@ function newHTMLDD(items, opts){
   return div;
 }
 //
-function drawSchema(abutton,exp){
-  printSchema();
+function drawSchema(abutton,opts){
+  var scons=document.getElementById("sconsole");
+  clearElement(scons);
+  scons.appendChild(daSchema.toHTMLTable(opts));
+  $('.panel-collapse.in').collapse('hide');
   abutton.innerText='Hide tables';
-  if (typeof exp !='undefined'){
-    console.log('init context menu');
-    $("#schemaTab td").schCM({
-      menuSelector: "#schCM",
-      menuSelected: function (invokedOn, selectedMenu) {
-        var tabid= Math.floor((invokedOn[0].parentNode.rowIndex-1)/2);
-        var tabname=daSchema.tables[tabid].name;
-        exploreTable(tabname);
-      }
-    });
-  }
   togSchema=hideSchema;
 }
-function hideSchema(abutton,exp){
-  unPrintSchema();
+function hideSchema(abutton,opts){
+  if(!inNode){
+    scons=document.getElementById("sconsole");
+    clearElement(scons);
+  }
   abutton.innerText='Show tables';
   togSchema=drawSchema;
 }
-function togSchema(abutton,exp){
-  drawSchema(abutton,exp);
+function togSchema(abutton,opts){
+  drawSchema(abutton,opts);
 }
 //Explore
 function exploreTable(tabname){
