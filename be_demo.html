@@ -401,13 +401,12 @@ function loadWeb(size){
 }
 function runcode(){
   var codecode=document.getElementById("TAFluent").value;
-  codecode=codecode+".materialize_fe().mata.toHTMLTableN(100)";
-  codecode="printtable("+codecode+")";
-//  document.getElementById("console").innerHTML = "code=" + codecode;
+  codecode=codecode+".materialize_fe().mat.toHTMLTableN(100)";
   var tt0=window.performance.now();
-  runMyAdhocCode(codecode);
+  htmltable=eval(codecode);
   var tt1=window.performance.now();
   var ttot=tt1-tt0;
+  printtable(htmltable);
   document.getElementById("console").innerHTML = "Query completed in " + (ttot.toFixed(2))+"ms" ;
   console.log('time to run code:'+ (ttot));
 }
