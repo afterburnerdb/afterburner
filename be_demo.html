@@ -128,23 +128,17 @@
         </div>
       <div>
     </div>
+    <h4>
+      <label class="label label-info">
+        Query
+        <span class="badge" id="qlabel">?</span>
+      </label>
+    <h4>
     <div class="row">
       <div class="col-md-12">
-        <!-- <h2>Fluent SQL</h2> -->
-
-        <!-- pane -->
-        <ul  class="nav nav-pills">
-          <li>
-            <a href="#2b" data-toggle="tab">SQL</a>
-          </li>
-        </ul>
-
         <div class="tab-content clearfix">
-          <div class="tab-pane active">
-            <textarea rows="11" id="TASQL" name="TASQL" class="prettyprint form-control animated linenums language-css"  type="text" readonly="" placeholder="Pick a query using Insert TPC-H Query button bellow.."></textarea>
-          </div>
+          <textarea rows="11" id="TASQL" name="TASQL" class="prettyprint form-control animated linenums language-css"  type="text" readonly="" placeholder="Pick a query using Insert TPC-H Query button bellow.."></textarea>
         </div>
-        <!-- end pane -->
         <div class="row"> 
           &nbsp; 
         </div>
@@ -177,7 +171,7 @@
                 <li role="presentation"><a role="menuitem" tabindex="-1" id="query22_fsql">Q22</a></li>
               </ul>
             </div>
-            <button type="button" onclick="runcode()" class="btn btn-default" href="#" data-placement="bot">
+            <button id="asisbebtn" type="button" onclick="runcode()" class="btn btn-default disabled" data-placement="bot">
               Run Full Query Against Backend
             </button>
           </div>
@@ -391,12 +385,10 @@ function loadWeb(size){
   var ds= new dataSource(urls, function(){newTable= new aTable(ds);});
 }
 function runcode(){
-  var codecode=document.getElementById("TAFluent").value;
-  // codecode=codecode+".materialize_fe().mat.toHTMLTableN(100)";
-  eval(codecode);
-  
   var tt0=window.performance.now();
-  htmltable= pci.execSQLHTMLTableN(daQuery.toSQL(),100);
+  var sqlstr=editor.getDoc().getValue()
+  console.log(sqlstr);
+  htmltable= pci.execSQLHTMLTableN(sqlstr,100);
   var tt1=window.performance.now();
   var ttot=tt1-tt0;
   printtable(htmltable);
@@ -426,8 +418,8 @@ function connBE(){
   $("#connbtn").addClass("disabled");
   $("#connbtn").text("Connection succesful");
 
-  $("#loadbebtn").removeClass("disabled");
-  $("#loadbebtn").addClass("btn-success");
+  $("#asisbebtn").removeClass("disabled");
+//  $("#btnasisbe").addClass("btn-success");
 }
 function pullBESchema(){
   console.log("loading backend tables");
@@ -455,7 +447,7 @@ jQuery("[id*='query']").click(function(e){
   sqlstr=sqlstr.replace(/,/g,', \n');
   var keyWords=['SELECT','FROM','JOIN','WHERE','FREE','HAVING','GROUP BY','ORDER BY','LIMIT','HAVING','AND','OR','LIKE'];
   keyWords.forEach((x)=> {sqlstr=sqlstr.replace(new RegExp(x,'g'),"\n"+x)});
-  console.log(sqlstr);
+  $('#qlabel').text(queryName.substring(5));//.toUpperCase());
   editor.getDoc().setValue("-- "+queryName+"\n"+sqlstr);
   e.preventDefault();});
 </script>
