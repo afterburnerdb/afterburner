@@ -40,6 +40,36 @@ function proxyClient(HOST,PORT){
     var web_resp=this.getJSON(uri);
     return web_resp.responseJSON;
   }
+  this.execSQLHTMLTableN= function(sql,num){
+    var web_resp=this.execSQL(sql);
+    var table=document.createElement('table');
+    table.setAttribute('class',"table table-bordered table-condensed table-nonfluid table-striped table-hover");
+
+    var thead = table.createTHead();
+    thead.setAttribute('class',"thead-default");
+    var tr = thead.insertRow(0);
+
+    for (var i=0;i<web_resp.structure.length;i++){
+      var th = document.createElement('th');
+      th.appendChild(document.createTextNode(web_resp.structure[i].column));
+      tr.appendChild(th);
+    }
+    thead.appendChild(tr);
+    var tbody= table.createTBody();
+    var alignright={0:1,1:1,4:1};
+    for (var i=0;(i<web_resp.rows && i<num);i++){
+      tr = document.createElement('tr');
+      for (var ii=0;ii<web_resp.structure.length;ii++){
+        var td = document.createElement('td');
+        td.appendChild(document.createTextNode(web_resp.data[i][ii]));
+        if (alignright[monetDBTypestoAB(web_resp.structure[ii].type)])
+          td.align="right";
+        tr.appendChild(td);
+      }
+      tbody.appendChild(tr);
+    }
+    return table;
+  }
   this.execFSQL= function(fsql){
     var uri='/query?fsql='+sql;
     return this.get(uri);
@@ -88,6 +118,32 @@ function proxyClient(HOST,PORT){
     daSchema.addTable(newTable);
   }
 }
+//UTIL
+function monetDBTypestoAB(mtype){
+  var monettypes={
+    'int': 0,
+    'i2' : 0,
+    'hugeint':0,
+    'bigint':0,
+    'smallint':0,
+    'tinyint':0,
+    'boolean':0,
+    'wrd':0,
+    'decimal':1,
+    'real':1,
+    'double':1,
+    'varchar':2,
+    'date':3,
+    'char':4
+  };
+  var abtype=monettypes[mtype];
+  if (typeof abtype == 'undfined'){
+    console.log('unsupported data types from monetdb:i'+i);
+    console.log('unsupported data types from monetdb:' + mtype );
+    return;
+  }else return abtype;
+}
+
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 if(inNode){
