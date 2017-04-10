@@ -11,6 +11,11 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.2/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pako/1.0.4/pako.min.js"></script>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.25.0/codemirror.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.25.0/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.25.0/mode/sql/sql.min.js"></script>
+
     <a href="https://github.com/lintool/afterburner/"><img style="position: absolute; top: 0; right: 0; border: 0; z-index:9999;" src="https://camo.githubusercontent.com/652c5b9acfaddf3a9c326fa6bde407b87f7be0f4/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6f72616e67655f6666373630302e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_orange_ff7600.png"></a>
  
   <style type="text/css">
@@ -129,26 +134,14 @@
 
         <!-- pane -->
         <ul  class="nav nav-pills">
-          <li class="active">
-            <a  href="#1b" data-toggle="tab">FSQL</a>
-          </li>
           <li>
             <a href="#2b" data-toggle="tab">SQL</a>
-          </li>
-          <li>
-            <a href="#3b" data-toggle="tab">Open?</a>
           </li>
         </ul>
 
         <div class="tab-content clearfix">
-          <div class="tab-pane active" id="1b">
-            <textarea rows="11" id="TAFluent" name="TAFluent" class="prettyprint form-control animated linenums language-css" placeholder="Type Fluent SQL or use example buttons.."></textarea>
-          </div>
-          <div class="tab-pane" id="2b">
-            <textarea rows="11" id="TASQL" name="TASQL" class="prettyprint form-control animated linenums language-css"  type="text" readonly="" placeholder="Type Fluent SQL or use example buttons.."></textarea>
-          </div>
-          <div class="tab-pane" id="3b">
-            <textarea rows="11" id="TASQL" name="TAOPEN" class="prettyprint form-control animated linenums language-css" placeholder="Type Fluent SQL or use example buttons.."></textarea>
+          <div class="tab-pane active">
+            <textarea rows="11" id="TASQL" name="TASQL" class="prettyprint form-control animated linenums language-css"  type="text" readonly="" placeholder="Pick a query using Insert TPC-H Query button bellow.."></textarea>
           </div>
         </div>
         <!-- end pane -->
@@ -354,6 +347,7 @@
 function myOnLoad(){
   abdb = new Afterburner();
   FSi = new fsql2sql();
+  onLoad2();
 }
 window.onload = function() {
   inNode=false;
@@ -441,15 +435,29 @@ function pullBESchema(){
 </script>
 
 <script type="text/javascript">
-
+function onLoad2(){
+ window.editor = CodeMirror.fromTextArea(document.getElementById('TASQL'), {
+    mode: "text/x-sql",
+    indentWithTabs: true,
+    smartIndent: true,
+    lineNumbers: true,
+    autofocus: true,
+    readOnly : true
+  });
+}
 jQuery("[id*='query']").click(function(e){
-                                var toeval=e.currentTarget.id+".toString().replace(/;/g,'').replace(/against/g,'').replace(/}\w*/,'').replace('return','daQuery=').replace(/function query.*{/,'/*"+e.currentTarget.id+"*/')";
-                                var evaled=eval(toeval);
-                                document.getElementById("TAFluent")
-                                  .value=evaled;
-                                document.getElementById("TASQL")
-                                  .value=eval(evaled+".toSQL()");
-                                  e.preventDefault();});
+  var fsqlOName=e.currentTarget.id;
+  var toeval=fsqlOName+".toString().replace(/;/g,'').replace(/against/g,'').replace(/}\w*/,'').replace('return','daQuery=').replace(/function query.*{/,'/*"+e.currentTarget.id+"*/')";
+  var evaled=eval(toeval);
+  var queryName=fsqlOName.substring(0,fsqlOName.length-5);
+  var sqlstr=eval(evaled+".toSQL()");
+  sqlstr=sqlstr.replace('/*CLOSED SQL*/','');
+  sqlstr=sqlstr.replace(/,/g,', \n');
+  var keyWords=['SELECT','FROM','JOIN','WHERE','FREE','HAVING','GROUP BY','ORDER BY','LIMIT','HAVING','AND','OR','LIKE'];
+  keyWords.forEach((x)=> {sqlstr=sqlstr.replace(new RegExp(x,'g'),"\n"+x)});
+  console.log(sqlstr);
+  editor.getDoc().setValue("-- "+queryName+"\n"+sqlstr);
+  e.preventDefault();});
 </script>
 
 </body>
