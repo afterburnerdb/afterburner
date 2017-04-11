@@ -627,7 +627,6 @@ function fsql2sql(){
     } else {
       DEBUG("running closed query.. query not against anything..");
       var be_jsn=pci.execSQL(this.toSQL());
-      DEBUG("be_jsn"+be_jsn);
       var ds= new dataSource(be_jsn);
       var tab=new aTable(ds);
       if (this.openA.length>0)
@@ -688,17 +687,17 @@ function fsql2sql(){
     this.matfe=true;
     return this;
   }
-  this.exploreMAVOptions =function(){
-    console.log("exploreMAVOptions:");
-    //Explore Ones:
-    var mavOpts=[];
-    this.whereA.forEach((x) => {
-      mavOpts.push[x]; //ones 
-      this.whereA.forEach((xx) => {
-        if (x!=xx) mavOpts.push[x,xx]
-      });
-    });
-  }
+  //this.exploreMAVOptions =function(){
+  //  console.log("exploreMAVOptions:");
+
+  //  //Explore Ones:
+  //  for (var i=0;i<this.whereA.length;i++){
+  //    console.log("Try opening query on:"+this.whereA[i]);
+  //    var tmpMAV= new fsql2sql();
+  //    var tmpFSQL= new fsql2sql();
+  //  }
+  //  
+  //}
   //this.clone = function(){
   //  var newi= new fsql2sql();
   //  newi.fromA=this.fromA.slice();
