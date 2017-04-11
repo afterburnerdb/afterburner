@@ -1,4 +1,4 @@
-<yDOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="utf-8">
@@ -145,43 +145,33 @@
         <div class="row">
           <div class="container">
             <div class="dropdown">
-              <button class="btn btn-default dropdown-toggle" type="button" id="menu1" data-toggle="dropdown" style="float:left; margin:0 10px 10px 0;">Insert TPC-H Query<span class="caret"></span></button>
+              <button class="btn btn-default dropdown-toggle disabled" type="button" id="menu1" data-toggle="dropdown" style="float:left; margin:0 10px 10px 0;">Insert TPC-H Query<span class="caret"></span></button>
               <ul class="dropdown-menu" role="menu" aria-labelledby="menu1">
-                <li role="presentation"><a role="menuitem" tabindex="-1" id="query1_fsql">Q1</a></li>
-                <li role="presentation"><a role="menuitem" tabindex="-1" id="query2_fsql">Q2</a></li>
-                <li role="presentation"><a role="menuitem" tabindex="-1" id="query3_fsql">Q3</a></li>
-                <li role="presentation"><a role="menuitem" tabindex="-1" id="query4_fsql">Q4</a></li>
-                <li role="presentation"><a role="menuitem" tabindex="-1" id="query5_fsql">Q5</a></li>
-                <li role="presentation"><a role="menuitem" tabindex="-1" id="query6_fsql">Q6</a></li>
-                <li role="presentation"><a role="menuitem" tabindex="-1" id="query7_fsql">Q7</a></li>
-                <li role="presentation"><a role="menuitem" tabindex="-1" id="query8_fsql">Q8</a></li>
-                <li role="presentation"><a role="menuitem" tabindex="-1" id="query9_fsql">Q9</a></li>
-                <li role="presentation"><a role="menuitem" tabindex="-1" id="query10_fsql">Q10</a></li>
-                <li role="presentation"><a role="menuitem" tabindex="-1" id="query11_fsql">Q11</a></li>
-                <li role="presentation"><a role="menuitem" tabindex="-1" id="query12_fsql">Q12</a></li>
-                <li role="presentation"><a role="menuitem" tabindex="-1" id="query13_fsql">Q13</a></li>
-                <li role="presentation"><a role="menuitem" tabindex="-1" id="query14_fsql">Q14</a></li>
-                <li role="presentation"><a role="menuitem" tabindex="-1" id="query15_fsql">Q15</a></li>
-                <li role="presentation"><a role="menuitem" tabindex="-1" id="query16_fsql">Q16</a></li>
-                <li role="presentation"><a role="menuitem" tabindex="-1" id="query17_fsql">Q17</a></li>
-                <li role="presentation"><a role="menuitem" tabindex="-1" id="query18_fsql">Q18</a></li>
-                <li role="presentation"><a role="menuitem" tabindex="-1" id="query19_fsql">Q19</a></li>
-                <li role="presentation"><a role="menuitem" tabindex="-1" id="query20_fsql">Q20</a></li>
-                <li role="presentation"><a role="menuitem" tabindex="-1" id="query21_fsql">Q21</a></li>
-                <li role="presentation"><a role="menuitem" tabindex="-1" id="query22_fsql">Q22</a></li>
+                <li><a id="query1_fsql">Q1</a></li>
+                <li><a id="query2_fsql">Q2</a></li>
+                <li><a id="query3_fsql">Q3</a></li>
+                <li><a id="query4_fsql">Q4</a></li>
+                <li><a id="query5_fsql">Q5</a></li>
+                <li><a id="query6_fsql">Q6</a></li>
+                <li><a id="query7_fsql">Q7</a></li>
+                <li><a id="query12_fsql">Q12</a></li>
+                <li><a id="query14_fsql">Q14</a></li>
+                <li><a id="query17_fsql">Q17</a></li>
+                <li><a id="query20_fsql">Q20</a></li>
+                <li><a id="query21_fsql">Q21</a></li>
+                <li><a id="query22_fsql">Q22</a></li>
               </ul>
             </div>
-            <button id="asisbebtn" type="button" onclick="runcode()" class="btn btn-default disabled" data-placement="bot" style="float:left; margin:0 10px 10px 0;">
+            <button id="asisbebtn" type="button" onclick="runcode()" class="btn btn-default" data-placement="bot" style="float:left; margin:0 10px 10px 0;">
               Run Full Query Against Backend
             </button>
-
-            <div class="dropdown"  id="openmenu" style="float:left; margin:0 10px 10px 0;">
+            <div id="opencons" style="float:left; margin:0 10px 10px 0;">
+            </div>
+            <!-- <div class="dropdown" id="openmenu" style="float:left; margin:0 10px 10px 0;">
               <button class="btn dropdown-toggle disabled" id="openbtn" type="button" data-toggle="dropdown">
                 Open!
               </button>
-              <ul class="dropdown-menu" id="openlist">
-              </ul>
-            </div>
+            </div> -->
           </div>
         </div>
       </div>
@@ -246,59 +236,12 @@
 <script src="./src/tpch/fsql/q05.js"></script>
 <script src="./src/tpch/fsql/q06.js"></script>
 <script src="./src/tpch/fsql/q07.js"></script>
-<script src="./src/tpch/fsql/q08.js"></script>
-<script src="./src/tpch/fsql/q09.js"></script>
-<script src="./src/tpch/fsql/q10.js"></script>
-<script src="./src/tpch/fsql/q11.js"></script>
 <script src="./src/tpch/fsql/q12.js"></script>
-<script src="./src/tpch/fsql/q13.js"></script>
 <script src="./src/tpch/fsql/q14.js"></script>
-<script src="./src/tpch/fsql/q15.js"></script>
-<script src="./src/tpch/fsql/q16.js"></script>
 <script src="./src/tpch/fsql/q17.js"></script>
-<script src="./src/tpch/fsql/q18.js"></script>
-<script src="./src/tpch/fsql/q19.js"></script>
 <script src="./src/tpch/fsql/q20.js"></script>
 <script src="./src/tpch/fsql/q21.js"></script>
-<script src="./src/tpch/fsql/q22.js"></script>
 
-<script src="./src/tpch/opendatesscen/mav01.js"></script>
-<script src="./src/tpch/opendatesscen/mav03.js"></script>
-<script src="./src/tpch/opendatesscen/mav04.js"></script>
-<script src="./src/tpch/opendatesscen/mav05.js"></script>
-<script src="./src/tpch/opendatesscen/mav06.js"></script>
-<script src="./src/tpch/opendatesscen/mav07.js"></script>
-<script src="./src/tpch/opendatesscen/mav08.js"></script>
-<script src="./src/tpch/opendatesscen/mav10.js"></script>
-<script src="./src/tpch/opendatesscen/mav12.js"></script>
-<script src="./src/tpch/opendatesscen/mav14.js"></script>
-<script src="./src/tpch/opendatesscen/mav15.js"></script>
-<script src="./src/tpch/opendatesscen/mav20.js"></script>
-
-<script src="./src/tpch/answers/ans1.js"></script>
-<script src="./src/tpch/answers/ans2.js"></script>
-<script src="./src/tpch/answers/ans3.js"></script>
-<script src="./src/tpch/answers/ans4.js"></script>
-<script src="./src/tpch/answers/ans5.js"></script>
-<script src="./src/tpch/answers/ans6.js"></script>
-<script src="./src/tpch/answers/ans7.js"></script>
-<script src="./src/tpch/answers/ans8.js"></script>
-<script src="./src/tpch/answers/ans9.js"></script>
-<script src="./src/tpch/answers/ans10.js"></script>
-<script src="./src/tpch/answers/ans11.js"></script>
-<script src="./src/tpch/answers/ans12.js"></script>
-<script src="./src/tpch/answers/ans13.js"></script>
-<script src="./src/tpch/answers/ans14.js"></script>
-<script src="./src/tpch/answers/ans15.js"></script>
-<script src="./src/tpch/answers/ans16.js"></script>
-<script src="./src/tpch/answers/ans17.js"></script>
-<script src="./src/tpch/answers/ans18.js"></script>
-<script src="./src/tpch/answers/ans19.js"></script>
-<script src="./src/tpch/answers/ans20.js"></script>
-<script src="./src/tpch/answers/ans21.js"></script>
-<script src="./src/tpch/answers/ans22.js"></script>
-
-<script src="./src/tpch/opendatesscen/benchmark_opendatescen.js"></script>
 <script src="./src/micro/benchmark_micro.js"></script>
 
 <script src="./src/tpch/q1allscen/benchmark_q1allscen.js"></script>
@@ -322,15 +265,6 @@
 <script src="./src/tpch/q6allscen/mav06c.js"></script>
 <script src="./src/tpch/q7allscen/benchmark_q7allscen.js"></script>
 <script src="./src/tpch/q7allscen/mav07a.js"></script>
-<script src="./src/tpch/q8allscen/benchmark_q8allscen.js"></script>
-<script src="./src/tpch/q8allscen/mav08a.js"></script>
-<script src="./src/tpch/q8allscen/mav08b.js"></script>
-<script src="./src/tpch/q8allscen/mav08c.js"></script>
-<script src="./src/tpch/q9allscen/benchmark_q9allscen.js"></script>
-<script src="./src/tpch/q9allscen/mav09a.js"></script>
-<script src="./src/tpch/q10allscen/benchmark_q10allscen.js"></script>
-<script src="./src/tpch/q10allscen/mav10a.js"></script>
-<script src="./src/tpch/q10allscen/mav10b.js"></script>
 <script src="./src/tpch/q12allscen/benchmark_q12allscen.js"></script>
 <script src="./src/tpch/q12allscen/mav12a.js"></script>
 <script src="./src/tpch/q12allscen/mav12b.js"></script>
@@ -425,9 +359,9 @@ function connBE(){
   $("#connbtn").addClass("disabled");
   $("#connbtn").text("Connection succesful");
 
-  $("#asisbebtn").removeClass("disabled");
-  $("#openbtn").removeClass("disabled");
-//  $("#btnasisbe").addClass("btn-success");
+//  $("#asisbebtn").removeClass("disabled");
+//  $("#openbtn").removeClass("disabled");
+  $("#menu1").removeClass("disabled");
 }
 function pullBESchema(){
   console.log("loading backend tables");
@@ -435,7 +369,6 @@ function pullBESchema(){
 </script>
 
 <script type="text/javascript">
-
 var q2free={
   '1' :['Q1a'],
   '2' :['Q2a','Q2b'],
@@ -465,18 +398,18 @@ var q2mav={
   '21':[query21a_mav(),query21b_mav()]
 }
 var q2oName={
-  '1' :['l_shipdate(2526 rows)'],
-  '2' :['p_size(50 rows)', 'p_type(150 rows)'],
-  '3' :['c_mktsegment(5 rows)', 'o_orderdate(2406 rows)', 'l_shipdate(2526 rows)'],
-  '4' :['o_orderdate(2526 rows)'],
-  '5' :['r_name(5 rows), o_orderdate(2406 rows)'],
-  '6' :['l_shipdate(2526 rows)', 'l_discount(11 rows)', 'l_quantity(50 rows)'],
-  '7' :['l_shipdate(2526 rows)'],
-  '12':['l_shipmode(7 rows)', 'l_receiptdate(2554 rows)'],
-  '14':['l_shipdate(2526 rows)'],
-  '17':['l_shipmode(7 rows)', 'l_receiptdate(2555 rows)'],
-  '20':['n_name(25 rows)'],
-  '21':['o_orderstatus(3 rows)', 'n_name(25 rows)']
+  '1' :['l_shipdate(2526 rows)'],['l_shipdate(2526 rows)']:'1',
+  '2' :['p_size(50 rows)', 'p_type(150 rows)'],'p_size(50 rows)':'2','p_type(150 rows)':'2',
+  '3' :['c_mktsegment(5 rows)', 'o_orderdate(2406 rows)', 'l_shipdate(2526 rows)'],'c_mktsegment(5 rows)':'3', 'o_orderdate(2406 rows)':'3', 'l_shipdate(2526 rows)':'3',
+  '4' :['o_orderdate(2526 rows)'],'o_orderdate(2526 rows)':'4',
+  '5' :['r_name(5 rows), o_orderdate(2406 rows)'],'r_name(5 rows)':'5', 'o_orderdate(2406 rows)':'5',
+  '6' :['l_shipdate(2526 rows)', 'l_discount(11 rows)', 'l_quantity(50 rows)'],'l_shipdate(2526 rows)':'6', 'l_discount(11 rows)':'6', 'l_quantity(50 rows)':'6',
+  '7' :['l_shipdate(2526 rows)'],'l_shipdate(2526 rows)':'7',
+  '12':['l_shipmode(7 rows)', 'l_receiptdate(2554 rows)'],'l_shipmode(7 rows)':'12','l_receiptdate(2554 rows)':'12',
+  '14':['l_shipdate(2526 rows)'],'l_shipdate(2526 rows)':'14',
+  '17':['l_shipmode(7 rows)', 'l_receiptdate(2555 rows)'],'l_shipmode(7 rows)':'17', 'l_receiptdate(2555 rows)':'17',
+  '20':['n_name(25 rows)'],'n_name(25 rows)':'20',
+  '21':['o_orderstatus(3 rows)', 'n_name(25 rows)'],'o_orderstatus(3 rows)':'21', 'n_name(25 rows)':'21'
 }
 function onLoad2(){
  window.editor = CodeMirror.fromTextArea(document.getElementById('TASQL'), {
@@ -499,15 +432,20 @@ jQuery("[id*='query']")
     sqlstr=sqlstr.replace(/,/g,', \n');
     var keyWords=['SELECT','FROM','JOIN','WHERE','FREE','HAVING','GROUP BY','ORDER BY','LIMIT','HAVING','AND','OR','LIKE'];
     keyWords.forEach((x)=> {sqlstr=sqlstr.replace(new RegExp(x,'g'),"\n"+x)});
-    $('#qlabel').text(queryName.substring(5));//.toUpperCase());
+    var qnum=queryName.substring(5);
+    $('#qlabel').text(qnum);//.toUpperCase());
     editor.getDoc().setValue("-- "+queryName+"\n"+sqlstr);
     $("#asisbebtn").show();
-    $("#openbtn").show();
-    
+//    $("#openbtn").show();
+    var htmldd=newHTMLDD('Open!',q2oName[qnum],{'id':'openbtn'});
+    var opencons=document.getElementById('opencons');
+    clearElement(opencons);
+    opencons.appendChild(htmldd);
+//    $("#openbtn").addClass("btn-success");
     e.preventDefault();
   });
   $("#asisbebtn").hide();
-  $("#openbtn").hide();
+//  $("#openbtn").hide();
 </script>
 
 </body>

@@ -37,7 +37,7 @@ function Explore(tabname){
     clearElement(cell);
     console.log("abdb.select().from("+this.tabname+").field("+colname+").group("+colname+").toArray()");
     var distinct=abdb.select().from(this.tabname).field(colname).group(colname).toArray();
-    cell.appendChild(newHTMLDD(['ALL','*'].concat(distinct),{id:'bcellmenu'}));
+    cell.appendChild(newHTMLDD('Select!',['ALL','*'].concat(distinct),{id:'bcellmenu'},'-sm'));
     $('.dropdown-toggle').dropdown('toggle');
 
     $("#bcellmenu").on("click", "li a", function() {

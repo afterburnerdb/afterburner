@@ -14,7 +14,6 @@ function newHTMLTable(opts){
   opts['id']= opts['id'] || "";
   opts['class']= opts['class'] || "table table-bordered table-condensed table-nonfluid";
   setAtts(table,opts);
- // Object.keys(opts).forEach((x)=>{table.setAttribute(x,opts[x])});
   return table;
 }
 function newHTMLThead(table,opts){
@@ -22,14 +21,12 @@ function newHTMLThead(table,opts){
   var thead = table.createTHead();
   opts['id']= opts['id'] || "";
   opts['class']= opts['class'] || "thead-default";
-  //Object.keys(opts).forEach((x)=>{thead.setAttribute(x,opts[x])});
   setAtts(thead,opts);
   return thead;
 }
 function newHTMLTD(text,opts){
   opts=opts||{};
   var td = document.createElement('td');
-  //Object.keys(opts).forEach((x)=>{td.setAttribute(x,opts[x])});
   setAtts(td,opts);
   td.appendChild(document.createTextNode(""+text));
   return td;
@@ -37,7 +34,6 @@ function newHTMLTD(text,opts){
 function newHTMLTH(text,opts){
   opts=opts||{};
   var td = document.createElement('th');
-  //Object.keys(opts).forEach((x)=>{td.setAttribute(x,opts[x])});
   setAtts(td,opts);
   td.appendChild(document.createTextNode(""+text));
   return td;
@@ -45,7 +41,6 @@ function newHTMLTH(text,opts){
 function newHTMLTBody(table,opts){
   opts=opts||{};
   var tbody = table.createTBody();
-  //Object.keys(opts).forEach((x)=>{tbody.setAttribute(x,opts[x])});
   setAtts(tbody,opts);
   return tbody;
 }
@@ -53,14 +48,12 @@ function newHTMLTBody(table,opts){
 function newHTMLUL(opts){
   opts=opts||{};
   var ul = document.createElement('ul');
-  //Object.keys(opts).forEach((x)=>{ul.setAttribute(x,opts[x])});
   setAtts(ul,opts);
   return ul;
 }
 function newHTMLA(text,opts){
   opts=opts||{};
   var a = document.createElement('a');
-  //Object.keys(opts).forEach((x)=>{a.setAttribute(x,opts[x])});
   setAtts(a,opts);
   a.appendChild(document.createTextNode(""+text));
   return a;
@@ -82,7 +75,6 @@ function newHTMLProgressBar(pbid,opts){
   setAtts(div2,opts2);
 
   div.appendChild(div2);
-//  div.appendChild(newHTMLA(text));
   return div;
 }
 function newHTMLContainer(opts){
@@ -122,12 +114,13 @@ function newHTMLBut(text,opts){
   setAtts(but,opts);
   return but;
 }
-function newHTMLDD(items, opts){
+function newHTMLDD(title,items, opts,size){
   opts=opts||{};
+  size=size||"";
   opts['class']='dropdown';
   var div = document.createElement('div');
   setAtts(div,opts);
-  var but=newHTMLBut('Select!',{'class':'btn-sm'});
+  var but=newHTMLBut(title,{'class':'btn'+size});
   div.appendChild(but); 
 //
   var ul = newHTMLUL({class:'dropdown-menu', role:'menu'});
