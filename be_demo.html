@@ -171,9 +171,17 @@
                 <li role="presentation"><a role="menuitem" tabindex="-1" id="query22_fsql">Q22</a></li>
               </ul>
             </div>
-            <button id="asisbebtn" type="button" onclick="runcode()" class="btn btn-default disabled" data-placement="bot">
+            <button id="asisbebtn" type="button" onclick="runcode()" class="btn btn-default disabled" data-placement="bot" style="float:left; margin:0 10px 10px 0;">
               Run Full Query Against Backend
             </button>
+
+            <div class="dropdown"  id="openmenu" style="float:left; margin:0 10px 10px 0;">
+              <button class="btn dropdown-toggle disabled" id="openbtn" type="button" data-toggle="dropdown">
+                Open!
+              </button>
+              <ul class="dropdown-menu" id="openlist">
+              </ul>
+            </div>
           </div>
         </div>
       </div>
@@ -361,7 +369,6 @@ function loadWeb(size){
   if (size=='small'){
   urls.list=[
     "https://lintool.github.io/afterburner-data/lineitem.800000.tbl.gz",
-
     "https://lintool.github.io/afterburner-data/nation.25.tbl.gz",
     "https://lintool.github.io/afterburner-data/orders.800000.tbl.gz",
     "https://lintool.github.io/afterburner-data/part.200000.tbl.gz",
@@ -419,6 +426,7 @@ function connBE(){
   $("#connbtn").text("Connection succesful");
 
   $("#asisbebtn").removeClass("disabled");
+  $("#openbtn").removeClass("disabled");
 //  $("#btnasisbe").addClass("btn-success");
 }
 function pullBESchema(){
@@ -427,6 +435,49 @@ function pullBESchema(){
 </script>
 
 <script type="text/javascript">
+
+var q2free={
+  '1' :['Q1a'],
+  '2' :['Q2a','Q2b'],
+  '3' :['Q3a','Q3b','Q3c'],
+  '4' :['Q4a'],
+  '5' :['Q5a','Q5b'],
+  '6' :['Q6a','Q6b','Q6c'],
+  '7' :['Q7a'],
+  '12':['Q12a','Q12b'],
+  '14':['Q14a'],
+  '17':['Q17a','Q17b'],
+  '20':['Q20a'],
+  '21':['Q21a','Q21b']
+}
+var q2mav={
+  '1' :[query1a_mav()],
+  '2' :[query2a_mav(),query2b_mav()],
+  '3' :[query3a_mav(),query3b_mav(),query3c_mav()],
+  '4' :[query4a_mav()],
+  '5' :[query5a_mav(),query5b_mav()],
+  '6' :[query6a_mav(),query6b_mav(),query6c_mav()],
+  '7' :[query7a_mav()],
+  '12':[query12a_mav(),query12b_mav()],
+  '14':[query14a_mav()],
+  '17':[query17a_mav(),query17b_mav()],
+  '20':[query20a_mav()],
+  '21':[query21a_mav(),query21b_mav()]
+}
+var q2oName={
+  '1' :['l_shipdate(2526 rows)'],
+  '2' :['p_size(50 rows)', 'p_type(150 rows)'],
+  '3' :['c_mktsegment(5 rows)', 'o_orderdate(2406 rows)', 'l_shipdate(2526 rows)'],
+  '4' :['o_orderdate(2526 rows)'],
+  '5' :['r_name(5 rows), o_orderdate(2406 rows)'],
+  '6' :['l_shipdate(2526 rows)', 'l_discount(11 rows)', 'l_quantity(50 rows)'],
+  '7' :['l_shipdate(2526 rows)'],
+  '12':['l_shipmode(7 rows)', 'l_receiptdate(2554 rows)'],
+  '14':['l_shipdate(2526 rows)'],
+  '17':['l_shipmode(7 rows)', 'l_receiptdate(2555 rows)'],
+  '20':['n_name(25 rows)'],
+  '21':['o_orderstatus(3 rows)', 'n_name(25 rows)']
+}
 function onLoad2(){
  window.editor = CodeMirror.fromTextArea(document.getElementById('TASQL'), {
     mode: "text/x-sql",
@@ -437,19 +488,26 @@ function onLoad2(){
     readOnly : true
   });
 }
-jQuery("[id*='query']").click(function(e){
-  var fsqlOName=e.currentTarget.id;
-  var toeval=fsqlOName+".toString().replace(/;/g,'').replace(/against/g,'').replace(/}\w*/,'').replace('return','daQuery=').replace(/function query.*{/,'/*"+e.currentTarget.id+"*/')";
-  var evaled=eval(toeval);
-  var queryName=fsqlOName.substring(0,fsqlOName.length-5);
-  var sqlstr=eval(evaled+".toSQL()");
-  sqlstr=sqlstr.replace('/*CLOSED SQL*/','');
-  sqlstr=sqlstr.replace(/,/g,', \n');
-  var keyWords=['SELECT','FROM','JOIN','WHERE','FREE','HAVING','GROUP BY','ORDER BY','LIMIT','HAVING','AND','OR','LIKE'];
-  keyWords.forEach((x)=> {sqlstr=sqlstr.replace(new RegExp(x,'g'),"\n"+x)});
-  $('#qlabel').text(queryName.substring(5));//.toUpperCase());
-  editor.getDoc().setValue("-- "+queryName+"\n"+sqlstr);
-  e.preventDefault();});
+jQuery("[id*='query']")
+  .click(function(e){
+    var fsqlOName=e.currentTarget.id;
+    var toeval=fsqlOName+".toString().replace(/;/g,'').replace(/against/g,'').replace(/}\w*/,'').replace('return','daQuery=').replace(/function query.*{/,'/*"+e.currentTarget.id+"*/')";
+    var evaled=eval(toeval);
+    var queryName=fsqlOName.substring(0,fsqlOName.length-5);
+    var sqlstr=eval(evaled+".toSQL()");
+    sqlstr=sqlstr.replace('/*CLOSED SQL*/','');
+    sqlstr=sqlstr.replace(/,/g,', \n');
+    var keyWords=['SELECT','FROM','JOIN','WHERE','FREE','HAVING','GROUP BY','ORDER BY','LIMIT','HAVING','AND','OR','LIKE'];
+    keyWords.forEach((x)=> {sqlstr=sqlstr.replace(new RegExp(x,'g'),"\n"+x)});
+    $('#qlabel').text(queryName.substring(5));//.toUpperCase());
+    editor.getDoc().setValue("-- "+queryName+"\n"+sqlstr);
+    $("#asisbebtn").show();
+    $("#openbtn").show();
+    
+    e.preventDefault();
+  });
+  $("#asisbebtn").hide();
+  $("#openbtn").hide();
 </script>
 
 </body>
