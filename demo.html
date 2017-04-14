@@ -72,6 +72,7 @@
             Initialize Afterburner!
           </button>
           <ul class="dropdown-menu">
+            <li><a>tiny (~0.5 GB)</a></li>
             <li><a>small (~0.75 GB)</a></li>
             <li><a>medium (~1.5 GB)</a></li>
             <li><a>large (~3.0 GB)</a></li>
@@ -82,14 +83,19 @@
             Load data!
           </button>
           <ul class="dropdown-menu">
-            <li><label class="btn btn-default btn-file" onclick="loadWeb()"
+            <li><label class="btn btn-default btn-file" onclick="loadWeb('tiny')"
                        style="border: none; border-color: transparent;">
-                  Load demo data (136 MB compressed)
+                  Load demo data (35 MB compressed)
                 </label>
             </li>
             <li><label class="btn btn-default btn-file" onclick="loadWeb('small')"
                        style="border: none; border-color: transparent;">
                   Load demo data (95 MB compressed)
+                </label>
+            </li>
+            <li><label class="btn btn-default btn-file" onclick="loadWeb()"
+                       style="border: none; border-color: transparent;">
+                  Load demo data (136 MB compressed)
                 </label>
             </li>
             <li>
@@ -278,7 +284,17 @@ function URLList(){
 }
 function loadWeb(size){
   var urls= new URLList();
-  if (size=='small'){
+  if (size=='tiny'){
+  urls.list=[
+    "https://afterburnerdb.github.io/afterburner-data/TPC-H-sf.15/lineitem.800000.tbl.gz",
+    "https://afterburnerdb.github.io/afterburner-data/TPC-H-sf.15/nation.25.tbl.gz",
+    "https://afterburnerdb.github.io/afterburner-data/TPC-H-sf.15/orders.800000.tbl.gz",
+    "https://afterburnerdb.github.io/afterburner-data/TPC-H-sf.15/part.200000.tbl.gz",
+    "https://afterburnerdb.github.io/afterburner-data/TPC-H-sf.15/partsupp.800000.tbl.gz",
+    "https://afterburnerdb.github.io/afterburner-data/TPC-H-sf.15/region.5.tbl.gz",
+    "https://afterburnerdb.github.io/afterburner-data/TPC-H-sf.15/supplier.10000.tbl.gz",
+    "https://afterburnerdb.github.io/afterburner-data/TPC-H-sf.15/customer.150000.tbl.gz"];
+  }else if (size=='small'){
   urls.list=[
     "https://afterburnerdb.github.io/afterburner-data/TPC-H-sf.15/lineitem.800000.tbl.gz",
     "https://afterburnerdb.github.io/afterburner-data/TPC-H-sf.15/nation.25.tbl.gz",
