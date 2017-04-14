@@ -369,19 +369,19 @@ function pullBESchema(){
 </script>
 
 <script type="text/javascript">
-var q2free={
-  '1' :['Q1a'],
-  '2' :['Q2a','Q2b'],
-  '3' :['Q3a','Q3b','Q3c'],
-  '4' :['Q4a'],
-  '5' :['Q5a','Q5b'],
-  '6' :['Q6a','Q6b','Q6c'],
-  '7' :['Q7a'],
-  '12':['Q12a','Q12b'],
-  '14':['Q14a'],
-  '17':['Q17a','Q17b'],
-  '20':['Q20a'],
-  '21':['Q21a','Q21b']
+var q2fsql={
+  '1' :query1_fsql,
+  '2' :query2_fsql,
+  '3' :query3_fsql,
+  '4' :query4_fsql,
+  '5' :query5_fsql,
+  '6' :query6_fsql,
+  '7' :query7_fsql,
+  '12':query12_fsql,
+  '14':query14_fsql,
+  '17':query17_fsql,
+  '20':query20_fsql,
+  '21':query21_fsql
 }
 var q2mav={
   '1' :[query1a_mav()],
@@ -398,7 +398,7 @@ var q2mav={
   '21':[query21a_mav(),query21b_mav()]
 }
 var q2oName={
-  '1' :['l_shipdate(2526 rows)'],['l_shipdate(2526 rows)']:'1',
+  '1' :['l_shipdate(2526 rows)'],'l_shipdate(2526 rows)':'1',
   '2' :['p_size(50 rows)', 'p_type(150 rows)'],'p_size(50 rows)':'2','p_type(150 rows)':'2',
   '3' :['c_mktsegment(5 rows)', 'o_orderdate(2406 rows)', 'l_shipdate(2526 rows)'],'c_mktsegment(5 rows)':'3', 'o_orderdate(2406 rows)':'3', 'l_shipdate(2526 rows)':'3',
   '4' :['o_orderdate(2526 rows)'],'o_orderdate(2526 rows)':'4',
@@ -411,6 +411,21 @@ var q2oName={
   '20':['n_name(25 rows)'],'n_name(25 rows)':'20',
   '21':['o_orderstatus(3 rows)', 'n_name(25 rows)'],'o_orderstatus(3 rows)':'21', 'n_name(25 rows)':'21'
 }
+var m2funk={
+  'l_shipdate(2526 rows)':'1',
+  'p_size(50 rows)':'2','p_type(150 rows)':'2',
+  'c_mktsegment(5 rows)':'3', 'o_orderdate(2406 rows)':'3', 'l_shipdate(2526 rows)':'3',
+  'o_orderdate(2526 rows)':'4',
+  'r_name(5 rows)':'5', 'o_orderdate(2406 rows)':'5',
+  'l_shipdate(2526 rows)':'6', 'l_discount(11 rows)':'6', 'l_quantity(50 rows)':'6',
+  'l_shipdate(2526 rows)':'7',
+  'l_shipmode(7 rows)':'12','l_receiptdate(2554 rows)':'12',
+  'l_shipdate(2526 rows)':'14',
+  'l_shipmode(7 rows)':'17', 'l_receiptdate(2555 rows)':'17',
+  'n_name(25 rows)':'20',
+  'o_orderstatus(3 rows)':'21', 'n_name(25 rows)':'21'
+}
+
 function onLoad2(){
  window.editor = CodeMirror.fromTextArea(document.getElementById('TASQL'), {
     mode: "text/x-sql",
@@ -433,19 +448,29 @@ jQuery("[id*='query']")
     var keyWords=['SELECT','FROM','JOIN','WHERE','FREE','HAVING','GROUP BY','ORDER BY','LIMIT','HAVING','AND','OR','LIKE'];
     keyWords.forEach((x)=> {sqlstr=sqlstr.replace(new RegExp(x,'g'),"\n"+x)});
     var qnum=queryName.substring(5);
-    $('#qlabel').text(qnum);//.toUpperCase());
+    $('#qlabel').text(qnum);
     editor.getDoc().setValue("-- "+queryName+"\n"+sqlstr);
     $("#asisbebtn").show();
-//    $("#openbtn").show();
-    var htmldd=newHTMLDD('Open!',q2oName[qnum],{'id':'openbtn'});
+    var htmldd=newHTMLDD('Open Q'+qnum,q2oName[qnum],{'id':'openbtn'});
     var opencons=document.getElementById('opencons');
     clearElement(opencons);
     opencons.appendChild(htmldd);
-//    $("#openbtn").addClass("btn-success");
+    $("#openbtn").on("click", "li a", function(e) {
+      expose=e;
+//    $("#openbtn").text;
+      console.log('this.text:'+this.text);
+      console.log('$("#openbtn").text:' + $("#openbtn button").text());
+      var btnlab=$("#openbtn button").text();
+      var actqnum=btnlab.substring(6);
+      console.log('qnum:' +actqnum );
+      qfsql=q2fsql[qnum];
+      mavs=q2mav[qnum];
+      mav=mavs[q2oName[qnum].indexOf(expose.currentTarget.text)];
+    });
+//    $("#openbtn").click();
     e.preventDefault();
   });
   $("#asisbebtn").hide();
-//  $("#openbtn").hide();
 </script>
 
 </body>
