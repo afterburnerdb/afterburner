@@ -89,6 +89,14 @@ var h3db;
 //
 function store_respond(size){
   size=size.toLowerCase();
+  if (size == 'tiny'){
+    console.log("using small store");
+    confmemmax=352321536;
+    conftmpstrStorageMB=50;
+    confbufPoolMB=25;
+    //confhashBits=22;
+    confbukpoolMB=25;
+  }
   if (size == 'small'){
     console.log("using small store");
     confmemmax=603979776;
@@ -109,7 +117,6 @@ function store_respond(size){
     conftmpstrStorageMB=512;
     confbufPoolMB=200;
   }
-
 }
 function init_store(size){
   if (typeof size !== 'undefined')
