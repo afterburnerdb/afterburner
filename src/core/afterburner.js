@@ -1499,7 +1499,7 @@ function _min(p){
   var type= typeCol(p);
   var varname="min"+unique;
   var memv='memF32';
-  if (type==3)
+  if (type==0 || type==3)
     memv='mem32';
   return `dec:var `+varname+`=10000000000.1;::
   post:res.addCol2("min(`+p+`)",`+type+`);::
@@ -1520,7 +1520,7 @@ function _max(p){
   var type= typeCol(p);
   var varname="max"+unique;
   var memv='memF32';
-  if (type==3)
+  if (type==0 || type==3)
     memv='mem32';
   return `dec:var `+varname+`=-10000000000.1;::
   post:res.addCol2("max(`+p+`)",`+type+`);::

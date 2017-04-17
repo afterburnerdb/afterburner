@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Afterburner Demo</title>
+
+<!--    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"> -->
+    <link rel="stylesheet" href="bootstrap/css/bootstrap.min.css"> 
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+   <style type="text/css">
+      body {
+        padding-top: 50px;
+      }
+      .modal {
+        text-align: left;
+      }
+      pre.prettyprint {
+        border: 1px solid #ccc;
+        margin-bottom: 0;
+        padding: 9.5px;
+      }
+      .table-nonfluid {
+        width: auto !important;
+      }
+      .table-responsive {
+        max-height: 150px;
+        overflow: auto;
+      }
+    </style>
+
+  </head>
+  <body>
+
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="#">Afterburner</a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+          <ul class="nav navbar-nav">
+            <li><a href="./index.html">Home</a></li>
+            <li class="active"><a href="./demo.html">Demo</a></li>
+            <li><a href="./viz_be.html">Viz</a></li>
+            <li><a href="https://github.com/lintool/afterburner/">Code (GitHub)</a></li>
+          </ul>
+
+        </div><!--/.navbar-collapse -->
+      </div>
+    </nav>
+
+    <!-- Main jumbotron for a primary marketing message or call to action -->
+
+<!--<div>
+      <a>Load a table from a file server.</a><br>
+     Server: <input type="text" name="fserverIP" value="127.0.0.1"><br>
+     Port: <input type="text" name="fserverPort" value="55443"><br>
+     <button submit="submit" id="loadserver">get table from server</button><hr>
+</div>-->
+
+<!-- <div class="jumbotron"> -->
+  <div class="container">
+    <div class="row">
+      <div class="col-md-3">
+        <label class="btn btn-default btn-file" href="#" data-toggle="tooltip" data-placement="bot" title="Load a database table from a local file">
+          Load table
+          <input type="file" id="fileInput" style="display: none;" multiple> 
+        </label>
+      </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+        <div id="sconsole" class="table-responsive">
+        </div>
+        <div>
+      </div>
+      <div class="row">
+        <div class="col-md-6">
+          <h2>JavaScript</h2>
+		<textarea rows="11" id="TAASM" name="TAASM" class="prettyprint form-control animated" placeholder="" ></textarea>
+		<button type="button" onclick="runASM()" class="btn btn-default" href="#" data-toggle="tooltip" data-placement="bot" title="Run code (Query)">
+                  Run ASM</button>
+       </div>
+        <div class="col-md-6">
+          <h2>Fluent SQL</h2>
+		<textarea rows="11" id="TAFluent" name="TAFluent" class="prettyprint form-control animated linenums language-css" placeholder="Type Fluent SQL or use example buttons.."></textarea>
+		<button type="button" onclick="fluentToASM()" class="btn btn-default" href="#" data-toggle="tooltip" data-placement="bot" title="Translate Fluent into JavaScript code">
+                  Fluent to ASM</button><br>
+		<button type="button" onclick="resetFluentASMq1()" class="btn btn-default" href="#" >
+                  Q1 Fluent</button>
+		<button type="button" onclick="resetFluentASMq2()" class="btn btn-default" href="#" >
+                  Q2 Fluent</button>
+		<button type="button" onclick="resetFluentASMq3()" class="btn btn-default" href="#" >
+                  Q3 Fluent</button>
+		<button type="button" onclick="resetFluentASMq4()" class="btn btn-default" href="#" data-toggle="tooltip" data-placement="bot" title="Load Fluent SQL for Q4">
+                  Q4 Fluent</button>
+        </div>
+
+      </div>
+       <div class="row"><div class="col-xs-12" style="height:50px;"></div></div>
+       <div class="row">
+        <div class="col-md-12">
+          <div id="divcons" class="table-responsive"> </div>
+        </div>
+      </div>
+
+    <br>
+    <div class="row" id="divconsole">
+      <div class="col-md-12">
+        <p id="console">Console area!</p>
+      </div>
+<!--    </div> -->
+  </div> <!-- /container -->
+
+  <div id="waitForFile" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-body">
+          <p>Loading.. Please wait..</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<!-- Afterburner -->
+
+<script src="./src/core/afterburner.js"></script>
+<script src="./src/core/fsql2sql.js"></script>
+<script src="./src/core/store.js"></script>
+<script src="./src/core/aTable.js"></script>
+<script src="./src/core/aSchema.js"></script>
+<script src="./src/core/queryResult.js"></script>
+<script src="./src/core/hashIndex.js"></script>
+<script src="./src/core/dataSource.js"></script>
+<script src="./src/core/common.js"></script>
+<script src="./src/core/html5FileParser.js"></script>
+<script src="./src/core/monetJSONParser.js"></script>
+<script src="./src/frontend/myJS.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.2/jquery.min.js"></script>
+<script src="./src/proxy/proxyConf.js"></script>
+<script src="./src/proxy/proxyClient.js"></script>
+<script src="./src/lib/explanation.js"></script>
+
+<!-- TPC-H -->
+
+<script src="./src/tpch/q01.js"></script>
+<script src="./src/tpch/q02.js"></script>
+<script src="./src/tpch/q03.js"></script>
+<script src="./src/tpch/q04.js"></script>
+<script src="./src/tpch/q05.js"></script>
+<script src="./src/tpch/q06.js"></script>
+<script src="./src/tpch/q07.js"></script>
+<script src="./src/tpch/q08.js"></script>
+<script src="./src/tpch/q09.js"></script>
+<script src="./src/tpch/q10.js"></script>
+<script src="./src/tpch/q11.js"></script>
+<script src="./src/tpch/q12.js"></script>
+<script src="./src/tpch/q13.js"></script>
+<script src="./src/tpch/q14.js"></script>
+<script src="./src/tpch/q15.js"></script>
+<script src="./src/tpch/q16.js"></script>
+<script src="./src/tpch/q17.js"></script>
+<script src="./src/tpch/q18.js"></script>
+<script src="./src/tpch/q19.js"></script>
+<script src="./src/tpch/q20.js"></script>
+<script src="./src/tpch/q21.js"></script>
+<script src="./src/tpch/q22.js"></script>
+
+<script src="./src/tpch/fsql/q01.js"></script>
+<script src="./src/tpch/fsql/q02.js"></script>
+<script src="./src/tpch/fsql/q03.js"></script>
+<script src="./src/tpch/fsql/q04.js"></script>
+<script src="./src/tpch/fsql/q05.js"></script>
+<script src="./src/tpch/fsql/q06.js"></script>
+<script src="./src/tpch/fsql/q07.js"></script>
+<script src="./src/tpch/fsql/q08.js"></script>
+<script src="./src/tpch/fsql/q09.js"></script>
+<script src="./src/tpch/fsql/q10.js"></script>
+<script src="./src/tpch/fsql/q11.js"></script>
+<script src="./src/tpch/fsql/q12.js"></script>
+<script src="./src/tpch/fsql/q13.js"></script>
+<script src="./src/tpch/fsql/q14.js"></script>
+<script src="./src/tpch/fsql/q15.js"></script>
+<script src="./src/tpch/fsql/q16.js"></script>
+<script src="./src/tpch/fsql/q17.js"></script>
+<script src="./src/tpch/fsql/q18.js"></script>
+<script src="./src/tpch/fsql/q19.js"></script>
+<script src="./src/tpch/fsql/q20.js"></script>
+<script src="./src/tpch/fsql/q21.js"></script>
+<script src="./src/tpch/fsql/q22.js"></script>
+
+<script src="./src/tpch/opendatesscen/mav01.js"></script>
+<script src="./src/tpch/opendatesscen/mav03.js"></script>
+<script src="./src/tpch/opendatesscen/mav04.js"></script>
+<script src="./src/tpch/opendatesscen/mav05.js"></script>
+<script src="./src/tpch/opendatesscen/mav06.js"></script>
+<script src="./src/tpch/opendatesscen/mav07.js"></script>
+<script src="./src/tpch/opendatesscen/mav08.js"></script>
+<script src="./src/tpch/opendatesscen/mav10.js"></script>
+<script src="./src/tpch/opendatesscen/mav12.js"></script>
+<script src="./src/tpch/opendatesscen/mav14.js"></script>
+<script src="./src/tpch/opendatesscen/mav15.js"></script>
+<script src="./src/tpch/opendatesscen/mav20.js"></script>
+
+<script src="./src/tpch/answers/ans1.js"></script>
+<script src="./src/tpch/answers/ans2.js"></script>
+<script src="./src/tpch/answers/ans3.js"></script>
+<script src="./src/tpch/answers/ans4.js"></script>
+<script src="./src/tpch/answers/ans5.js"></script>
+<script src="./src/tpch/answers/ans6.js"></script>
+<script src="./src/tpch/answers/ans7.js"></script>
+<script src="./src/tpch/answers/ans8.js"></script>
+<script src="./src/tpch/answers/ans9.js"></script>
+<script src="./src/tpch/answers/ans10.js"></script>
+<script src="./src/tpch/answers/ans11.js"></script>
+<script src="./src/tpch/answers/ans12.js"></script>
+<script src="./src/tpch/answers/ans13.js"></script>
+<script src="./src/tpch/answers/ans14.js"></script>
+<script src="./src/tpch/answers/ans15.js"></script>
+<script src="./src/tpch/answers/ans16.js"></script>
+<script src="./src/tpch/answers/ans17.js"></script>
+<script src="./src/tpch/answers/ans18.js"></script>
+<script src="./src/tpch/answers/ans19.js"></script>
+<script src="./src/tpch/answers/ans20.js"></script>
+<script src="./src/tpch/answers/ans21.js"></script>
+<script src="./src/tpch/answers/ans22.js"></script>
+
+<script src="./src/tpch/benchmark_tpch.js"></script>
+<script src="./src/tpch/opendatesscen/benchmark_opendatescen.js"></script>
+<script src="./src/micro/benchmark_micro.js"></script>
+
+<script src="./src/tpch/q1allscen/benchmark_q1allscen.js"></script>
+<script src="./src/tpch/q1allscen/mav01a.js"></script>
+
+<script src="./src/tpch/q2allscen/benchmark_q2allscen.js"></script>
+<script src="./src/tpch/q2allscen/mav02a.js"></script>
+<script src="./src/tpch/q2allscen/mav02b.js"></script>
+<script src="./src/tpch/q2allscen/mav02c.js"></script>
+
+<script src="./src/tpch/q3allscen/benchmark_q3allscen.js"></script>
+<script src="./src/tpch/q3allscen/mav03a.js"></script>
+<script src="./src/tpch/q3allscen/mav03b.js"></script>
+<script src="./src/tpch/q3allscen/mav03c.js"></script>
+
+<script src="./src/tpch/q4allscen/benchmark_q4allscen.js"></script>
+<script src="./src/tpch/q4allscen/mav04a.js"></script>
+
+<script src="./src/tpch/q5allscen/benchmark_q5allscen.js"></script>
+<script src="./src/tpch/q5allscen/mav05a.js"></script>
+<script src="./src/tpch/q5allscen/mav05b.js"></script>
+
+<script src="./src/tpch/q6allscen/benchmark_q6allscen.js"></script>
+<script src="./src/tpch/q6allscen/mav06a.js"></script>
+<script src="./src/tpch/q6allscen/mav06b.js"></script>
+<script src="./src/tpch/q6allscen/mav06c.js"></script>
+
+<script src="./src/tpch/q7allscen/benchmark_q7allscen.js"></script>
+<script src="./src/tpch/q7allscen/mav07a.js"></script>
+
+<script src="./src/tpch/q8allscen/benchmark_q8allscen.js"></script>
+<script src="./src/tpch/q8allscen/mav08a.js"></script>
+<script src="./src/tpch/q8allscen/mav08b.js"></script>
+<script src="./src/tpch/q8allscen/mav08c.js"></script>
+
+<script src="./src/tpch/q9allscen/benchmark_q9allscen.js"></script>
+<script src="./src/tpch/q9allscen/mav09a.js"></script>
+
+<script src="./src/tpch/q10allscen/benchmark_q10allscen.js"></script>
+<script src="./src/tpch/q10allscen/mav10a.js"></script>
+<script src="./src/tpch/q10allscen/mav10b.js"></script>
+
+<!--<script src="./src/tpch/q11allscen/benchmark_q11allscen.js"></script>
+<script src="./src/tpch/q11allscen/mav11a.js"></script> -->
+
+<script src="./src/tpch/q12allscen/benchmark_q12allscen.js"></script>
+<script src="./src/tpch/q12allscen/mav12a.js"></script>
+<script src="./src/tpch/q12allscen/mav12b.js"></script>
+
+<!--<script src="./src/tpch/q13allscen/benchmark_q13allscen.js"></script>
+<script src="./src/tpch/q13allscen/mav13a.js"></script> -->
+
+<script src="./src/tpch/q14allscen/benchmark_q14allscen.js"></script>
+<script src="./src/tpch/q14allscen/mav14a.js"></script>
+
+<!--<script src="./src/tpch/q16allscen/benchmark_q16allscen.js"></script>
+<script src="./src/tpch/q16allscen/mav16a.js"></script>
+<script src="./src/tpch/q16allscen/mav16b.js"></script>
+<script src="./src/tpch/q16allscen/mav16c.js"></script>-->
+
+<script src="./src/tpch/q17allscen/benchmark_q17allscen.js"></script>
+<script src="./src/tpch/q17allscen/mav17a.js"></script>
+<script src="./src/tpch/q17allscen/mav17b.js"></script>
+
+<script src="./src/tpch/q20allscen/benchmark_q20allscen.js"></script>
+<script src="./src/tpch/q20allscen/mav20a.js"></script>
+
+<script src="./src/tpch/q21allscen/benchmark_q21allscen.js"></script>
+<script src="./src/tpch/q21allscen/mav21a.js"></script>
+<script src="./src/tpch/q21allscen/mav21b.js"></script>
+
+<script>
+function myOnLoad(){
+  abdb = new Afterburner();
+  FSi = new fsql2sql();
+  document.getElementById("TAASM").value="";
+}
+window.onload = function() {
+  inNode=false;
+  var fileInput = document.getElementById('fileInput');
+  fileInput.addEventListener('change', function(e) {
+    $("#waitForFile").modal();
+    var files = fileInput.files;
+    var ds= new dataSource(files, function(){newTable= new aTable(ds);},0);
+  });
+  myOnLoad();
+}
+function runASM(){
+  asmcode=document.getElementById("TAASM").value;
+  document.getElementById("console").innerHTML = "ASM=" + asmcode
+  tt0=window.performance.now();
+  runMyAdhocCode(asmcode);
+  tt1=window.performance.now();
+  console.log('time to run asm:'+ (tt1-tt0));
+}
+
+function resetFluentASMq1(){
+  document.getElementById("TAFluent").value=`abdb.select()
+  .from("orders")
+  .field(count("o_totalprice"))
+  .where(lt("o_totalprice",1500))
+  .toString()`;
+  fluentToASM();
+}
+function resetFluentASMq2(){
+  document.getElementById("TAFluent").value=`abdb.select()
+  .from("lineitem").join("orders").on("l_orderkey","o_orderkey")
+  .field(sum('o_totalprice'))
+  .toString()`;
+  fluentToASM();
+}
+function resetFluentASMq3(){
+  document.getElementById("TAFluent").value=`abdb.select()
+  .field("o_orderdate")
+  .field(count('o_orderkey'))
+  .from("orders")
+  .group("o_orderdate")
+  .toString()`;
+  fluentToASM();
+}
+function resetFluentASMq4(){
+  document.getElementById("TAFluent").value=`abdb.select()
+  .from("lineitem").join("orders").on("l_orderkey","o_orderkey")
+  .field("l_orderkey")
+  .field(sum('l_extendedprice'))
+  .field("o_orderdate")
+  .field("o_shippriority")
+  .where(between('o_orderdate', date('1996-01-01'), date('1996-01-31')))
+  .group("l_orderkey")
+  .group("o_orderdate")
+  .group("o_shippriority")
+  .order([-1])
+  .limit(10)
+  .toString()`;
+  fluentToASM();
+}
+/*abdb.select().from("myview").field("l_orderkey").field("revenue").field("o_orderdate").field("o_shippriority").where(eq('o_orderdate',date('1996-01-06'))).order([-1]).limit(10).toString()*/
+function fluentToASM(){
+        strASM="document.getElementById(\"TAASM\").value="
+        strASM= strASM + document.getElementById("TAFluent").value;
+
+	document.getElementById("console").innerHTML = strASM;
+
+	try {
+		runMyAdhocCode(strASM);
+	}
+	catch(err) {
+	    document.getElementById("console").innerHTML = err.message;
+	}
+}
+</script>
+
+
+<!-- Bootstrap core JavaScript
+================================================== -->
+<!-- Placed at the end of the document so the pages load faster -->
+<!-- <script src="bootstrap/jquery.min.js"></script>-->
+  <!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script> -->
+
+<!-- <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script> -->
+<script src="bootstrap/js/bootstrap.min.js"></script>
+
+<!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+<script src="https://maxcdn.bootstrapcdn.com/js/ie10-viewport-bug-workaround.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pako/1.0.4/pako.min.js"></script>
+
+<script type="text/javascript">
+  $(document).ready(function() {
+    $("body").tooltip({ selector: '[data-toggle=tooltip]', show: { effect: "blind", duration: 1500} });
+});
+
+</script>
+
+</body>
+</html>

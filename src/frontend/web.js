@@ -136,7 +136,12 @@ function newHTMLBR(){
   var br = document.createElement('br');
   return br;
 }
-
+function newHTMLInput(opts){
+  opts=opts||{};
+  var input = document.createElement('input');
+  setAtts(input,opts);
+  return input;
+}
 //
 function drawSchema(abutton,opts){
   var scons=document.getElementById("sconsole");
