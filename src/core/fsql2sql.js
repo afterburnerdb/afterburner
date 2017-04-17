@@ -109,13 +109,15 @@ function fsql2sql(){
     return this;
   }
   this.open = function(col, ...rest){
-    if(this.against){
-      console.log("Does not support opened col against a mav");
-      return;
+    if (typeof col != 'undefined'){
+      if(this.against){
+        console.log("Does not support opened col against a mav");
+        return;
+      }
+      col=fixCol(col);
+      this.openA.push(col);
+      this.opened=true;
     }
-    col=fixCol(col);
-    this.openA.push(col);
-    this.opened=true;
     //
     if (rest.length>0)
       return this.open(rest[0], ...rest.slice(1));
