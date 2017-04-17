@@ -16,9 +16,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.25.0/codemirror.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.25.0/mode/sql/sql.min.js"></script>
 
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/9.1.0/nouislider.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/9.1.0/nouislider.min.js"></script>
-
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
 
     <a href="https://github.com/lintool/afterburner/"><img style="position: absolute; top: 0; right: 0; border: 0; z-index:9999;" src="https://camo.githubusercontent.com/652c5b9acfaddf3a9c326fa6bde407b87f7be0f4/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6f72616e67655f6666373630302e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_orange_ff7600.png"></a>
  
@@ -366,50 +365,20 @@ function pullBESchema(){
 </script>
 
 <script type="text/javascript">
-//var q2fsql={
-//  '1' :query1_fsql,
-//  '2' :query2_fsql,
-//  '3' :query3_fsql,
-//  '4' :query4_fsql,
-//  '5' :query5_fsql,
-//  '6' :query6_fsql,
-//  '7' :query7_fsql,
-//  '12':query12_fsql,
-//  '14':query14_fsql,
-//  '17':query17_fsql,
-//  '20':query20_fsql,
-//  '21':query21_fsql
-//}
-
 var q2oName={
-  '1' :['l_shipdate(2526 rows)'],
-  '2' :['p_size(50 rows)', 'p_type(150 rows)'],
-  '3' :['c_mktsegment(5 rows)', 'o_orderdate(2406 rows)'],
-  '4' :['o_orderdate(2526 rows)'],
-  '5' :['r_name(5 rows)', 'o_orderdate(2406 rows)'],
-  '6' :['l_shipdate(2526 rows)', 'l_discount(11 rows)', 'l_quantity(50 rows)'],
-  '7' :['l_shipdate(2526 rows)'],
-  '12':['l_shipmode(7 rows)', 'l_receiptdate(2554 rows)'],
-  '14':['l_shipdate(2526 rows)'],
-  '17':['l_shipmode(7 rows)', 'l_receiptdate(2555 rows)'],
-  '20':['n_name(25 rows)'],
-  '21':['o_orderstatus(3 rows)', 'n_name(25 rows)'],
+  '1' :['l_shipdate (2526 rows)'],
+  '2' :['p_size (50 rows)', 'p_type (150 rows)'],
+  '3' :['c_mktsegment (5 rows)', 'o_orderdate (2406 rows)'],
+  '4' :['o_orderdat e(2526 rows)'],
+  '5' :['r_name (5 rows)', 'o_orderdate (2406 rows)'],
+  '6' :['l_shipdate (2526 rows)', 'l_discount (11 rows)', 'l_quantity (50 rows)'],
+  '7' :['l_shipdate (2526 rows)'],
+  '12':['l_shipmode (7 rows)', 'l_receiptdate (2554 rows)'],
+  '14':['l_shipdate (2526 rows)'],
+  '17':['p_brand (25 rows)', 'p_container (40 rows)'],
+  '20':['n_name (25 rows)'],
+  '21':['o_orderstatus (3 rows)', 'n_name (25 rows)'],
 }
-var m2funk={
-  'l_shipdate(2526 rows)':'1',
-  'p_size(50 rows)':'2','p_type(150 rows)':'2',
-  'c_mktsegment(5 rows)':'3', 'o_orderdate(2406 rows)':'3', 'l_shipdate(2526 rows)':'3',
-  'o_orderdate(2526 rows)':'4',
-  'r_name(5 rows)':'5', 'o_orderdate(2406 rows)':'5',
-  'l_shipdate(2526 rows)':'6', 'l_discount(11 rows)':'6', 'l_quantity(50 rows)':'6',
-  'l_shipdate(2526 rows)':'7',
-  'l_shipmode(7 rows)':'12','l_receiptdate(2554 rows)':'12',
-  'l_shipdate(2526 rows)':'14',
-  'l_shipmode(7 rows)':'17', 'l_receiptdate(2555 rows)':'17',
-  'n_name(25 rows)':'20',
-  'o_orderstatus(3 rows)':'21', 'n_name(25 rows)':'21'
-}
-
 function onLoad2(){
  window.editor = CodeMirror.fromTextArea(document.getElementById('TASQL'), {
     mode: "text/x-sql",

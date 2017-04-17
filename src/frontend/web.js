@@ -65,6 +65,13 @@ function newHTMLP(text,opts){
   p.appendChild(document.createTextNode(""+text));
   return p;
 }
+function newHTMLLabel(things,opts){
+  opts=opts||{};
+  var label = document.createElement('label');
+  setAtts(label,opts);
+  label.appendChild(things);
+  return label;
+}
 function newHTMLProgressBar(pbid,opts){
   opts=opts||{};
   opts['class']='progress';
@@ -103,6 +110,12 @@ function newHTMLH4(opts){
   var h4 = document.createElement('h4');
   setAtts(h4,opts);
   return h4;
+}
+function newHTMLH5(opts){
+  opts=opts||{};
+  var h5 = document.createElement('h4');
+  setAtts(h5,opts);
+  return h5;
 }
 function newHTMLBut(text,opts){
   opts=opts||{};
