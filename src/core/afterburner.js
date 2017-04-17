@@ -1497,14 +1497,16 @@ function _min(p){
   }
   var unique=uniqueVarCounter++;
   var type= typeCol(p);
-  var varname="min"+unique
+  var varname="min"+unique;
+  var memv='memF32';
+  if (type==3)
+    memv='mem32';
   return `dec:var `+varname+`=10000000000.1;::
   post:res.addCol2("min(`+p+`)",`+type+`);::
   preexek:`+varname+`=10000000000.1;::
   exec: if (`+varname+` > (`+bound+`)) {`+varname+` = `+bound+`;}::
   execg:if (`+varname+` > (`+bound+`)) {`+varname+` = `+bound+`;}::
-  postexek:memF32[(temps+(tempsptr<<2))>>2]=`+varname+`;tempsptr= (tempsptr + 1 )|0;::`;
-  
+  postexek:`+memv+`[(temps+(tempsptr<<2))>>2]=`+varname+`;tempsptr= (tempsptr + 1 )|0;::`;
 }
 function _max(p){
   var bound="";
@@ -1516,13 +1518,16 @@ function _max(p){
   }
   var unique=uniqueVarCounter++;
   var type= typeCol(p);
-  var varname="max"+unique
+  var varname="max"+unique;
+  var memv='memF32';
+  if (type==3)
+    memv='mem32';
   return `dec:var `+varname+`=-10000000000.1;::
   post:res.addCol2("max(`+p+`)",`+type+`);::
   preexek:`+varname+`=-10000000000.1;::
   exec: if (`+varname+` < (`+bound+`)) {`+varname+` = `+bound+`;}::
   execg:if (`+varname+` < (`+bound+`)) {`+varname+` = `+bound+`;}::
-  postexek:memF32[(temps+(tempsptr<<2))>>2]=`+varname+`;tempsptr= (tempsptr + 1 )|0;::`;
+  postexek:`+memv+`[(temps+(tempsptr<<2))>>2]=`+varname+`;tempsptr= (tempsptr + 1 )|0;::`;
 }
 function _count(p){
   var unique=uniqueVarCounter++;

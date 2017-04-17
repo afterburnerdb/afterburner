@@ -1,6 +1,8 @@
 function query1_fsql0(against,lodate,hidate){
-  lodate='1990-01-01';
-  hidate='1998-09-02';
+  lodate= lodate||'1990-01-01';
+  hidate= hidate||'1998-09-02';
+  console.log('lodate:',lodate);
+  console.log('hidate:',hidate);
 return select(against)
   .from('@lineitem')
   .field('@l_returnflag','@l_linestatus',
@@ -121,27 +123,116 @@ var q2mav={
 //  '20':[query20a_mav()],
 //  '21':[query21a_mav(),query21b_mav()]
 }
+var q2viztype={
+  '1' :['slider'],
+  '2' :[query2a_mav(),query2b_mav()],
+  '3' :[query3a_mav(),query3b_mav()],
+//  '4' :[query4a_mav()],
+//  '5' :[query5a_mav(),query5b_mav()],
+//  '6' :[query6a_mav(),query6b_mav(),query6c_mav()],
+//  '7' :[query7a_mav()],
+//  '12':[query12a_mav(),query12b_mav()],
+//  '14':[query14a_mav()],
+//  '17':[query17a_mav(),query17b_mav()],
+//  '20':[query20a_mav()],
+//  '21':[query21a_mav(),query21b_mav()]
+}
 //
-function splitDemo(qnum,qscen){
+function splitDemo(qnum,qscen,opencol){
   this.qnum=qnum;
   this.qcen=qscen;
   this.mav=q2mav[qnum][qscen];
   this.fsql=q2fsqlE[qnum][qscen];
-//..
-  var divcons=document.getElementById("divcons");
-  clearElement(divcons);
+  this.vizt=q2viztype[qnum][qscen];
   console.log('qnum:',qnum);
   console.log('qscen:',qscen);
   console.log('mav:',this.mav);
-  this.mav.materialize_fe();
   console.log('fsql:',this.fsql);
-  expose = this.fsql;
-  q=this.fsql(this.mav);
-  var tt0=window.performance.now();
-  q.ABI.materialize();
-  var tt1=window.performance.now();
-  var ttot=tt1-tt0;
-  divcons.appendChild(res.toHTMLTableN(100));
-  document.getElementById("console").innerHTML = "Query completed in " + (ttot.toFixed(2))+"ms" ;
-  console.log('time to run code:'+ (ttot));
+//..
+  this.drawviz=function(){
+    var tt0=window.performance.now();
+    this.mav.materialize_fe();
+    var tt1=window.performance.now();
+    var ttot=tt1-tt0;
+    if (ttot>5)
+      document.getElementById("console").innerHTML = "Materialized View pulled in " + (ttot.toFixed(2))+"ms";
+    if (this.vizt == 'slider'){
+      this.drawslide();
+    }
+  }
+//Slider
+  this.runSliderQuery=function(loval,hival,firsttime){
+    var q=this.fsql(this.mav,loval,hival);
+    var tt0=window.performance.now();
+    q.ABI.materialize();
+    var tt1=window.performance.now();
+    var ttot=tt1-tt0;
+    if(!firsttime)
+      document.getElementById("console").innerHTML = "Query completed in " + (ttot.toFixed(2))+"ms" ;
+    console.log('time to run code:'+ (ttot));
+  }
+  this.drawslide=function(){
+    var divcons=document.getElementById("divcons");
+    clearElement(divcons);
+
+    var minval=abdb.select().from(this.mav.mat.name).field(_min(opencol)).eval();//'1998-01-01';
+    //var minval='1998-01-01';
+    var maxval=abdb.select().from(this.mav.mat.name).field(_max(opencol)).eval();
+
+    var row1=newHTMLDIV();
+    var slider=newHTMLDIV();
+    //row1.appendChild(newHTMLBR());
+    row1.appendChild(newHTMLP(''));
+    row1.appendChild(slider);
+    row1.appendChild(newHTMLBR());
+
+    var row2=newHTMLDIV();
+    var col1=newHTMLCol('md',4,{id:'loval'});
+    col1.innerHTML=minval;
+    var col2=newHTMLCol('md',4,{id:'label',align:'center'});
+    col2.innerHTML=opencol;
+    var col3=newHTMLCol('md',4,{id:'hival',class:'pull-right',align:'right'});
+    col3.innerHTML=maxval;
+    row2.appendChild(col1);
+    row2.appendChild(col2);
+    row2.appendChild(col3);
+
+    this.runSliderQuery(minval,maxval,'firsttime');
+
+    var row3=newHTMLDIV({id:'splittable'});
+    row3.appendChild(res.toHTMLTableN(100));
+    divcons.appendChild(newHTMLBR());
+    divcons.appendChild(row1);
+    //divcons.appendChild(newHTMLBR());
+    divcons.appendChild(row2);
+    divcons.appendChild(newHTMLBR());
+    divcons.appendChild(row3);
+
+    //var slider = document.getElementById('slider');
+    noUiSlider.create(slider, {
+    	start: [strdate_to_int(minval), strdate_to_int(maxval)],
+    	connect: true,
+    	range: {
+    		'min': strdate_to_int(minval),
+    		'max': strdate_to_int(maxval)
+    	},
+        step: 1
+    });
+    sliderValues = [
+    	document.getElementById('loval'),
+    	document.getElementById('hival')
+    ];
+    slider.noUiSlider.on('change', function( values, handle ){
+      if (typeof SDi !='undefined')
+        SDi.runSliderQuery(int_to_strdate(values[0]), int_to_strdate(values[1]));
+        var splittable=document.getElementById("splittable");
+        clearElement(splittable);
+        splittable.appendChild(res.toHTMLTableN(100));
+    });
+    slider.noUiSlider.on('update', function( values, handle ) {
+      sliderValues[handle].innerHTML = int_to_strdate(+values[handle]);
+    });
+  }
+//..
+  this.drawviz();
 }

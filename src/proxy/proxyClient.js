@@ -60,8 +60,14 @@ function proxyClient(HOST,PORT){
     for (var i=0;(i<web_resp.rows && i<num);i++){
       tr = document.createElement('tr');
       for (var ii=0;ii<web_resp.structure.length;ii++){
+        var abtype=monetDBTypestoAB(web_resp.structure[ii].type);
         var td = document.createElement('td');
-        td.appendChild(document.createTextNode(web_resp.data[i][ii]));
+        if ( abtype ==0 )
+          td.appendChild(document.createTextNode(Number.parseInt(web_resp.data[i][ii])));
+        else if (abtype ==1 )
+          td.appendChild(document.createTextNode(Number.parseFloat(web_resp.data[i][ii]).toFixed(2)));
+        else 
+          td.appendChild(document.createTextNode(web_resp.data[i][ii]));
         if (alignright[monetDBTypestoAB(web_resp.structure[ii].type)])
           td.align="right";
         tr.appendChild(td);

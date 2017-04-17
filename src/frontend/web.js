@@ -132,6 +132,11 @@ function newHTMLDD(title,items, opts,size){
   div.appendChild(ul); 
   return div;
 }
+function newHTMLBR(){
+  var br = document.createElement('br');
+  return br;
+}
+
 //
 function drawSchema(abutton,opts){
   var scons=document.getElementById("sconsole");

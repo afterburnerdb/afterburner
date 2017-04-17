@@ -447,14 +447,14 @@ jQuery("[id*='query']")
 //      var mavs=q2mav[qnum];
       var scenid=q2oName[qnum].indexOf(e.currentTarget.text);
 //      mav=mavs[scenid];
-      viz_scene(qnum,scenid);
+      viz_scene(qnum,scenid,e.currentTarget.text.replace(/\s*\(.*\)/,'') );
     });
     e.preventDefault();
   });
   $("#asisbebtn").hide();
 
-function viz_scene(qnum,qscen){
-  SDi= new splitDemo(qnum,qscen);
+function viz_scene(qnum,qscen,opencol){
+  SDi= new splitDemo(qnum,qscen,opencol);
 }
 </script>
 
