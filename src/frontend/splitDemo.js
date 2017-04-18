@@ -1,8 +1,4 @@
 function query1_fsql0(against,lodate,hidate){
-  lodate= lodate||'1990-01-01';
-  hidate= hidate||'1998-09-02';
-  console.log('lodate:',lodate);
-  console.log('hidate:',hidate);
 return select(against)
   .from('@lineitem')
   .field('@l_returnflag','@l_linestatus',
@@ -91,8 +87,9 @@ function query3_fsql1(against,lodate,hidate){
    .where(eq("@c_custkey", "@o_custkey"),
           eq("@l_orderkey", "@o_orderkey"))
    .where(eq("@c_mktsegment", 'BUILDING'),
-    lt("@o_orderdate",hidate),
-    gt("@l_shipdate",lodate))
+    lte("@o_orderdate",date(hidate)),
+    gte("@o_orderdate",date(lodate)),
+    gt("@l_shipdate",date('1995-03-15')))
    .field("@l_orderkey", as(sum( mul("@l_extendedprice", sub(1,"@l_discount"))),"revenue"),"@o_orderdate","@o_shippriority")
    .group("@l_orderkey", "@o_orderdate", "@o_shippriority")
    .order("-@revenue","@o_orderdate")
@@ -392,10 +389,6 @@ function splitDemo(qnum,qscen,opencol){
   this.mav=q2mav[qnum][qscen];
   this.fsql=q2fsqlE[qnum][qscen];
   this.vizt=q2viztype[qnum][qscen];
-  console.log('qnum:',qnum);
-  console.log('qscen:',qscen);
-  console.log('mav:',this.mav);
-  console.log('fsql:',this.fsql);
 //..
   this.drawviz=function(){
     var tt0=window.performance.now();
@@ -404,18 +397,23 @@ function splitDemo(qnum,qscen,opencol){
     var ttot=tt1-tt0;
     if (ttot>5)
       document.getElementById("console").innerHTML = "Materialized View pulled in " + (ttot.toFixed(2))+"ms";
-    if (this.vizt == 'slider'){
-      this.drawslider();
-    } else if (this.vizt=='liker'){
-      this.drawliker();
-    } else if (this.vizt=='menu'){
-      this.drawmenu();
-    }
 
+    var divcons=document.getElementById("divcons");
+    var dashcons=document.getElementById("dashcons");
+    clearElement(divcons);
+    clearElement(dashcons);
+    var coltype=daSchema.getColTypeByName(opencol,[this.mav.mat.name]);
+
+    if (this.vizt == 'slider'){
+      this.drawslider(divcons,dashcons,coltype);
+    } else if (this.vizt=='liker'){
+      this.drawliker(divcons,dashcons,coltype);
+    } else if (this.vizt=='menu'){
+      this.drawmenu(divcons,dashcons,coltype);
+    }
   }
-//Slider
-  this.runSliderQuery=function(loval,hival,firsttime){
-    var q=this.fsql(this.mav,loval,hival);
+  this.runQuery=function(params,firsttime){
+    var q=this.fsql(this.mav, ...params);
     var tt0=window.performance.now();
     q.ABI.materialize();
     var tt1=window.performance.now();
@@ -424,15 +422,13 @@ function splitDemo(qnum,qscen,opencol){
       document.getElementById("console").innerHTML = "Query completed in " + (ttot.toFixed(2))+"ms" ;
     console.log('time to run code:'+ (ttot));
   }
-  this.drawslider=function(){
-    var divcons=document.getElementById("divcons");
-    clearElement(divcons);
-    var coltype=daSchema.getColTypeByName(opencol,[this.mav.mat.name])
+//Slider
+  this.drawslider=function(divcons,dashcons,coltype){
     var minval=abdb.select().from(this.mav.mat.name).field(_min(opencol)).eval();
     var maxval=abdb.select().from(this.mav.mat.name).field(_max(opencol)).eval();
     if (coltype==1){ 
-      minval=minval.toFixed(2);
-      maxval=maxval.toFixed(2);
+      minval=Number.parseFloat(minval.toFixed(2))
+      maxval=Number.parseFloat(maxval.toFixed(2))
     }
     var row1=newHTMLDIV();
     var slider=newHTMLDIV({id:'slider'});
@@ -451,7 +447,7 @@ function splitDemo(qnum,qscen,opencol){
     row2.appendChild(col2);
     row2.appendChild(col3);
 
-    this.runSliderQuery(minval,maxval,'firsttime');
+    this.runQuery([minval,maxval],'firsttime');
 
     var row3=newHTMLDIV({id:'splittable'});
     row3.appendChild(res.toHTMLTableN(100));
@@ -470,7 +466,7 @@ function splitDemo(qnum,qscen,opencol){
         values: [strdate_to_int(minval), strdate_to_int(maxval)],
         change: function(event,ui) {
           if (typeof SDi !='undefined')
-            SDi.runSliderQuery(int_to_strdate(ui.values[0]),int_to_strdate(ui.values[1]));
+            SDi.runQuery(ui.values.map(int_to_strdate));
           var splittable=document.getElementById("splittable");
           clearElement(splittable);
           splittable.appendChild(res.toHTMLTableN(100));
@@ -488,12 +484,15 @@ function splitDemo(qnum,qscen,opencol){
         values: [minval, maxval],
         change: function(event,ui) {
           if (typeof SDi !='undefined')
-            SDi.runSliderQuery(ui.values[0],ui.values[1]);
+            SDi.runQuery(ui.values);
           var splittable=document.getElementById("splittable");
           clearElement(splittable);
           splittable.appendChild(res.toHTMLTableN(100));
         },
         slide: function( event, ui ) {
+          console.log("ui.handleIndex"+ui.handleIndex);
+          console.log("ui.values[ui.handleIndex]"+ui.values[ui.handleIndex]);
+
           sliderValues[ui.handleIndex].innerHTML = ui.values[ui.handleIndex];
         }
       });
@@ -505,7 +504,7 @@ function splitDemo(qnum,qscen,opencol){
         values: [minval, maxval],
         change: function(event,ui) {
           if (typeof SDi !='undefined')
-            SDi.runSliderQuery(ui.values[0],ui.values[1]);
+            SDi.runQuery(ui.values);
           var splittable=document.getElementById("splittable");
           clearElement(splittable);
           splittable.appendChild(res.toHTMLTableN(100));
@@ -517,73 +516,40 @@ function splitDemo(qnum,qscen,opencol){
     }
   }
 //Menu
-  this.runMenuQuery=function(eqval,firsttime){
-    var q=this.fsql(this.mav,eqval);
-    var tt0=window.performance.now();
-    q.ABI.materialize();
-    var tt1=window.performance.now();
-    var ttot=tt1-tt0;
-    if(!firsttime)
-      document.getElementById("console").innerHTML = "Query completed in " + (ttot.toFixed(2))+"ms" ;
-    console.log('time to run code:'+ (ttot));
-  }
-  this.drawmenu=function(){
-    var divcons=document.getElementById("divcons");
-    clearElement(divcons);
-    var coltype=daSchema.getColTypeByName(opencol,[this.mav.mat.name])
+  this.drawmenu=function(divcons,dashcons,coltype){
     var allval=abdb.select().from(this.mav.mat.name).field(opencol).group(opencol).toArray();//'1998-01-01';
-    console.log("allval:"+allval);
-
     var row1=newHTMLDIV();
     var menu=newHTMLDIV();
-    
-    //row1.appendChild(newHTMLP(opencol,{style:"float:left; margin:0 10px 10px 0;"}));
     row1.appendChild(newHTMLBut(opencol,{class:"btn btn-primary",style:"float:left; margin:0 10px 10px 0;"}));
     row1.appendChild(menu);
     row1.appendChild(newHTMLBR());
-    this.runMenuQuery(allval[0],'firsttime');
-
+    this.runQuery([allval[0]],'firsttime');
     var row3=newHTMLDIV({id:'splittable'});
     row3.appendChild(res.toHTMLTableN(100));
     divcons.appendChild(newHTMLBR());
     divcons.appendChild(row1);
     divcons.appendChild(newHTMLBR());
     divcons.appendChild(row3);
-
     menu.appendChild(newHTMLDD('Select!',[].concat(allval),{id:'bcellmenu'},'-sm'));
     $('.dropdown-toggle').dropdown('toggle');
 
     $("#bcellmenu").on("click", "li a", function() {
       $("#bcellmenu button").text(this.text);
       if (typeof SDi !='undefined')
-        SDi.runMenuQuery(this.text);
+        SDi.runQuery([this.text]);
       var splittable=document.getElementById("splittable");
       clearElement(splittable);
       splittable.appendChild(res.toHTMLTableN(100));
     });
   }
 //Liker
-  this.runLikerQuery=function(likeqstr,firsttime){
-    var q=this.fsql(this.mav,likeqstr);
-    var tt0=window.performance.now();
-    q.ABI.materialize();
-    var tt1=window.performance.now();
-    var ttot=tt1-tt0;
-    if(!firsttime)
-      document.getElementById("console").innerHTML = "Query completed in " + (ttot.toFixed(2))+"ms" ;
-    console.log('time to run code:'+ (ttot));
-  }
-  this.drawliker=function(){
-    var divcons=document.getElementById("divcons");
-    clearElement(divcons);
-    var coltype=daSchema.getColTypeByName(opencol,[this.mav.mat.name])
-
+  this.drawliker=function(divcons,dashcons,coltype){
     var row1=newHTMLDIV();
     var liker=newHTMLDIV();
     row1.appendChild(newHTMLBut(opencol,{class:"btn btn-primary",style:"float:left; margin:0 10px 10px 0;"}));
     row1.appendChild(liker);
     row1.appendChild(newHTMLBR());
-    this.runLikerQuery("",'firsttime');
+    this.runQuery('firsttime',[""]);
 
     var row3=newHTMLDIV({id:'splittable'});
     row3.appendChild(res.toHTMLTableN(100));
@@ -597,7 +563,6 @@ function splitDemo(qnum,qscen,opencol){
     liker.appendChild(newHTMLInput({id:'likeends',type:'text',placeholder:'Ends with?'}));
 
     $("[id^=like]").on("change","", function() {
-      console.log('liker');
       var begins=$('#likebegins').val().replace(/\s/g,'');
       var has=$('#likehas').val().replace(/\s/g,'');
       var ends=$('#likeends').val().replace(/\s/g,'');
@@ -609,15 +574,13 @@ function splitDemo(qnum,qscen,opencol){
       if (ends && ends!=="")
         likeQstr=likeQstr+"%"+ends;
       likeQstr=likeQstr.replace(/\%\%/g,'%');
-      console.log('likeQstr'+likeQstr);
       if (typeof SDi !='undefined')
-        SDi.runLikerQuery(likeQstr);
+        SDi.runQuery([likeQstr]);
       var splittable=document.getElementById("splittable");
       clearElement(splittable);
       splittable.appendChild(res.toHTMLTableN(100));
     });
   }
-
 //..
   this.drawviz();
 }

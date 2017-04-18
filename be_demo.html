@@ -117,12 +117,6 @@
         <label class="btn btn-default btn-file" id="schmbtn" data-placement="bot" onclick="togSchema(this,{'be':true})">
           Show Tables
         </label>
-        <!--<div class="dropdown"  id="connmenu" style="float:left; margin:0 10px 10px 0;">-->
-        <!--
-        <button class="btn dropdown-toggle disabled" id="loadbebtn" type="button" data-toggle="dropdown" onclick="pullBESchema()" >
-          Load table info from Backend
-        </button>
-        -->
       </div>
     </div>
     <div class="row rowspc">
@@ -179,7 +173,11 @@
         <p id="console"></p>
       </div>
     </div>
-
+    <div class="row">
+      <div class="col-md-12">
+        <p id="dashcons"></p>
+      </div>
+    </div>
     <div class="row">
       <div class="col-md-12">
         <div id="divcons" class="table-responsive">
@@ -324,13 +322,12 @@ function loadWeb(size){
 function runcode(){
   var tt0=window.performance.now();
   var sqlstr=editor.getDoc().getValue()
-  console.log(sqlstr);
   htmltable= pci.execSQLHTMLTableN(sqlstr,100);
   var tt1=window.performance.now();
   var ttot=tt1-tt0;
   printtable(htmltable);
   document.getElementById("console").innerHTML = "Query completed in " + (ttot.toFixed(2))+"ms" ;
-  console.log('time to run code:'+ (ttot));
+  DEBUG('time to run code:'+ (ttot));
 }
 function printtable(htmltable){
   divcons=document.getElementById("divcons");
@@ -338,7 +335,7 @@ function printtable(htmltable){
   divcons.appendChild(htmltable);
 }
 $("#initmenu").on("click", "li a", function() {
-  console.log("will store with size:"+$(this).text());
+  DEBUG("will store with size:"+$(this).text());
   var size=$(this).text().split(" ")[0];
   init_store(size);
   $("#initbtn").removeClass("btn-warning");
@@ -348,19 +345,12 @@ $("#initmenu").on("click", "li a", function() {
   $("#loadwbtn").addClass("btn-success");
 });
 function connBE(){
-  console.log("connecting to backend");
+  DEBUG("connecting to backend");
   pci= new proxyClient();
-  //if success
   $("#connbtn").removeClass("btn-primary");
   $("#connbtn").addClass("disabled");
   $("#connbtn").text("Connection succesful");
-
-//  $("#asisbebtn").removeClass("disabled");
-//  $("#openbtn").removeClass("disabled");
   $("#menu1").removeClass("disabled");
-}
-function pullBESchema(){
-  console.log("loading backend tables");
 }
 </script>
 
@@ -369,7 +359,7 @@ var q2oName={
   '1' :['l_shipdate (2526 rows)'],
   '2' :['p_size (50 rows)', 'p_type (150 rows)'],
   '3' :['c_mktsegment (5 rows)', 'o_orderdate (2406 rows)'],
-  '4' :['o_orderdat e(2526 rows)'],
+  '4' :['o_orderdate (2526 rows)'],
   '5' :['r_name (5 rows)', 'o_orderdate (2406 rows)'],
   '6' :['l_shipdate (2526 rows)', 'l_discount (11 rows)', 'l_quantity (50 rows)'],
   '7' :['l_shipdate (2526 rows)'],
@@ -407,15 +397,9 @@ jQuery("[id*='query']")
     clearElement(opencons);
     opencons.appendChild(htmldd);
     $("#openbtn").on("click", "li a", function(e) {
-      //console.log('this.text:'+this.text);
-      //console.log('$("#openbtn").text:' + $("#openbtn button").text());
       var btnlab=$("#openbtn button").text();
       var actqnum=btnlab.substring(6);
-      console.log('qnum:' +actqnum );
-//      var qfsql=q2fsql[qnum];
-//      var mavs=q2mav[qnum];
       var scenid=q2oName[qnum].indexOf(e.currentTarget.text);
-//      mav=mavs[scenid];
       viz_scene(qnum,scenid,e.currentTarget.text.replace(/\s*\(.*\)/,'') );
     });
     e.preventDefault();
