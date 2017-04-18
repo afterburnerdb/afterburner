@@ -123,34 +123,42 @@ function aTable(dSrc) {
 //UTIL
     this.toHTMLTableN = function(num) {
       var table=document.createElement('table');
-      table.setAttribute('border','1');
-      var tr = document.createElement('tr'); 
+      table.setAttribute('class',"table table-bordered table-condensed table-nonfluid table-striped table-hover");
+
+      var thead = table.createTHead();
+      thead.setAttribute('class',"thead-default");
+      var tr = thead.insertRow(0);
+
       for (var i=0;i<this.numcols;i++){
-          td = document.createElement('td');
-          td.appendChild(document.createTextNode(this.colnames[i]) );
-          tr.appendChild(td);
+          var th = document.createElement('th');
+          th.appendChild(document.createTextNode(this.colnames[i]));
+          tr.appendChild(th);
       }
-      table.appendChild(tr);
+      thead.appendChild(tr);
+      var tbody= table.createTBody();
       for (var i=0;(i<this.numrows && i<num);i++){
         tr = document.createElement('tr');
         for (var ii=0;ii<this.numcols;ii++){
-          td = document.createElement('td');
+          var td = document.createElement('td');
           if (this.coltypes[ii]==0){
-            td.appendChild(document.createTextNode(""+mem32[(this.cols[ii]+(i<<2))>>2]));
+            td.appendChild(document.createTextNode(""+mem32[(this.cols[ii] + (i<<2))>>2]));
+            td.align="right";
           } else if (this.coltypes[ii]==1){
-            td.appendChild(document.createTextNode(""+memF32[(this.cols[ii] +(i<<2))>>2]));
+            td.appendChild(document.createTextNode(""+memF32[(this.cols[ii] + (i<<2))>>2].toFixed(2)));
+            td.align="right";
           } else if (this.coltypes[ii]==2){
-            td.appendChild(document.createTextNode(strToString(mem32[this.cols[ii]+(i<<2)])));
+            td.appendChild(document.createTextNode(strToString(mem32[(this.cols[ii] + (i<<2))>>2])));
           } else if (this.coltypes[ii]==3){
-            td.appendChild(document.createTextNode(""+mem32[(this.cols[ii] + (i<<2))>>2]));
+            td.appendChild(document.createTextNode(""+int_to_strdate(mem32[(this.cols[ii] + (i<<2))>>2])));
           } else if (this.coltypes[ii]==4){
-            td.appendChild(document.createTextNode(""+mem32[(this.cols[ii] + (i<<2))>>2]));
+            td.appendChild(document.createTextNode(""+int_to_strchar(mem32[(this.cols[ii] + (i<<2))>>2])));
+            td.align="right";
           } else{
             alert("unknown type");
           }
           tr.appendChild(td);
         }
-        table.appendChild(tr);
+        tbody.appendChild(tr);
       }
       return table;
     };

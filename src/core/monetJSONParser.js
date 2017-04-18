@@ -7,13 +7,14 @@ if(typeof module == 'undefined'){
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 function monetJSONParser(pjsnA) {
+  if (!(pjsnA instanceof Array)) psjnA=[pjsnA];
   this.fname=null; 
   this.delimCode=null;
   this.eolCode=null;
   this.actualcs=0;
   this.buffer=null;
   this.pin=0;
-  this.numcols=pjsnA[0].cols;
+  this.numcols= pjsnA[0].cols;
   this.currC=0;
   this.jsn=pjsnA[this.currC];
   this.currlen=this.jsn.data.length;

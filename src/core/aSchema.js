@@ -96,13 +96,34 @@ function aSchema(){
       var ppd=newHTMLDIV({class:"panel panel-default"});
       var ph=newHTMLDIV({class:"panel-heading"});
       var h4=newHTMLH4({class:"panel-title"});
-      var a=newHTMLA(this.tables[i].name+" ("+this.tables[i].numrows+" rows)",{role:"button", 'data-toggle':"collapse", 'data-parent':"#accordion", 'aria-expanded':"true",href:"#schmclps"+i, 'aria-controls':"schmclps"+i});
-      h4.appendChild(a);
+      var a;
+      if (opts['be']){
+        var tabloc;
+        if (this.tables[i].loc=='backend'){
+          tabloc='@backend'
+          a=newHTMLA(this.tables[i].name,{role:"button", 'data-toggle':"collapse", 'data-parent':"#accordion", 'aria-expanded':"false",href:"#schmclps"+i, 'aria-controls':"schmclps"+i});
+          h4.appendChild(a);
+          a=newHTMLA(tabloc,{role:"button", style:'float:right;'});
+          h4.appendChild(a);
+          ph.appendChild(h4);
+          ppd.appendChild(ph);
+          pg.appendChild(ppd);
+          continue;
+        }else{
+          tabloc='@browser'
+          a=newHTMLA(this.tables[i].name,{role:"button", 'data-toggle':"collapse", 'data-parent':"#accordion", 'aria-expanded':"false",href:"#schmclps"+i, 'aria-controls':"schmclps"+i});
+          h4.appendChild(a);
+          a=newHTMLA(tabloc,{role:"button", style:'float:right;'});
+          h4.appendChild(a);
+        }
+      }else{
+        a=newHTMLA(this.tables[i].name+" ("+this.tables[i].numrows+" rows)",{role:"button", 'data-toggle':"collapse", 'data-parent':"#accordion", 'aria-expanded':"false",href:"#schmclps"+i, 'aria-controls':"schmclps"+i});
+        h4.appendChild(a);
+      }
       if (opts['exp']){
         a=newHTMLA("explore ",{role:"button", style:'float:right;', onclick:"prepExplore();exploreTable('"+this.tables[i].name+"')"});
         h4.appendChild(a);
       }
-
       ph.appendChild(h4);
       ppd.appendChild(ph);
 

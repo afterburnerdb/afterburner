@@ -72,11 +72,6 @@ function createTableControl(tableDefT)
 
     return tableControl;
 }
-function clearElement(e){
-    while (e.firstChild) {
-      e.removeChild(e.firstChild);
-    }
-}
 
 function addTableToQ(orientation,tableDefT){
     var element;

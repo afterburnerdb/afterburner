@@ -374,40 +374,7 @@ handyColTypes["fridge"]=[0,2,2,2,0];
     this.colptrs=null;
     this.colnames=Object.keys(src.col).map(peelDQIf);//.map(escapeIf);
     this.coltypes=[];
-    for (var i=0;i<src.structure.length;i++){
-      if (src.structure[i].type== 'int')
-        this.coltypes.push(0);
-      else if (src.structure[i].type== 'i2')
-        this.coltypes.push(0);
-      else if (src.structure[i].type== 'hugeint')
-        this.coltypes.push(0);
-      else if (src.structure[i].type== 'bigint')
-        this.coltypes.push(0);
-      else if (src.structure[i].type== 'smallint')
-        this.coltypes.push(0);
-      else if (src.structure[i].type== 'tinyint')
-        this.coltypes.push(0);
-      else if (src.structure[i].type== 'boolean')
-        this.coltypes.push(0);
-      else if (src.structure[i].type== 'wrd')
-        this.coltypes.push(0);
-      else if (src.structure[i].type== 'decimal')
-        this.coltypes.push(1);
-      else if (src.structure[i].type== 'real')
-        this.coltypes.push(1);
-      else if (src.structure[i].type== 'double')
-        this.coltypes.push(1);
-      else if (src.structure[i].type== 'varchar')
-        this.coltypes.push(2);
-      else if (src.structure[i].type== 'date')
-        this.coltypes.push(3);
-      else if (src.structure[i].type== 'char')
-        this.coltypes.push(4);
-      else {
-        console.log('unsupported data types from monetdb:i'+i);
-        console.log('unsupported data types from monetdb:' + src.structure[i].type );
-      }
-    }
+    src.structure.forEach((x)=> {this.coltypes.push(monetDBTypestoAB(x.type))})
     this.parser=new monetJSONParser(srcA);
   }
   this.fromHTML5File= function(file,funk){//firefox browser file                  
@@ -455,7 +422,8 @@ handyColTypes["fridge"]=[0,2,2,2,0];
     this.fromURL(src,funk);
   } else if (typeof src == 'string' && (inNode)){
     this.fromFile(src);
-  } else if (typeof src == "object" && typeof src[0] == "object" && typeof src[0].data == 'object'){
+  } else if ((typeof src == "object" && typeof src.data == "object") ||
+             (typeof src == "object" && typeof src[0] == "object" && typeof src[0].data == "object")){
     this.fromMonetJSON(src);
   } else {
     console.log('Unsupported DS type, typeof DS:'+ typeof DS);
