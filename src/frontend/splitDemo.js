@@ -391,17 +391,23 @@ function splitDemo(qnum,qscen,opencol){
   this.vizt=q2viztype[qnum][qscen];
 //..
   this.drawviz=function(){
-    var tt0=window.performance.now();
-    this.mav.materialize_fe();
-    var tt1=window.performance.now();
-    var ttot=tt1-tt0;
-    if (ttot>5)
-      document.getElementById("console").innerHTML = "Materialized View pulled in " + (ttot.toFixed(2))+"ms";
-
+    var hadtomat=false;
+    if (this.mav.matfe)
+      document.getElementById("console").innerHTML = "Materialized view already in browser!";
+    else {
+      var tt0=window.performance.now();
+      this.mav.materialize_be();
+      var tt1=window.performance.now();
+      this.mav.materialize_fe();
+      var tt2=window.performance.now();
+      var ttotmatbe=tt1-tt0;
+      var ttotmetfe=tt2-tt1;
+        document.getElementById("console").innerHTML = "Time to create materialized view @backend:"+ttotmatbe.toFixed(2)+"<br> Time to load materialized view into browser: " + (ttotmetfe.toFixed(2))+"ms";
+    }
     var divcons=document.getElementById("divcons");
     var dashcons=document.getElementById("dashcons");
-    clearElement(divcons);
-    clearElement(dashcons);
+    clearElementsById(["divcons","dashcons"]);
+
     var coltype=daSchema.getColTypeByName(opencol,[this.mav.mat.name]);
 
     if (this.vizt == 'slider'){
@@ -437,24 +443,23 @@ function splitDemo(qnum,qscen,opencol){
     row1.appendChild(newHTMLBR());
 
     var row2=newHTMLDIV();
-    var col1=newHTMLCol('md',3,{id:'loval'});
+    var col1=newHTMLCol('md',4,{id:'loval'});
     col1.innerHTML=minval;
-    var col2=newHTMLCol('md',3,{id:'label',align:'center'});
-    col2.appendChild(newHTMLBut(opencol,{class:"btn btn-primary",style:"float:left; margin:0 10px 10px 0;"}));
-    var col3=newHTMLCol('md',3,{id:'hival',class:'pull-right',align:'right'});
+    var col2=newHTMLCol('md',4,{id:'label', align:'center'});
+    col2.appendChild(newHTMLBut(opencol,{class:"btn btn-primary",style:"float:center;"}));
+    var col3=newHTMLCol('md',4,{id:'hival',class:'pull-right',align:'right'});
     col3.innerHTML=maxval;
     row2.appendChild(col1);
     row2.appendChild(col2);
     row2.appendChild(col3);
+    dashcons.appendChild(newHTMLBR());
+    dashcons.appendChild(row1);
+    dashcons.appendChild(row2);
+    dashcons.appendChild(newHTMLBR());
 
     this.runQuery([minval,maxval],'firsttime');
-
     var row3=newHTMLDIV({id:'splittable'});
     row3.appendChild(res.toHTMLTableN(100));
-    divcons.appendChild(newHTMLBR());
-    divcons.appendChild(row1);
-    divcons.appendChild(row2);
-    divcons.appendChild(newHTMLBR());
     divcons.appendChild(row3);
     sliderValues = [document.getElementById('loval'), document.getElementById('hival')];
 
@@ -523,12 +528,13 @@ function splitDemo(qnum,qscen,opencol){
     row1.appendChild(newHTMLBut(opencol,{class:"btn btn-primary",style:"float:left; margin:0 10px 10px 0;"}));
     row1.appendChild(menu);
     row1.appendChild(newHTMLBR());
+    dashcons.appendChild(newHTMLBR());
+    dashcons.appendChild(row1);
+    dashcons.appendChild(newHTMLBR());
+
     this.runQuery([allval[0]],'firsttime');
     var row3=newHTMLDIV({id:'splittable'});
     row3.appendChild(res.toHTMLTableN(100));
-    divcons.appendChild(newHTMLBR());
-    divcons.appendChild(row1);
-    divcons.appendChild(newHTMLBR());
     divcons.appendChild(row3);
     menu.appendChild(newHTMLDD('Select!',[].concat(allval),{id:'bcellmenu'},'-sm'));
     $('.dropdown-toggle').dropdown('toggle');
@@ -549,13 +555,13 @@ function splitDemo(qnum,qscen,opencol){
     row1.appendChild(newHTMLBut(opencol,{class:"btn btn-primary",style:"float:left; margin:0 10px 10px 0;"}));
     row1.appendChild(liker);
     row1.appendChild(newHTMLBR());
-    this.runQuery('firsttime',[""]);
+    dashcons.appendChild(newHTMLBR());
+    dashcons.appendChild(row1);
+    dashcons.appendChild(newHTMLBR());
 
+    this.runQuery('firsttime',[""]);
     var row3=newHTMLDIV({id:'splittable'});
     row3.appendChild(res.toHTMLTableN(100));
-    divcons.appendChild(newHTMLBR());
-    divcons.appendChild(row1);
-    divcons.appendChild(newHTMLBR());
     divcons.appendChild(row3);
 
     liker.appendChild(newHTMLInput({id:'likebegins',type:'text',placeholder:'Begins with?'}));

@@ -156,6 +156,15 @@ function newHTMLInput(opts){
   return input;
 }
 //
+function clearElement(e){
+    while (e.firstChild) {
+      e.removeChild(e.firstChild);
+    }
+}
+function clearElementsById(list){
+  list.forEach((x)=> clearElement(document.getElementById(x)));
+}
+//
 function drawSchema(abutton,opts){
   var scons=document.getElementById("sconsole");
   clearElement(scons);

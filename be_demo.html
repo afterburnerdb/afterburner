@@ -402,6 +402,7 @@ jQuery("[id*='query']")
       var scenid=q2oName[qnum].indexOf(e.currentTarget.text);
       viz_scene(qnum,scenid,e.currentTarget.text.replace(/\s*\(.*\)/,'') );
     });
+    clearElementsById(["console","dashcons","divcons"]);
     e.preventDefault();
   });
   $("#asisbebtn").hide();
