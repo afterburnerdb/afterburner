@@ -402,7 +402,9 @@ function splitDemo(qnum,qscen,opencol){
       var tt2=window.performance.now();
       var ttotmatbe=tt1-tt0;
       var ttotmetfe=tt2-tt1;
-        document.getElementById("console").innerHTML = "Time to create materialized view @backend:"+ttotmatbe.toFixed(2)+"<br> Time to load materialized view into browser: " + (ttotmetfe.toFixed(2))+"ms";
+      document.getElementById("console").innerHTML = 
+        "Time to create materialized view @backend: "+ttotmatbe.toFixed(2)+"ms<br>"+
+        "Time to load materialized view into browser: " + (ttotmetfe.toFixed(2))+"ms";
     }
     var divcons=document.getElementById("divcons");
     var dashcons=document.getElementById("dashcons");
