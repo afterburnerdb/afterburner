@@ -115,29 +115,21 @@ app.get('/pull', function (req, res) {
     });
   }
 });
-app.get('/demo_be.html', function (req, res) {
-   res.sendFile('demo_be.html',{root:'../../'});
-})
-app.get('/browser-frontend.min.js', function (req, res) {
-   res.sendFile('browser-frontend.min.js',{root:'../../'});
-})
-
 app.get(/.*js$/, function (req, res) {
+  if (req.originalUrl.length>60)
+    return;
    res.sendFile(req.originalUrl,{root:'../..'});
 })
 app.get(/.*html$/, function (req, res) {
+  if (req.originalUrl.length>60)
+    return;
    res.sendFile(req.originalUrl,{root:'../..'});
 })
-app.get(/.*bootstrap.*/, function (req, res) {
+app.get(/.*afterburner.png$/, function (req, res) {
+  if (req.originalUrl.length>60)
+    return;
    res.sendFile(req.originalUrl,{root:'../..'});
 })
-app.get(/.*gz$/, function (req, res) {
-   res.sendFile(req.originalUrl,{root:'../..'});
-})
-app.get(/.*tbl$/, function (req, res) {
-   res.sendFile(req.originalUrl,{root:'../..'});
-})
-
 
 app.use(function(req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");
@@ -149,7 +141,7 @@ app.use(function(req, res, next) {
 //  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
   next();
 });
-var server = app.listen(proxyConf.proxy.webport, function () {
+var server = app.listen(proxyConf.proxy.lport, function () {
 
   var host = server.address().address
   var port = server.address().port
