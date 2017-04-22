@@ -66,12 +66,22 @@
       <p class="lead">Interactive SQL analytics in your browser!</p>
     </div>
 
-    <p>In this online demo we've prepared a sample data warehouse based on the <a href="http://www.tpc.org/tpch/">TPC-H</a> schema. 
-      For best performance, we recommend using <a href="https://www.mozilla.org/en-US/firefox/all/">Firefox (64-bit)</a> 
-      (for <a href="http://asmjs.org/">asm.js</a> support) and running on a client with at least 4GB memory.
-      Begin by clicking on the "initialize" button below and select a memory configuration (how much memory on the client to allocate).
-      Then load some data and you'll be ready to start issuing SQL queries!</p>
-
+    <p>In this demo we've prepared a sample data warehouse based on the
+       <a href="http://www.tpc.org/tpch/">TPC-H</a> schema using scale factor
+       100 GB on a backend node (MonetDB v11.23.13). For best performance, we
+       recommend using 
+       <a href="https://www.mozilla.org/en-US/firefox/all/">Firefox (64-bit)</a>
+       (for <a href="http://asmjs.org/">asm.js</a> support) and running on a
+       client with at least 4GB memory. Begin by clicking on the "initialize"
+       button below and select a memory configuration (how much memory on
+       the client to allocate). Then click the "connect" button below to
+       connect to the backend and you'll be ready to pick some of the SQL
+       queries we picked for you. Click "Run Full Query Against Backend" to run
+       the query on the backend node. Alternatively, you can pick a column to
+       free (i.e. explore query using an in browser materialized view). We 
+       prepared sliders, menus, etc. for each query so you can explore queries
+       under different filters.
+    </p>
     <div class="row">
       <div class="container">
         <div class="dropdown"  id="initmenu" style="float:left; margin:0 10px 10px 0;">
