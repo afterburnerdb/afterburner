@@ -198,6 +198,8 @@ function ppSQLstr(sqlstr){
   sqlstr=sqlstr.replace(/\/\*CLOSED SQL\*\//g,'');
   sqlstr=sqlstr.replace(/\/\*OPENED SQL\*\//g,'');
   sqlstr=sqlstr.replace(/,/g,',\n\t');
+  sqlstr=sqlstr.replace(/,\n\s*2/g,',2');
+  sqlstr=sqlstr.replace(/monetdb_qid\d*/g,'materialed');
   var keyWords=['SELECT','FROM','JOIN','WHERE','FREE','HAVING','GROUP BY','ORDER BY','LIMIT','HAVING'];
   keyWords.forEach((x)=> {sqlstr=sqlstr.replace(new RegExp(x,'g'),"\n"+x)});
   var keyWords=['AND','[\s\t]OR'];

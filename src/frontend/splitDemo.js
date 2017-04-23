@@ -427,8 +427,11 @@ function splitDemo(qnum,qscen,opencol){
   }
   this.runQuery=function(params,firsttime){
     var q=this.fsql(this.mav, ...params);
+    this.mav.matfe=false;
+    var qfake=this.fsql(this.mav, ...params);
     $("#ctlTACSQL").collapse('show');
-    editorCSQL.getDoc().setValue(ppSQLstr(q.toSQL()));
+    editorCSQL.getDoc().setValue(ppSQLstr(qfake.toSQL()));
+    this.mav.matfe=true;
     var tt0=window.performance.now();
     q.ABI.materialize();
     var tt1=window.performance.now();
