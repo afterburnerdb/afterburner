@@ -68,10 +68,11 @@
       <div class="container">
         <div class="dropdown"  id="initmenu" style="float:left; margin:0 10px 10px 0;">
           <button class="btn dropdown-toggle btn-warning" id="initbtn" type="button" data-toggle="dropdown">
-           <!--btn-primary-->
+            <span class="glyphicon glyphicon-fire" id="initglyph"></span> 
             Initialize Afterburner!
           </button>
           <ul class="dropdown-menu">
+            <li><a>tiny (~0.5 GB)</a></li>
             <li><a>small (~0.75 GB)</a></li>
             <li><a>medium (~1.5 GB)</a></li>
             <li><a>large (~3.0 GB)</a></li>
@@ -307,8 +308,7 @@ function prepExplore(){
   console.log("@prepExplore");
   $("#qconsole").hide();
   $("#sconsole").hide();
-  //$("#divconsole").hide();
-  $("#divcons").hide();
+  clearElementsById(["divcons"]);
   $("#togexqu").show();
   $("#econsole").show();
 }
@@ -317,8 +317,7 @@ function backToQuery(){
   $("#qconsole").show();
   $("#sconsole").show();
   $("#econsole").show();
-  //$("#divconsole").show();
-  $("#divcons").show();
+  clearElementsById(["divcons"]);
   $("#togexqu").hide();
   $("#econsole").hide();
 }

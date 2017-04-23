@@ -90,6 +90,7 @@
             Initialize Afterburner!
           </button>
           <ul class="dropdown-menu">
+            <li><a>tiny (~0.5 GB)</a></li>
             <li><a>small (~0.75 GB)</a></li>
             <li><a>medium (~1.5 GB)</a></li>
             <li><a>large (~3.0 GB)</a></li>
@@ -111,17 +112,57 @@
         </div>
       <div>
     </div>
-    <h4>
-      <label class="label label-info">
-        Query
-        <span class="badge" id="qlabel">?</span>
-      </label>
-    </h4>
     <div class="row">
       <div class="col-md-12">
-        <div class="tab-content clearfix">
-          <textarea rows="11" id="TASQL" name="TASQL" class="prettyprint form-control animated linenums language-css"  type="text" readonly="" placeholder="Pick a query using Insert TPC-H Query button bellow.."></textarea>
+        <div class="panel-group" id="group">
+          <div id="pnlsql" class="panel panel-default">
+            <div class="panel-heading">
+              <h4 class="panel-title">
+                <a data-toggle="collapse" data-parent="#group" href="#ctlTASQL">
+                  Query
+                  <span class="badge" id="qlabel">?</span>
+                </a>
+              </h4>
+            </div>
+            <div id="ctlTASQL" class="panel-collapse collapse">
+              <textarea rows="10" id="TASQL" name="TASQL" type="text" readonly="" 
+                        placeholder="Pick a query using Insert TPC-H Query button bellow..">
+              </textarea>
+            </div>
+          </div>
+          <div id="pnlvsql" class="panel panel-default">
+            <div class="panel-heading">
+              <h4 class="panel-title">
+                <a data-toggle="collapse" data-parent="#group" href="#ctlTAVSQL">
+                  Materialized View
+                  <span class="badge" id="vlabel">?</span>
+                </a>
+              </h4>
+            </div>
+            <div id="ctlTAVSQL" class="panel-collapse collapse">
+              <textarea rows="10" id="TAVSQL" name="TAVSQL" type="text" readonly="" 
+                        placeholder="Open a query using the Open button bellow..">
+              </textarea>
+            </div>
+          </div>
+          <div id="pnlcsql" class="panel panel-default">
+            <div class="panel-heading">
+              <h4 class="panel-title">
+                <a data-toggle="collapse" data-parent="#group" href="#ctlTACSQL">
+                  Compensating SQL
+                  <span class="badge" id="clabel">?</span>
+                </a>
+              </h4>
+            </div>
+            <div id="ctlTACSQL" class="panel-collapse collapse">
+              <textarea rows="10" id="TACSQL" name="TACSQL" type="text" readonly="" 
+                        placeholder="Open a query using the Open button bellow..">
+              </textarea>
+            </div>
+          </div>
         </div>
+      </div>
+    </div>
         <div class="row"> 
           &nbsp; 
         </div>
@@ -275,7 +316,7 @@ function URLList(){
 function runcode(){
   clearElementsById(["console","dashcons","divcons"]);
   var tt0=window.performance.now();
-  var sqlstr=editor.getDoc().getValue()
+  var sqlstr=editorSQL.getDoc().getValue()
   htmltable= pci.execSQLHTMLTableN(sqlstr,100);
   var tt1=window.performance.now();
   var ttot=tt1-tt0;
@@ -301,6 +342,7 @@ function connBE(){
   pci= new proxyClient();
   $("#connbtn").removeClass("btn-primary");
   $("#connbtn").addClass("disabled");
+  $("#pnlsql").addClass("panel-primary");
   $("#connbtn").text("Connection succesful");
   $("#menu1").removeClass("disabled");
 }
@@ -322,7 +364,7 @@ var q2oName={
   '21':['o_orderstatus (3 rows)', 'n_name (25 rows)'],
 }
 function onLoad2(){
- window.editor = CodeMirror.fromTextArea(document.getElementById('TASQL'), {
+ window.editorSQL = CodeMirror.fromTextArea(document.getElementById('TASQL'), {
     mode: "text/x-sql",
     indentWithTabs: true,
     smartIndent: true,
@@ -330,19 +372,42 @@ function onLoad2(){
     autofocus: true,
     readOnly : true
   });
+ window.editorVSQL = CodeMirror.fromTextArea(document.getElementById('TAVSQL'), {
+    mode: "text/x-sql",
+    indentWithTabs: true,
+    smartIndent: true,
+    lineNumbers: true,
+    autofocus: true,
+    readOnly : true
+  });
+ window.editorCSQL = CodeMirror.fromTextArea(document.getElementById('TACSQL'), {
+    mode: "text/x-sql",
+    indentWithTabs: true,
+    smartIndent: true,
+    lineNumbers: true,
+    autofocus: true,
+    readOnly : true
+  });
+
+
 }
 jQuery("[id*='query']")
   .click(function(e){
     var fsqlOName=e.currentTarget.id;
     var queryName=fsqlOName.substring(0,fsqlOName.length-5);
     var sqlstr=eval(fsqlOName+"().toSQL()");
-    sqlstr=sqlstr.replace(/\/\*CLOSED SQL\*\//g,'');
-    sqlstr=sqlstr.replace(/,/g,',\n ');
-    var keyWords=['SELECT','FROM','JOIN','WHERE','FREE','HAVING','GROUP BY','ORDER BY','LIMIT','HAVING','AND','OR'];
-    keyWords.forEach((x)=> {sqlstr=sqlstr.replace(new RegExp(x,'g'),"\n"+x)});
+    var sqlstr=ppSQLstr(sqlstr);
     var qnum=queryName.substring(5);
+
     $('#qlabel').text(qnum);
-    editor.getDoc().setValue("-- "+queryName+"\n"+sqlstr);
+    $("#ctlTASQL").collapse('show');
+    editorSQL.getDoc().setValue("-- "+queryName+"\n"+sqlstr);
+    $("#ctlTAVSQL").collapse('hide');
+    $("#ctlTACSQL").collapse('hide');
+    $("#pnlvsql").removeClass("panel-success");
+    $("#pnlcsql").removeClass("panel-warning");
+    $('#vlabel').text("?");
+    $('#clabel').text("?");
     $("#asisbebtn").show();
     var htmldd=newHTMLDD('Open Q'+qnum,q2oName[qnum],{'id':'openbtn'});
     var opencons=document.getElementById('opencons');
@@ -352,7 +417,10 @@ jQuery("[id*='query']")
       var btnlab=$("#openbtn button").text();
       var actqnum=btnlab.substring(6);
       var scenid=q2oName[qnum].indexOf(e.currentTarget.text);
-      viz_scene(qnum,scenid,e.currentTarget.text.replace(/\s*\(.*\)/,'') );
+      var colname=e.currentTarget.text.replace(/\s*\(.*\)/,'') 
+      $('#vlabel').text("Query:"+qnum + " Column:"+colname);
+      $('#clabel').text("Query:"+qnum + " Column:"+colname);
+      viz_scene(qnum,scenid,colname);
     });
     clearElementsById(["console","dashcons","divcons"]);
     e.preventDefault();
