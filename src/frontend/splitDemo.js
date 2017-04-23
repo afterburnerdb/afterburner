@@ -406,6 +406,11 @@ function splitDemo(qnum,qscen,opencol){
         "Time to create materialized view @backend: "+ttotmatbe.toFixed(2)+"ms<br>"+
         "Time to load materialized view into browser: " + (ttotmetfe.toFixed(2))+"ms";
     }
+    $("#ctlTAVSQL").collapse('show');
+    editorVSQL.getDoc().setValue(ppSQLstr(this.mav.toSQL()));
+    $("#pnlvsql").addClass("panel-success");
+    $("#pnlcsql").addClass("panel-warning");
+
     var divcons=document.getElementById("divcons");
     var dashcons=document.getElementById("dashcons");
     clearElementsById(["divcons","dashcons"]);
@@ -422,6 +427,8 @@ function splitDemo(qnum,qscen,opencol){
   }
   this.runQuery=function(params,firsttime){
     var q=this.fsql(this.mav, ...params);
+    $("#ctlTACSQL").collapse('show');
+    editorCSQL.getDoc().setValue(ppSQLstr(q.toSQL()));
     var tt0=window.performance.now();
     q.ABI.materialize();
     var tt1=window.performance.now();

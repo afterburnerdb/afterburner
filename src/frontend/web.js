@@ -193,3 +193,17 @@ function exploreTable(tabname){
   $('#exploreTab tbody').on("click","td",function(e){Ei.bcell(this)});
   $('#exploreTab thead').on("click","th",function(e){Ei.hcell(this)});
 }
+//Prettyrint sql
+function ppSQLstr(sqlstr){
+  sqlstr=sqlstr.replace(/\/\*CLOSED SQL\*\//g,'');
+  sqlstr=sqlstr.replace(/\/\*OPENED SQL\*\//g,'');
+  sqlstr=sqlstr.replace(/,/g,',\n\t');
+  var keyWords=['SELECT','FROM','JOIN','WHERE','FREE','HAVING','GROUP BY','ORDER BY','LIMIT','HAVING'];
+  keyWords.forEach((x)=> {sqlstr=sqlstr.replace(new RegExp(x,'g'),"\n"+x)});
+  var keyWords=['AND','[\s\t]OR'];
+  keyWords.forEach((x)=> {sqlstr=sqlstr.replace(new RegExp(x,'g'),"\t\n"+x)});
+
+  sqlstr=sqlstr.replace(/^[\s\t]*[\n|\r|\r\n]/gm,'');
+  return sqlstr;
+}
+
