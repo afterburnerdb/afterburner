@@ -100,7 +100,7 @@ function Explore(tabname){
              fieldstr+
              wherestr.replace(".where()","")+
              groupstr+
-             ".toArray2()";
+             ".materialize()";
 
     var tt0=window.performance.now();
     console.log("qstr:"+qstr);
@@ -109,8 +109,9 @@ function Explore(tabname){
     var tt1=window.performance.now();
     var ttot=tt1-tt0;
     document.getElementById("console").innerHTML = "Query completed in " + (ttot.toFixed(2))+"ms<br>";
-    document.getElementById("console").innerHTML+= "qstr:"+ qstr + "<br>";
-    document.getElementById("console").innerHTML+= "qeval:"+ qeval;
+    //document.getElementById("console").innerHTML+= "qstr:"+ qstr + "<br>";
+    //document.getElementById("console").innerHTML+= "qeval:"+ qeval;
+    printtable(res.toHTMLTableN(100))
     console.log('time to run code:'+ (ttot));
 
   }

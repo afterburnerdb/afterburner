@@ -308,8 +308,7 @@ function prepExplore(){
   console.log("@prepExplore");
   $("#qconsole").hide();
   $("#sconsole").hide();
-  //$("#divconsole").hide();
-  $("#divcons").hide();
+  clearElementsById(["divcons"]);
   $("#togexqu").show();
   $("#econsole").show();
 }
@@ -318,8 +317,7 @@ function backToQuery(){
   $("#qconsole").show();
   $("#sconsole").show();
   $("#econsole").show();
-  //$("#divconsole").show();
-  $("#divcons").show();
+  clearElementsById(["divcons"]);
   $("#togexqu").hide();
   $("#econsole").hide();
 }
