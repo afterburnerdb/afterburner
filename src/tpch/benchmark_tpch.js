@@ -465,6 +465,81 @@ function bench_tpch_Q1(){
   var t1=get_time_ms();
   console.log("Time to run Q1_variant_5k * " + repeats + " times: "+time_diff(t0,t1)) + "(ms)";
 }
+
+function Query3a_no_orderby(){
+  var fe_mav3a=query3a_mav();
+  fe_mav3a.materialize_fe();
+  var t0=get_time_ms();
+  for (var i=0;i<10;i++)
+    abdb.select()
+      .from(fe_mav3a.mat.name)
+      .field(_count("*"))
+      .where(_eq("c_mktsegment", "BUILDING"))
+      .materialize();
+  var t1=get_time_ms();
+  console.log("time filter:"+time_diff(t0,t1)/10+ "(ms)");
+
+  var t0=get_time_ms();
+  for (var i=0;i<10;i++)
+    abdb.select()
+      .from(fe_mav3a.mat.name)
+      .field("l_orderkey",_sum("SUM((l_extendedprice*(1-l_discount)))"),"o_orderdate","o_shippriority")
+      .where(_eq("c_mktsegment", "BUILDING"))
+      .group("l_orderkey","o_orderdate","o_shippriority")
+      .materialize();
+  var t1=get_time_ms();
+  console.log("time no order:"+time_diff(t0,t1)/10+ "(ms)");
+
+  var t0=get_time_ms();
+  for (var i=0;i<10;i++)
+    abdb.select()
+      .from(fe_mav3a.mat.name)
+      .field("l_orderkey",_sum("SUM((l_extendedprice*(1-l_discount)))"),"o_orderdate","o_shippriority")
+      .where(_eq("c_mktsegment", "BUILDING"))
+      .group("l_orderkey","o_orderdate","o_shippriority")
+      .order([0,1])
+      .materialize();
+  var t1=get_time_ms();
+  console.log("time query3a:"+time_diff(t0,t1)/10+ "(ms)");
+}
+function Query3b_no_orderby(){
+  var fe_mav3b=query3b_mav();
+  fe_mav3b.materialize_fe();
+
+  var t0=get_time_ms();
+  for (var i=0;i<10;i++)
+    abdb.select()
+      .from(fe_mav3b.mat.name)
+      .field(_count("*"))
+      .where(_lt("o_orderdate", _date("1995-03-15")))
+      .materialize();
+  var t1=get_time_ms();
+  console.log("time to filter:"+time_diff(t0,t1)/10+ "(ms)");
+
+  var t0=get_time_ms();
+  for (var i=0;i<10;i++)
+    abdb.select()
+      .from(fe_mav3b.mat.name)
+      .field("l_orderkey",_sum("SUM((l_extendedprice*(1-l_discount)))"),"o_orderdate","o_shippriority")
+      .where(_lt("o_orderdate", _date("1995-03-15")))
+      .group("l_orderkey","o_orderdate","o_shippriority")
+      .materialize();
+  var t1=get_time_ms();
+  console.log("time no order:"+time_diff(t0,t1)/10+ "(ms)");
+
+  var t0=get_time_ms();
+  for (var i=0;i<10;i++)
+    abdb.select()
+      .from(fe_mav3b.mat.name)
+      .field("l_orderkey",_sum("SUM((l_extendedprice*(1-l_discount)))"),"o_orderdate","o_shippriority")
+      .where(_lt("o_orderdate", _date("1995-03-15")))
+      .group("l_orderkey","o_orderdate","o_shippriority")
+      .order([0,1])
+      .materialize();
+  var t1=get_time_ms();
+  console.log("time query3b:"+time_diff(t0,t1)/10+ "(ms)");
+}
+
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 if(inNode){
