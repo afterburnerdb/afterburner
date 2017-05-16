@@ -134,14 +134,14 @@
             <div class="panel-heading">
               <h4 class="panel-title">
                 <a data-toggle="collapse" data-parent="#group" href="#ctlTAVSQL">
-                  Materialized View
+                  Materialized View Query
                   <span class="badge" id="vlabel">?</span>
                 </a>
               </h4>
             </div>
             <div id="ctlTAVSQL" class="panel-collapse collapse">
               <textarea rows="10" id="TAVSQL" name="TAVSQL" type="text" readonly="" 
-                        placeholder="Open a query using the Open button bellow..">
+                        placeholder="Free a query using the Free button bellow..">
               </textarea>
             </div>
           </div>
@@ -149,14 +149,14 @@
             <div class="panel-heading">
               <h4 class="panel-title">
                 <a data-toggle="collapse" data-parent="#group" href="#ctlTACSQL">
-                  Compensating SQL
+                  Frontend Query
                   <span class="badge" id="clabel">?</span>
                 </a>
               </h4>
             </div>
             <div id="ctlTACSQL" class="panel-collapse collapse">
               <textarea rows="10" id="TACSQL" name="TACSQL" type="text" readonly="" 
-                        placeholder="Open a query using the Open button bellow..">
+                        placeholder="Free a query using the Free button bellow..">
               </textarea>
             </div>
           </div>
@@ -412,7 +412,7 @@ jQuery("[id*='query']")
     $('#vlabel').text("?");
     $('#clabel').text("?");
     $("#asisbebtn").show();
-    var htmldd=newHTMLDD('Open Q'+qnum,q2oName[qnum],{'id':'openbtn'});
+    var htmldd=newHTMLDD('Free Q'+qnum,q2oName[qnum],{'id':'openbtn'});
     var opencons=document.getElementById('opencons');
     clearElement(opencons);
     opencons.appendChild(htmldd);
