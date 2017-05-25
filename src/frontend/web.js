@@ -186,6 +186,8 @@ function togSchema(abutton,opts){
 }
 //Explore
 function exploreTable(tabname){
+  if (typeof tabname == 'undefined')
+    tabname= daSchema.tables[daSchema.tables.length-1].name;
   Ei= new Explore(tabname);
   var econs=document.getElementById("econsole");
   clearElement(econs);

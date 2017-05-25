@@ -114,14 +114,19 @@
             </li>
           </ul>
         </div>
-        <label class="btn btn-default btn-file" id="schmbtn" data-toggle="tooltip" data-placement="bot" onclick="togSchema(this,{exp:true})" style="float:left; margin:0 10px 10px 0;">
-          Show Tables
-        </label>
       </div>
     </div>
+    <!-- schema console
     <div class="row rowspc" id="">
       <div class="col-md-12">
         <div id="sconsole">
+        </div>
+      <div>
+    </div>
+    -->
+    <div class="row rowspc" id="">
+      <div class="col-md-12">
+        <div id="etconsole">
         </div>
       <div>
     </div>
@@ -155,7 +160,7 @@
       </div>
       <div class="modal-footer">
           <div class='col-md-1'>
-            <button id="modalgate" type="button" onclick="$('#waitForPT').modal('hide');$('#schmbtn').click();" class="btn btn-default" disabled>Dismiss</button>
+            <button id="modalgate" type="button" onclick="$('#waitForPT').modal('hide');prepExplore();exploreTable()" class="btn btn-default" disabled>Explore</button>
           </div>
       </div>
     </div>
@@ -295,8 +300,7 @@ function printtable(htmltable){
 }
 function prepExplore(){
   console.log("@prepExplore");
-  $("#qconsole").hide();
-  $("#sconsole").hide();
+//  $("#sconsole").hide();
   clearElementsById(["divcons"]);
   $("#econsole").show();
 }

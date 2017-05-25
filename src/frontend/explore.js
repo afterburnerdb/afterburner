@@ -3,20 +3,21 @@ function Explore(tabname){
   this.tab=daSchema.getTable(tabname);
   this.tabname=this.tab.name;
   this.allColNames=this.tab.colnames.slice(0);
-  this.selColNames=this.tab.colnames.slice(0);
+  this.allColNames.splice(this.allColNames.indexOf("id"),1);
+  this.allColNames.splice(this.allColNames.indexOf("p"),1);
+  this.selColNames=this.allColNames.slice(0);
   this.selColVals=[];
   this.selColNames.forEach((x)=>{this.selColVals.push('*')});
-  this.aggA=["_count('*')"];
-  this.valA=[this.tab.numrows];
-
+  this.aggA=["_count('*')","_sum('p')","_avg('p')"];
+  this.valA=abdb.select().from(this.tabname).field(_count('*'),_sum('p'),_avg('p')).toArray2();
+  //
+  this.et= new explanationTablep1(tabname,4,16,"p");
 //Control panel
   this.cpAddDomCol=function(col){
     console.log("@cpAddDomCol col:"+col);
-    hasaseen=col;
   }
   this.cpSetDomCol=function(col,val){
     console.log("@cpSetDomCol col:"+col);
-    hasaseen=col;
   }
   this.cpRmvDomCol=function(col){
     console.log("@cpRmvDomCol col:"+col);
@@ -39,7 +40,6 @@ function Explore(tabname){
     var distinct=abdb.select().from(this.tabname).field(colname).group(colname).toArray();
     cell.appendChild(newHTMLDD('Select!',['ALL','*'].concat(distinct),{id:'bcellmenu'},'-sm'));
     $('.dropdown-toggle').dropdown('toggle');
-
     $("#bcellmenu").on("click", "li a", function() {
       Ei.bcello(this,cell.cellIndex,cell,colname);
     });
@@ -109,8 +109,6 @@ function Explore(tabname){
     var tt1=window.performance.now();
     var ttot=tt1-tt0;
     document.getElementById("console").innerHTML = "Query completed in " + (ttot.toFixed(2))+"ms<br>";
-    //document.getElementById("console").innerHTML+= "qstr:"+ qstr + "<br>";
-    //document.getElementById("console").innerHTML+= "qeval:"+ qeval;
     printtable(res.toHTMLTableN(100))
     console.log('time to run code:'+ (ttot));
 
@@ -121,9 +119,8 @@ function Explore(tabname){
     var thead = newHTMLThead(table);
     var tr = thead.insertRow(0);
     this.selColNames.forEach((x)=>{tr.appendChild(newHTMLTH(x))});
-    tr.appendChild(newHTMLTH("Add"));
+    tr.appendChild(newHTMLTH(""));
     this.aggA.forEach((x)=>{tr.appendChild(newHTMLTH(x))});
-    tr.appendChild(newHTMLTH("Add"));
     var body= newHTMLTBody(table);
     tr = body.insertRow(0);
     this.selColNames.forEach((x)=>{tr.appendChild(newHTMLTD('*'))});
