@@ -441,7 +441,7 @@ function fsql2sql(){
         }
       }  
     }
-    var SELECT_STMT="/*CONPENSATING SQL*/SELECT " + this.attsA.join(', ');
+    var SELECT_STMT="/*COMPENSATING SQL*/SELECT " + this.attsA.join(', ');
     var FROM_STMT="FROM " + this.fromA.join(', ');
 
     var LJOIN_STMT="";
