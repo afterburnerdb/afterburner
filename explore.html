@@ -134,6 +134,9 @@
                 <a>
                   Explanation Table
                 </a>
+                <a role="button" style='float:right'>
+                   enh:Suggest a new pattern!
+                </a>
               </h4>
             </div>
             <!-- <div id="etconsole" class="panel-collapse collapse">-->
@@ -159,6 +162,9 @@
                 <!-- <a data-toggle="collapse" data-parent="#group" href="#divcons">-->
                 <a>
                   Exploration
+                </a>
+                <a role="button" style='float:right'>
+                    enh:view as icicle!
                 </a>
               </h4>
             </div>
@@ -347,6 +353,11 @@ function printtable(htmltable){
   divcons=document.getElementById("divcons");
   clearElement(divcons);
   divcons.appendChild(htmltable);
+}
+function printet(ettable){
+  etcons=document.getElementById("etconsole");
+  clearElement(etcons);
+  etcons.appendChild(ettable);
 }
 function prepExplore(){
   console.log("@prepExplore");

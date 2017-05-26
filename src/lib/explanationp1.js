@@ -286,11 +286,34 @@ if (typeof binatt == undefined)
     }
     return true;
   }
+  this.toOBJ=function(){
+    if (this.kldivf<0)
+      this.kldivf=this.calcKLDIV();
+    var pats=[];
+    for (var pid=0;pid<this.numpats;pid++){
+      var newpat={ cols:[],
+                   count:-1,
+                   avgp:-1 };
+      for (var cid=0; cid<this.numatts; cid++){
+        if (mem32[(this.et.patsp+(((pid*this.numatts)+cid)<<2))>>2] == -666)
+          newpat.cols.push('*');
+        else 
+          newpat.cols.push(strToString(mem32[(this.et.patsp+(((pid*this.numatts)+cid)<<2))>>2]));
+      }
+      newpat.est= this.lambda2est(this.et.lambdas[pid]);
+      newpat.avgp= this.et.p[pid];
+      newpat.count= this.et.count[pid];
+      pats.push(newpat);
+    }
+    return {  kldiv:this.kldivf,
+              infogain:this.kldivo-this.kldivf,
+              pats:pats };
+  }
   this.printET=function(){
-    var kldiv=this.calcKLDIV();
-    this.kldivf=kldiv;
-    console.log('debug:'+ 'printET:  kldiv:'+kldiv);
-    console.log('debug:'+ 'kldiv droped from:' + this.kldivo + " to:" +kldiv + " infogain:"+(this.kldivo-kldiv))
+    var etobj=this.toOBJ();
+    console.log('debug:'+ 'printET:  kldiv:'+etobj.kldiv);
+    console.log('debug:'+ 'kldiv droped from:' + this.kldivo + " to:" +etobj.kldiv + " infogain:"+etobj.infogain);
+    var patstr="pid:"+pid+"::";
     for (var pid=0;pid<this.numpats;pid++){
       var patstr="pid:"+pid+"::";
       for (var cid=0; cid<this.numatts; cid++){

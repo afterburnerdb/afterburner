@@ -257,6 +257,13 @@ function queryResult(tempsptr) {
       }
       return ret;
     };
+   this.toOBJ= function(){
+      return {numrows:this.numrows,
+              numcols:this.numcols,
+              colnames:this.colnames.slice(0),
+              coltypes:this.coltypes.slice(0),
+              array2:this.toArray2()};
+    };
 
     this.firstCell = function(){
       if (inNode){

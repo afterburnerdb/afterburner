@@ -84,6 +84,23 @@ function newHTMLProgressBar(pbid,opts){
   div.appendChild(div2);
   return div;
 }
+
+function newHTMLProgressBarGreenRed(ppct,opts){
+  opts=opts||{};
+  opts['class']='progress';
+  var div = document.createElement('div');
+  setAtts(div,opts);
+  var opts2={class:'progress-bar progress-bar-success',role:'progressbar','aria-valuenow':'0','aria-valuemin':'0','aria-valuemax':'100',style:'width:'+ppct+'%'};
+  var div2 = document.createElement('div');
+  setAtts(div2,opts2);
+  div.appendChild(div2);
+  var opts2={class:'progress-bar progress-bar-danger',role:'progressbar','aria-valuenow':'0','aria-valuemin':'0','aria-valuemax':'100',style:'width:'+(100-ppct)+'%'};
+  var div2 = document.createElement('div');
+  setAtts(div2,opts2);
+  div.appendChild(div2);
+  return div;
+}
+
 function newHTMLContainer(opts){
   opts=opts||{};
   opts['class']= 'container';
