@@ -921,6 +921,8 @@ env={'temps':temps,
       return code + `return res.toArray()`;
     else if (purpose == 'array2')
       return code + `return res.toArray2()`;
+    else if (purpose == 'obj')
+      return code + `return res.toOBJ()`;
     else if (purpose == 'mat')
       return code + `return res.registerTable()`;
     else 
@@ -937,6 +939,12 @@ env={'temps':temps,
       return new Function('ignore', this.toVanilla('array2'))();
     else 
       return new Function('ignore', this.toString('array2'))();
+  }
+  this.toOBJ = function(vanilla){
+    if (vanilla)
+      return new Function('ignore', this.toVanilla('obj'))();
+    else 
+      return new Function('ignore', this.toString('obj'))();
   }
   this.eval = function(vanilla){
     if (vanilla)

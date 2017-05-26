@@ -80,13 +80,30 @@
         </div>
         <div class="dropdown" style="float:left; margin:0 10px 10px 0;" >
           <button class="btn dropdown-toggle disabled" id="loadwbtn" type="button" data-toggle="dropdown">
-            Load data!
+            Explore dataset!
           </button>
           <ul class="dropdown-menu">
-            <li><label class="btn btn-default btn-file" onclick="loadWeb()"
+            <!-- load all 
+              <li><label class="btn btn-default btn-file" onclick="loadWeb()"
                        style="border: none; border-color: transparent;">
                   Load demo data (12 MB compressed)
                 </label>
+              </li>
+            -->
+            <li><label class="btn btn-default btn-file" onclick="loadUpgrade()"
+                     style="border: none; border-color: transparent;">
+                Load upgrade (58 KB compressed)
+              </label>
+            </li>
+            <li><label class="btn btn-default btn-file" onclick="loadAdult()"
+                     style="border: none; border-color: transparent;">
+                Load adult (244 KB compressed)
+              </label>
+            </li>
+            <li><label class="btn btn-default btn-file" onclick="loadIncome()"
+                     style="border: none; border-color: transparent;">
+                Load income (11 MB compressed)
+              </label>
             </li>
             <li>
                 <label class="btn btn-default btn-file" id="loaddbtn" data-placement="bot"
@@ -97,84 +114,97 @@
             </li>
           </ul>
         </div>
-        <label class="btn btn-default btn-file" id="schmbtn" data-toggle="tooltip" data-placement="bot" onclick="togSchema(this,{exp:true})" style="float:left; margin:0 10px 10px 0;">
-          Show Tables
-        </label>
-        <label class="btn btn-default btn-file" id="togexqu" data-toggle="tooltip" data-placement="bot" onclick="backToQuery()" style="float:left; margin:0 10px 10px 0;">
-          <span class="glyphicon glyphicon-arrow-left"></span> 
-          Back to Query
-        </label>
-
       </div>
     </div>
+    <!-- schema console
     <div class="row rowspc" id="">
       <div class="col-md-12">
         <div id="sconsole">
         </div>
       <div>
     </div>
+    -->
+    <div class="row">
+      <div class="col-md-12">
+        <div class="panel-group" id="group">
+          <div id="pnlET" class="panel panel-primary">
+            <div class="panel-heading">
+              <h4 class="panel-title">
+                <!--<a data-toggle="collapse" data-parent="#group" href="#etconsole">-->
+                <a>
+                  Explanation Table
+                </a>
+                <a role="button" style='float:right'>
+                   enh:Suggest a new pattern!
+                </a>
+              </h4>
+            </div>
+            <!-- <div id="etconsole" class="panel-collapse collapse">-->
+            <div id="etconsole">
+            </div>
+          </div>
+          <div id="pnlE" class="panel panel-success">
+            <div class="panel-heading">
+              <h4 class="panel-title">
+                <!--<a data-toggle="collapse" data-parent="#group" href="#econsole">-->
+                <a>
+                  Control Exploration
+                </a>
+              </h4>
+            </div>
+            <!--<div id="econsole" class="panel-collapse collapse">-->
+            <div id="econsole">
+            </div>
+          </div>
+          <div id="pnlExp" class="panel panel-warning">
+            <div class="panel-heading">
+              <h4 class="panel-title">
+                <!-- <a data-toggle="collapse" data-parent="#group" href="#divcons">-->
+                <a>
+                  Exploration
+                </a>
+                <a role="button" style='float:right'>
+                    enh:view as icicle!
+                </a>
+              </h4>
+            </div>
+            <!-- <div id="divcons" class="panel-collapse collapse"> -->
+            <div id="divcons">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- explanation table console
+    <div class="row rowspc" id="">
+      <div class="col-md-12">
+        <div id="etconsole">
+        </div>
+      <div>
+    </div>
+    -->
+    <!-- explore ctl panel
     <div class="row rowspc" id="">
       <div class="col-md-12">
         <div id="econsole">
         </div>
       <div>
     </div>
-    <div class="row" id="qconsole">
-      <div class="col-md-12">
-        <h2>Fluent SQL</h2>
-      	<textarea rows="11" id="TAFluent" name="TAFluent" class="prettyprint form-control animated linenums language-css" placeholder="Type Fluent SQL or use example buttons.."></textarea>
-        <div class="row"> 
-          &nbsp; 
-        </div>
-        <div class="row">
-          <div class="container">
-            <div class="dropdown">
-              <button class="btn btn-default dropdown-toggle" onchange="alert('boom')" type="button" id="menu1" data-toggle="dropdown" style="float:left; margin:0 10px 10px 0;">Insert TPC-H Query<span class="caret"></span></button>
-              <ul class="dropdown-menu" role="menu" aria-labelledby="menu1">
-                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query1">Q1</a></li>
-                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query2">Q2</a></li>
-                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query3">Q3</a></li>
-                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query4">Q4</a></li>
-                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query5">Q5</a></li>
-                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query6">Q6</a></li>
-                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query7">Q7</a></li>
-                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query8">Q8</a></li>
-                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query9">Q9</a></li>
-                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query10">Q10</a></li>
-                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query11">Q11</a></li>
-                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query12">Q12</a></li>
-                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query13">Q13</a></li>
-                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query14">Q14</a></li>
-                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query15">Q15</a></li>
-                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query16">Q16</a></li>
-                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query17">Q17</a></li>
-                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query18">Q18</a></li>
-                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query19">Q19</a></li>
-                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query20">Q20</a></li>
-                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query21">Q21</a></li>
-                <li role="presentation"><a role="menuitem" tabindex="-1" href="#" id="query22">Q22</a></li>
-              </ul>
-            </div>
-            <button type="button" onclick="runcode()" class="btn btn-default" href="#" data-placement="bot">
-              Run Query
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
     <br>
+    -->
     <div class="row" id="divconsole">
       <div class="col-md-12">
         <p id="console"></p>
       </div>
     </div>
-
+    <!-- exploration result
     <div class="row">
       <div class="col-md-12">
         <div id="divcons" class="table-responsive">
         </div>
       </div>
     </div>
+    -->
   </div> <!-- /container -->
 
 <div id="waitForPT" class="modal fade" style="left" role="dialog">
@@ -186,7 +216,7 @@
       </div>
       <div class="modal-footer">
           <div class='col-md-1'>
-            <button id="modalgate" type="button" onclick="$('#waitForPT').modal('hide');$('#schmbtn').click();" class="btn btn-default" disabled>Dismiss</button>
+            <button id="modalgate" type="button" onclick="$('#waitForPT').modal('hide');prepExplore();exploreTable()" class="btn btn-default" disabled>Explore</button>
           </div>
       </div>
     </div>
@@ -209,6 +239,9 @@
 <script src="./src/frontend/web.js"></script>
 <script src="./src/frontend/progressTracker.js"></script>
 <script src="./src/frontend/explore.js"></script>
+<script src="./src/lib/explanation.js"></script>
+<script src="./src/lib/explanationp1.js"></script>
+<script src="./src/lib/explanationp2.js"></script>
 
 <!-- TPC-H -->
 
@@ -289,9 +322,26 @@ function loadWeb(){
   PTi.trackURLs(urls.list);
   var ds= new dataSource(urls, function(){newTable= new aTable(ds);});
 }
+function loadUpgrade(){
+  var urls= new URLList();
+  urls.list=["https://afterburnerdb.github.io/afterburner-data/datasets/upgrade.5795.tbl.gz"]
+  PTi.trackURLs(urls.list);
+  var ds= new dataSource(urls, function(){newTable= new aTable(ds);});
+}
+function loadAdult(){
+  var urls= new URLList();
+  urls.list=["https://afterburnerdb.github.io/afterburner-data/datasets/adult.32561.tbl.gz"]
+  PTi.trackURLs(urls.list);
+  var ds= new dataSource(urls, function(){newTable= new aTable(ds);});
+}
+function loadIncome(){
+  var urls= new URLList();
+  urls.list=["https://afterburnerdb.github.io/afterburner-data/datasets/income.1487904.tbl.gz"];
+  PTi.trackURLs(urls.list);
+  var ds= new dataSource(urls, function(){newTable= new aTable(ds);});
+}
 function runcode(){
   var codecode=document.getElementById("TAFluent").value;
-//  document.getElementById("console").innerHTML = "code=" + codecode;
   var tt0=window.performance.now();
   runMyAdhocCode(codecode);
   var tt1=window.performance.now();
@@ -304,24 +354,17 @@ function printtable(htmltable){
   clearElement(divcons);
   divcons.appendChild(htmltable);
 }
+function printet(ettable){
+  etcons=document.getElementById("etconsole");
+  clearElement(etcons);
+  etcons.appendChild(ettable);
+}
 function prepExplore(){
   console.log("@prepExplore");
-  $("#qconsole").hide();
-  $("#sconsole").hide();
+//  $("#sconsole").hide();
   clearElementsById(["divcons"]);
-  $("#togexqu").show();
   $("#econsole").show();
 }
-function backToQuery(){
-  console.log("@prepQuery");
-  $("#qconsole").show();
-  $("#sconsole").show();
-  $("#econsole").show();
-  clearElementsById(["divcons"]);
-  $("#togexqu").hide();
-  $("#econsole").hide();
-}
-$("#togexqu").hide();
 $("#initmenu").on("click", "li a", function() {
   console.log("will store with size:"+$(this).text());
   var size=$(this).text().split(" ")[0];
