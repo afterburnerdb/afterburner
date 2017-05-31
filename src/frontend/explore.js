@@ -8,8 +8,8 @@ function Explore(tabname){
   this.selColNames=this.allColNames.slice(0);
   this.selColVals=[];
   this.selColNames.forEach((x)=>{this.selColVals.push('*')});
-  this.aggA=["_count('*')","_sum('p')","_avg('p')"];
-  this.valA=abdb.select().from(this.tabname).field(_count('*'),_sum('p'),_avg('p')).toArray2();
+  this.aggA=["_count('*')","_avg('p')"];
+  this.valA=abdb.select().from(this.tabname).field(_count('*'),_avg('p')).toArray2();
   //
   this.et= new explanationTablep1(tabname,5,16,"p");
 //Control panel
@@ -121,15 +121,15 @@ function Explore(tabname){
     var thead = newHTMLThead(table);
     var tr = thead.insertRow(0);
     this.selColNames.forEach((x)=>{tr.appendChild(newHTMLTH(x))});
-    tr.appendChild(newHTMLTH(""));
-    tr.appendChild(newHTMLTH("Add to ET"));
+    //tr.appendChild(newHTMLTH(""));
+    //tr.appendChild(newHTMLTH("Add to ET"));
     //this.aggA.forEach((x)=>{tr.appendChild(newHTMLTH(x))});
     var body= newHTMLTBody(table);
     tr = body.insertRow(0);
     this.selColVals.forEach((x)=>{tr.appendChild(newHTMLTD(x))});
 
-    tr.appendChild(newHTMLTD(""));
-    tr.appendChild(newHTMLTD("enh:Add to ET"));
+    //tr.appendChild(newHTMLTD(""));
+    //tr.appendChild(newHTMLTD("enh:Add to ET"));
     //for (var i=0;i<this.valA.length;i++){
     //  tr.appendChild(newHTMLTD(this.valA[i],{id:'rcell'+i}));
     //};
@@ -151,7 +151,7 @@ function Explore(tabname){
     //tr.appendChild(newHTMLTH("EST(p)"));
     tr.appendChild(newHTMLTH(""));
     tr.appendChild(newHTMLTH("Explore"));
-    tr.appendChild(newHTMLTH("Edit ET"));
+    //tr.appendChild(newHTMLTH("Edit ET"));
 
     var body= newHTMLTBody(table);
     for (var pid=etobj.pats.length-1;pid>-1;pid--){
@@ -171,7 +171,7 @@ function Explore(tabname){
       td.appendChild(a);
       tr.appendChild(td);
 
-      tr.appendChild(newHTMLTH("enh:remove"));
+      //tr.appendChild(newHTMLTH("enh:remove"));
     } 
     printet(table);
     //return table;
