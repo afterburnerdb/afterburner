@@ -12,7 +12,9 @@ function aTable(dSrc) {
     this.name = "";
     this.src=dSrc;
     this.numrows = -1;
+    this.sparerows=100;
     this.numcols = 0;
+    this.sparecols = 50;
     this.colnames = [];
     this.colptrs=0;
     this.cols = [];
@@ -37,13 +39,13 @@ function aTable(dSrc) {
 //          memF32=require('./store.js').memF32;
         }
 //
-        var colptrs = malloc(this.numcols<<2);
+        var colptrs = malloc((this.numcols+this.sparecols)<<2);
         var coltypes=this.coltypes;
         this.colptrs=colptrs;
         var fp=this.src.parser;
         var nr=this.numrows;
         for (var i=0;i<this.numcols;i++){
-          mem32[(this.colptrs+(i<<2))>>2]= malloc((nr+1)<<2);
+          mem32[(this.colptrs+(i<<2))>>2]= malloc((nr+this.sparerows+1)<<2);
           this.cols[i]=mem32[(this.colptrs+(i<<2))>>2];
         } 
         var strbuff=malloctmpstr(100*1024);
@@ -119,7 +121,49 @@ function aTable(dSrc) {
         return mem32[(this.colptrs+(i<<2))>>2];
     return -1;
   }
-
+//ALTER
+    this.addColIfNotExists= function(colname,coltype){
+      var colptr=this.getColPByName(colname);
+      if(colptr>-1) 
+        return colptr;
+      if(this.sparecols>0){
+        this.sparecols--;
+        this.numcols++;
+        this.colnames.push(colname);
+        this.coltypes.push(coltype);
+        colptr=mem32[(this.colptrs+((this.numcols-1)<<2))>>2]= malloc((this.numrows+this.sparerows+1)<<2);
+        this.cols.push(colptr);
+        return colptr;
+      }
+      console.log('out of spare cols.. cant alter table');
+      return -1;
+    }
+//INSERT
+    this.insertValues=function(rowA){
+      var coltypes=this.coltypes;
+      if(this.sparerows>0){
+        this.sparerows--;
+        for (var i=0;i<this.numcols;i++){
+          memF32[(mem32[(this.colptrs+(i<<2))>>2] + (this.numrows<<2) )>>2]=rowA[i] || _null();
+          if(coltypes[i]==0){
+            mem32 [(mem32[(this.colptrs+(i<<2))>>2] + (this.numrows<<2) )>>2]=rowA[i] || _null();
+          } else if(coltypes[i]==1){
+            memF32[(mem32[(this.colptrs+(i<<2))>>2] + (this.numrows<<2) )>>2]=rowA[i] || _null();
+          } else if(coltypes[i]==2){
+            mem32 [(mem32[(this.colptrs+(i<<2))>>2] + (this.numrows<<2) )>>2]=rowA[i] || _null();
+          } else if(coltypes[i]==3){
+            mem32 [(mem32[(this.colptrs+(i<<2))>>2] + (this.numrows<<2) )>>2]=rowA[i] || _null();
+          } else if(coltypes[i]==4){
+            mem32 [(mem32[(this.colptrs+(i<<2))>>2] + (this.numrows<<2) )>>2]=rowA[i] || _null();
+          } else{
+            alert('cannot handle data type:' + coltypes[i])
+          }
+        }
+        return ++this.numrows;
+      }
+      console.log('out of spare cols.. cant alter table');
+      return -1;
+    }
 //UTIL
     this.toHTMLTableN = function(num) {
       var table=document.createElement('table');
@@ -250,6 +294,11 @@ function aTable(dSrc) {
     this.numcols=dSrc.numcols;
     this.colnames=dSrc.colnames;
     this.coltypes=dSrc.coltypes;
+
+    if (this.src.type=='schema'){
+      this.colptrs=malloc((this.numcols+this.sparecols)<<2);
+      return;
+    }
 
     if (this.src.parser !== null){
       DEBUG('new table from a parser')
