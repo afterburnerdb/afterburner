@@ -496,7 +496,7 @@ function Afterburner(){
    joiner=extractfrom(all,'join');
    grouper=extractfrom(all,'group');
    execs=extractfrom(all,'exec',null,'tempsptr');
-  postexek=extractfrom(all,'postexek');
+   postexek=extractfrom(all,'postexek');
    sorter=extractfrom(all,'sorter');
    limiter=extractfrom(all,'limit');
    ret="function runner(){"
@@ -721,28 +721,37 @@ function Afterburner(){
    DEBUG('@build');
    var all=this.expandFrom();
    var filter_gen=this.expandFilter();
-   //all=all+filter_gen.dec;
    all=all+filter_gen.code;
    all=all+this.expandFields();
    dec=extractfrom(all,'dec');
    prepend=extractfrom(all,'pre');
-//   preexek=extractfrom(all,'preexek');
    looper=extractfrom(all,'loop');
    filter=extractfrom(all,'filter');
    execs=extractfrom(all,'exec');
+   execp2s=extractfrom(all,'execp2');
+   postp1=extractfrom(all,'postp1');
    postexek=extractfrom(all,'postexek');
+   //postexekp2=extractfrom(all,'postexekp2');
    sorter=extractfrom(all,'sorter');
    limiter=extractfrom(all,'limit');
    ret="function runner(){"
    ret=ret+dec+'/*dec*/';
    ret=ret+prepend+'/*prepend*/';
-//   ret=ret+preexek+'/*preexek*/';
    ret=ret+looper+'/*looper*/';
    ret=ret+filter+'/*filter*/';
    ret=ret+execs+'}/*execs*/';
+
+   ret=ret+postp1+'/*postp1*/';
+   ret=ret+'if(aggpass==1){';
+   ret=ret+dec.match('trav_.*?;').join(";")+'/*reinit travs*/';
+   ret=ret+prepend+'/*prepend*/';
+   ret=ret+looper+'/*looper*/';
+   ret=ret+filter+'/*filter*/';
+   ret=ret+execp2s+'}}/*2 pass aggs*/';
+
    if (this.aggsA.length>0)
      ret=ret+postexek+'/*postexek*/';
-//   ret=ret+'transpose('+sorter+');';
+
    ret=ret+limiter+'/*limiter*/';
    ret=ret+"return tempsptr|0;}";
     return ret;
@@ -841,6 +850,7 @@ function Afterburner(){
   var odidonce=0;
   var isintmpstr=0;
   var dirtybyte=0;
+  var aggpass=0;
   `+vars.join('\n')+`
   `+core+`
   function hash_str(strp){
@@ -1692,6 +1702,38 @@ function _avg(p){
   exec:`+varnamecount+`=`+varnamecount+`+1.0;::
   execg:`+varnamecount+`=`+varnamecount+`+1.0;::
   postexek:memF32[(temps+(tempsptr<<2))>>2]=+(+(` +  varnamesum  + `)/ +(` + varnamecount + `));tempsptr= (tempsptr + 1 )|0;::`;
+}
+function _variance(p){
+  var bound=bindCol(p);
+  var unique=uniqueVarCounter++;
+  var type= typeCol(p);
+  if ((type==0) || (type==3) || (type==4))
+    bound=coerceFloat(bound);
+  var tab= col2trav(p);
+  var varnamesum="avgsum"+unique
+  var varnamecount="avgcount"+unique
+  var varnameavg="avg"+unique
+  var varnameerror="error"+unique
+  var varerror2sum="error2sum"+unique
+  return `dec:var `+varnamecount+`=0.0;::
+  dec:var `+varnamesum+`=0.0;::
+  dec:var `+varnameavg+`=0.0;::
+  dec:var `+varnameerror+`=0.0;::
+  dec:var `+varerror2sum+`=0.0;::
+  post:res.addCol2("variance(`+p+`)",1);::
+  preexek:`+varnamesum+`=0.0;::
+  preexek:`+varnamecount+`=0.0;::
+  preexek:`+varerror2sum+`=0.0;::
+  exec:`+varnamesum+`=`+varnamesum+`+(`+bound+`);::
+  execp2:`+varnameerror+`=`+varnameavg+`-(`+ bound  +`);::
+  execg:`+varnamesum+`=`+varnamesum+`+(`+bound+`);::
+  execg2:`+varnameerror+`=`+varnameavg+`-(`+ bound  +`);::
+  exec:`+varnamecount+`=`+varnamecount+`+1.0;::
+  execp2:`+varerror2sum+`=`+varerror2sum+`+(`+ varnameerror  +`*`+ varnameerror + `);::
+  execg:`+varnamecount+`=`+varnamecount+`+1.0;::
+  execg2:`+varerror2sum+`=`+varerror2sum+`+(`+ varnameerror  +`*`+ varnameerror + `);::
+  postp1:`+varnameavg+`=+(+(` +  varnamesum  + `)/ +(` + varnamecount + `)); aggpass=1;::
+  postexek:memF32[(temps+(tempsptr<<2))>>2]=+(+(` + varerror2sum + `)/ +(` + varnamecount + `));tempsptr= (tempsptr + 1 )|0; aggpass=2;::`;
 }
 function _date(p1){
   if (p1.indexOf('DATE') > -1){
