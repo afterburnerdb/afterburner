@@ -642,6 +642,8 @@ function Afterburner(){
     filter=extractfrom(all,'filter');
     grouper=extractfrom(all,'group');
     execs=extractfrom(all,'exec',null,'tempsptr');
+    execp2s=extractfrom(all,'execp2');
+    postp1=extractfrom(all,'postp1');
     postexek=extractfrom(all,'postexek');
     sorter=extractfrom(all,'sorter');
     limiter=extractfrom(all,'limit');
@@ -665,7 +667,7 @@ function Afterburner(){
     }
     if((dirtybyte & (1<<(hki&15)))|((redo|0)>0)){ 
       currb=mem32[((h2bb+(hki<<2))|0)>>2]|0;
-      curr=1;producable=0; alarm=0;
+      curr=1;producable=0; alarm=0;aggpass=0;
         if ((redo|0)>0){
           hki=redo;
           otrav_`+this.fromA[0]+`=ntrav_`+this.fromA[0]+`;
@@ -676,6 +678,7 @@ function Afterburner(){
           `+ocombound+`
 	}
       `+preexek+`
+      reinintcurrb=currb;
       while(currb){ 
         if ((curr|0)>(mem32[currb>>2]|0)){
           if (currb=mem32[(currb+(((hash2BucketSize+1)|0)<<2)|0)>>2]|0){
@@ -707,6 +710,39 @@ function Afterburner(){
         curr=curr+1|0;
       }
       if(producable){
+        `+postp1+`
+        if (aggpass==1){
+          currb=reinintcurrb;curr=1;
+          while(currb){ 
+            if ((curr|0)>(mem32[currb>>2]|0)){
+              if (currb=mem32[(currb+(((hash2BucketSize+1)|0)<<2)|0)>>2]|0){
+                curr=1;
+                `+combound+`
+              }
+              else
+               break;
+            }else{
+              `+combound+`
+            }
+            if ((trav_`+this.fromA[0]+`|0)<0) {curr=curr+1|0; continue;} 
+            if (`+daConts+`){
+              ntrav_`+this.fromA[0]+`=trav_`+this.fromA[0]+`;
+              if (((redo|0)<0)&(!alarm)){
+                redo=hki;
+                producable=0;
+                break;
+              }
+              redo=hki;
+              curr=curr+1|0;
+              continue;
+            }
+            if (alarm){
+              mem32[((currb+(curr<<2))|0)>>2]=-1;
+            }
+            `+execp2s+`
+            curr=curr+1|0;
+          }
+        }
         `+postexek+`      
       }
     }
@@ -851,6 +887,7 @@ function Afterburner(){
   var isintmpstr=0;
   var dirtybyte=0;
   var aggpass=0;
+  var reinintcurrb=0;
   `+vars.join('\n')+`
   `+core+`
   function hash_str(strp){
