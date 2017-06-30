@@ -275,6 +275,9 @@ handyColTypes["adult"]=[
 2
 ];
 
+handyColNames["postsecondary"]=["id", "p1", "workclass", "p2", "status", "occupation", "relationship", "race", "sex", "country"];
+handyColTypes["postsecondary"]=[0,0,2,0,2,2,2,2,2,2];
+
 handyColNames["income"]=[
 "id", 
 "p",
