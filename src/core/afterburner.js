@@ -642,7 +642,7 @@ function Afterburner(){
     filter=extractfrom(all,'filter');
     grouper=extractfrom(all,'group');
     execs=extractfrom(all,'exec',null,'tempsptr');
-    execp2s=extractfrom(all,'execp2');
+    excp2s=extractfrom(all,'excp2');
     postp1=extractfrom(all,'postp1');
     postexek=extractfrom(all,'postexek');
     sorter=extractfrom(all,'sorter');
@@ -667,7 +667,7 @@ function Afterburner(){
     }
     if((dirtybyte & (1<<(hki&15)))|((redo|0)>0)){ 
       currb=mem32[((h2bb+(hki<<2))|0)>>2]|0;
-      curr=1;producable=0; alarm=0;aggpass=0;
+      curr=1;producable=0; alarm=0;aggpass=0;alarmingKeyCounter=0;
         if ((redo|0)>0){
           hki=redo;
           otrav_`+this.fromA[0]+`=ntrav_`+this.fromA[0]+`;
@@ -703,6 +703,8 @@ function Afterburner(){
           continue;
         }
         if (alarm){
+	  mem32[((alarmingKeysp+(alarmingKeyCounter<<2))|0)>>2]=mem32[((currb+(curr<<2))|0)>>2];
+          alarmingKeyCounter=(alarmingKeyCounter+1)|0;
 	  mem32[((currb+(curr<<2))|0)>>2]=-1;
         }
         `+execs+`
@@ -712,35 +714,28 @@ function Afterburner(){
       if(producable){
         `+postp1+`
         if (aggpass){
-          currb=reinintcurrb;curr=1;
-          while(currb){ 
-            if ((curr|0)>(mem32[currb>>2]|0)){
-              if (currb=mem32[(currb+(((hash2BucketSize+1)|0)<<2)|0)>>2]|0){
-                curr=1;
+          if(alarm){
+            while(alarmingKeyCounter){
+              alarmingKeyCounter=(alarmingKeyCounter-1)|0;
+              trav_`+this.fromA[0]+`=mem32[((alarmingKeysp+(alarmingKeyCounter<<2))|0)>>2]|0;
+              `+excp2s+`
+            }
+          }else{
+            currb=reinintcurrb;curr=1;
+            while(currb){ 
+              if ((curr|0)>(mem32[currb>>2]|0)){
+                if (currb=mem32[(currb+(((hash2BucketSize+1)|0)<<2)|0)>>2]|0){
+                  curr=1;
+                  `+combound+`
+                }
+                else
+                 break;
+              }else{
                 `+combound+`
               }
-              else
-               break;
-            }else{
-              `+combound+`
-            }
-            if ((trav_`+this.fromA[0]+`|0)<0) {curr=curr+1|0; continue;} 
-            if (`+daConts+`){
-              ntrav_`+this.fromA[0]+`=trav_`+this.fromA[0]+`;
-              if (((redo|0)<0)&(!alarm)){
-                redo=hki;
-                producable=0;
-                break;
-              }
-              redo=hki;
+              `+excp2s+`
               curr=curr+1|0;
-              continue;
             }
-            if (alarm){
-              mem32[((currb+(curr<<2))|0)>>2]=-1;
-            }
-            `+execp2s+`
-            curr=curr+1|0;
           }
         }
         `+postexek+`      
@@ -764,7 +759,7 @@ function Afterburner(){
    looper=extractfrom(all,'loop');
    filter=extractfrom(all,'filter');
    execs=extractfrom(all,'exec');
-   execp2s=extractfrom(all,'execp2');
+   excp2s=extractfrom(all,'excp2');
    postp1=extractfrom(all,'postp1');
    postexek=extractfrom(all,'postexek');
    //postexekp2=extractfrom(all,'postexekp2');
@@ -783,7 +778,7 @@ function Afterburner(){
    ret=ret+prepend+'/*prepend*/';
    ret=ret+looper+'/*looper*/';
    ret=ret+filter+'/*filter*/';
-   ret=ret+execp2s+'}}/*2 pass aggs*/';
+   ret=ret+excp2s+'}}/*2 pass aggs*/';
 
    if (this.aggsA.length>0)
      ret=ret+postexek+'/*postexek*/';
@@ -840,6 +835,7 @@ function Afterburner(){
   var storedB=env.storedB|0;
   var malloc_ctr=0;
   var hashBitFilter=env.hashBitFilter|0;
+  var alarmingKeysp=env.alarmingKeysp|0;
   var hdbsize32=env.hdbsize32|0;
   var h1bb=env.h1bb|0;
   var h2bb=env.h2bb|0;
@@ -887,6 +883,7 @@ function Afterburner(){
   var isintmpstr=0;
   var dirtybyte=0;
   var aggpass=0;
+  var alarmingKeyCounter=0;
   var reinintcurrb=0;
   `+vars.join('\n')+`
   `+core+`
@@ -975,6 +972,7 @@ function Afterburner(){
 env={'temps':temps,
 'storedB':storedB,
 'hashBitFilter':hashBitFilter,
+'alarmingKeysp':alarmingKeysp,
 'hdbsize32':hdbsize32,
 'h1bb':h1bb,
 'h2bb':h2bb,
@@ -1766,11 +1764,11 @@ function _variance(p){
   preexek:`+varnamecount+`=0.0;::
   preexek:`+varerror2sum+`=0.0;::
   exec:`+varnamesum+`=`+varnamesum+`+(`+bound+`);::
-  execp2:`+varnameerror+`=`+varnameavg+`-(`+ bound  +`);::
+  excp2:`+varnameerror+`=`+varnameavg+`-(`+ bound  +`);::
   execg:`+varnamesum+`=`+varnamesum+`+(`+bound+`);::
   execg2:`+varnameerror+`=`+varnameavg+`-(`+ bound  +`);::
   exec:`+varnamecount+`=`+varnamecount+`+1.0;::
-  execp2:`+varerror2sum+`=`+varerror2sum+`+(`+ varnameerror  +`*`+ varnameerror + `);::
+  excp2:`+varerror2sum+`=`+varerror2sum+`+(`+ varnameerror  +`*`+ varnameerror + `);::
   execg:`+varnamecount+`=`+varnamecount+`+1.0;::
   execg2:`+varerror2sum+`=`+varerror2sum+`+(`+ varnameerror  +`*`+ varnameerror + `);::
   postp1:`+varnameavg+`=+(+(` +  varnamesum  + `)/ +(` + varnamecount + `)); aggpass=1;::
@@ -1815,7 +1813,7 @@ function _covariance(p1,p2){
   execg:`+varnamesum1+`=`+varnamesum1+`+(`+bound1+`);::
   execg:`+varnamesum2+`=`+varnamesum2+`+(`+bound2+`);::
   exec:`+varnamecount+`=`+varnamecount+`+1.0;::
-  execp2:`+varerrormulsum+`=`+varerrormulsum+`+((`+ varnameavg1+`-(`+ bound1 +`)) * (`+ varnameavg2+`-(`+ bound2 +`)));::
+  excp2:`+varerrormulsum+`=`+varerrormulsum+`+((`+ varnameavg1+`-(`+ bound1 +`)) * (`+ varnameavg2+`-(`+ bound2 +`)));::
   execg:`+varnamecount+`=`+varnamecount+`+1.0;::
   execg2:`+varerrormulsum+`=`+varerrormulsum+`+((`+ varnameavg1+`-(`+ bound1 +`)) * (`+ varnameavg2+`-(`+ bound2 +`)));::
   postp1:`+varnameavg1+`=+(+(` +  varnamesum1  + `)/ +(` + varnamecount + `)); aggpass=1;::
