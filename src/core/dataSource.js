@@ -275,6 +275,9 @@ handyColTypes["adult"]=[
 2
 ];
 
+handyColNames["postsecondary"]=["id", "p1", "workclass", "p2", "status", "occupation", "relationship", "race", "sex", "country"];
+handyColTypes["postsecondary"]=[0,0,2,0,2,2,2,2,2,2];
+
 handyColNames["income"]=[
 "id", 
 "p",
@@ -399,6 +402,15 @@ handyColTypes["fridge"]=[0,2,2,2,0];
     this.useFnameHints(this.fname);
     this.parser=new urlParser(urls,funk);
   }
+  this.fromSchema = function(tabname){
+      console.log('@fromSchema');
+      this.type='schema'
+      this.name=tabname.substring(1);
+      this.numrows=0;
+      this.numcols=0;
+      this.colnames=[];
+      this.coltypes=[];
+  }
   this.fromFile = function(fname){
       var nodeFileParser= require('./nodeFileParser.js');
       this.type='realpath';
@@ -420,6 +432,8 @@ handyColTypes["fridge"]=[0,2,2,2,0];
     this.fromHTML5File(src,funk);
   } else if (src instanceof URLList){
     this.fromURL(src,funk);
+  } else if (typeof src == 'string' && (src[0]=='#')){
+    this.fromSchema(src);
   } else if (typeof src == 'string' && (inNode)){
     this.fromFile(src);
   } else if ((typeof src == "object" && typeof src.data == "object") ||

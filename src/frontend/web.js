@@ -212,6 +212,17 @@ function exploreTable(tabname){
   $('#exploreTab tbody').on("click","td",function(e){Ei.bcell(this)});
   $('#exploreTab thead').on("click","th",function(e){Ei.hcell(this)});
 }
+function cExploreTable(tabname){
+  if (typeof tabname == 'undefined')
+    tabname= daSchema.tables[daSchema.tables.length-1].name;
+  CEi= new CExplore(tabname);
+  var econs=document.getElementById("econsole");
+  clearElement(econs);
+  econs.appendChild(CEi.toHTMLTable());
+  $('#exploreTab tbody').on("click","td",function(e){CEi.bcell(this)});
+  $('#exploreTab thead').on("click","th",function(e){CEi.hcell(this)});
+}
+
 //Prettyrint sql
 function ppSQLstr(sqlstr){
   sqlstr=sqlstr.replace(/\/\*CLOSED SQL\*\//g,'');

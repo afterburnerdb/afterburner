@@ -88,7 +88,28 @@ function aSchema(){
     }
     return table2.numrows;
   }
-
+//CREATE
+  this.createTable=function(tabname){
+    var newtab= new aTable(new dataSource('#'+tabname));
+    this.addTable(newtab);
+  }
+//DROP
+  this.dropTable=function(tabname){
+    var tabindex=daSchema.tables.indexOf(daSchema.getTable('et'));
+    if (tabindex>-1)
+      daSchema.tables.splice(tabindex,1)
+   }
+//ALTER
+  this.addColIfNotExists=function(tabname,colname,coltype){
+    var tab=this.getTable(tabname);
+    return tab.addColIfNotExists(colname,coltype);
+  }
+//INSERT
+  this.insertValues=function(tabname,rowA){
+    var tab=this.getTable(tabname);
+    return tab.insertValues(rowA);
+  }
+//UTIL
   this.toHTMLTable = function(opts) {
     opts=opts||{};
     var pg=newHTMLDIV({class:"panel-group", id:"accordion", role:"tablist", 'aria-multiselectable':"true"});

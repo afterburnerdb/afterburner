@@ -13,6 +13,7 @@ function Afterburner(){
     uniqueVarCounter=0;
     this.fromA=[];
     this.joinA=[];
+    this.loopA=[];
     this.onA=[];
     this.joinP='';
     this.hasljoin=0;
@@ -29,7 +30,27 @@ function Afterburner(){
     this.als2tab={};
     this.tab2als={};
     funs=[];
+    vars=[];
+    varnames=[];
     theGeneratingAB=this;
+    return this;
+  }
+  this.alterTable = function(tabname){
+    this.tabnameS=tabname;
+    return this;
+  }
+  this.createTable = function(tabname){
+    this.tabnameS=tabname;
+    daSchema.createTable(tabname);
+    return this;
+  }
+  this.dropTable = function(tabname){
+    this.tabnameS=tabname;
+    daSchema.dropTable(tabname);
+    return this;
+  }
+  this.insert = function(tabname){
+    this.tabnameS=tabname;
     return this;
   }
 //////////////////////////////////////////////////////////////////////////////
@@ -169,6 +190,17 @@ function Afterburner(){
   this.limit = function(param){
     this.limitA=param;
     return this;
+  }
+  this.addColIfNotExists=function(colname,coltype){
+    return daSchema.addColIfNotExists(this.tabnameS,colname,coltype);
+  }
+  this.addCol=function(colname,coltype){
+    daSchema.addColIfNotExists(this.tabnameS,colname,coltype);
+    return this;
+  }
+  this.values=function(rowA){
+    console.log("@values:"+rowA);
+    return daSchema.insertValues(this.tabnameS,rowA);
   }
 //////////////////////////////////////////////////////////////////////////////
 //EXPANDS
@@ -464,7 +496,7 @@ function Afterburner(){
    joiner=extractfrom(all,'join');
    grouper=extractfrom(all,'group');
    execs=extractfrom(all,'exec',null,'tempsptr');
-  postexek=extractfrom(all,'postexek');
+   postexek=extractfrom(all,'postexek');
    sorter=extractfrom(all,'sorter');
    limiter=extractfrom(all,'limit');
    ret="function runner(){"
@@ -610,6 +642,8 @@ function Afterburner(){
     filter=extractfrom(all,'filter');
     grouper=extractfrom(all,'group');
     execs=extractfrom(all,'exec',null,'tempsptr');
+    excp2s=extractfrom(all,'excp2');
+    postp1=extractfrom(all,'postp1');
     postexek=extractfrom(all,'postexek');
     sorter=extractfrom(all,'sorter');
     limiter=extractfrom(all,'limit');
@@ -633,7 +667,7 @@ function Afterburner(){
     }
     if((dirtybyte & (1<<(hki&15)))|((redo|0)>0)){ 
       currb=mem32[((h2bb+(hki<<2))|0)>>2]|0;
-      curr=1;producable=0; alarm=0;
+      curr=1;producable=0; alarm=0;aggpass=0;alarmingKeyCounter=0;
         if ((redo|0)>0){
           hki=redo;
           otrav_`+this.fromA[0]+`=ntrav_`+this.fromA[0]+`;
@@ -644,6 +678,7 @@ function Afterburner(){
           `+ocombound+`
 	}
       `+preexek+`
+      reinintcurrb=currb;
       while(currb){ 
         if ((curr|0)>(mem32[currb>>2]|0)){
           if (currb=mem32[(currb+(((hash2BucketSize+1)|0)<<2)|0)>>2]|0){
@@ -668,6 +703,8 @@ function Afterburner(){
           continue;
         }
         if (alarm){
+	  mem32[((alarmingKeysp+(alarmingKeyCounter<<2))|0)>>2]=mem32[((currb+(curr<<2))|0)>>2];
+          alarmingKeyCounter=(alarmingKeyCounter+1)|0;
 	  mem32[((currb+(curr<<2))|0)>>2]=-1;
         }
         `+execs+`
@@ -675,6 +712,32 @@ function Afterburner(){
         curr=curr+1|0;
       }
       if(producable){
+        `+postp1+`
+        if (aggpass){
+          if(alarm){
+            while(alarmingKeyCounter){
+              alarmingKeyCounter=(alarmingKeyCounter-1)|0;
+              trav_`+this.fromA[0]+`=mem32[((alarmingKeysp+(alarmingKeyCounter<<2))|0)>>2]|0;
+              `+excp2s+`
+            }
+          }else{
+            currb=reinintcurrb;curr=1;
+            while(currb){ 
+              if ((curr|0)>(mem32[currb>>2]|0)){
+                if (currb=mem32[(currb+(((hash2BucketSize+1)|0)<<2)|0)>>2]|0){
+                  curr=1;
+                  `+combound+`
+                }
+                else
+                 break;
+              }else{
+                `+combound+`
+              }
+              `+excp2s+`
+              curr=curr+1|0;
+            }
+          }
+        }
         `+postexek+`      
       }
     }
@@ -689,28 +752,37 @@ function Afterburner(){
    DEBUG('@build');
    var all=this.expandFrom();
    var filter_gen=this.expandFilter();
-   //all=all+filter_gen.dec;
    all=all+filter_gen.code;
    all=all+this.expandFields();
    dec=extractfrom(all,'dec');
    prepend=extractfrom(all,'pre');
-//   preexek=extractfrom(all,'preexek');
    looper=extractfrom(all,'loop');
    filter=extractfrom(all,'filter');
    execs=extractfrom(all,'exec');
+   excp2s=extractfrom(all,'excp2');
+   postp1=extractfrom(all,'postp1');
    postexek=extractfrom(all,'postexek');
+   //postexekp2=extractfrom(all,'postexekp2');
    sorter=extractfrom(all,'sorter');
    limiter=extractfrom(all,'limit');
    ret="function runner(){"
    ret=ret+dec+'/*dec*/';
    ret=ret+prepend+'/*prepend*/';
-//   ret=ret+preexek+'/*preexek*/';
    ret=ret+looper+'/*looper*/';
    ret=ret+filter+'/*filter*/';
    ret=ret+execs+'}/*execs*/';
+
+   ret=ret+postp1+'/*postp1*/';
+   ret=ret+'if(aggpass){';
+   ret=ret+dec.match('trav_.*?;').join(";")+'/*reinit travs*/';
+   ret=ret+prepend+'/*prepend*/';
+   ret=ret+looper+'/*looper*/';
+   ret=ret+filter+'/*filter*/';
+   ret=ret+excp2s+'}}/*2 pass aggs*/';
+
    if (this.aggsA.length>0)
      ret=ret+postexek+'/*postexek*/';
-//   ret=ret+'transpose('+sorter+');';
+
    ret=ret+limiter+'/*limiter*/';
    ret=ret+"return tempsptr|0;}";
     return ret;
@@ -763,6 +835,7 @@ function Afterburner(){
   var storedB=env.storedB|0;
   var malloc_ctr=0;
   var hashBitFilter=env.hashBitFilter|0;
+  var alarmingKeysp=env.alarmingKeysp|0;
   var hdbsize32=env.hdbsize32|0;
   var h1bb=env.h1bb|0;
   var h2bb=env.h2bb|0;
@@ -783,6 +856,8 @@ function Afterburner(){
   var mem16 = new global.Int16Array(mem);
   var mem32 = new global.Int32Array(mem);
   var memF32 = new global.Float32Array(mem);
+  var math_pow = global.Math.pow;
+  var math_log = global.Math.log;
   var redo=1;
   var producable=0;
   var alarm=0;
@@ -807,6 +882,10 @@ function Afterburner(){
   var odidonce=0;
   var isintmpstr=0;
   var dirtybyte=0;
+  var aggpass=0;
+  var alarmingKeyCounter=0;
+  var reinintcurrb=0;
+  `+vars.join('\n')+`
   `+core+`
   function hash_str(strp){
     strp=strp|0;
@@ -893,6 +972,7 @@ function Afterburner(){
 env={'temps':temps,
 'storedB':storedB,
 'hashBitFilter':hashBitFilter,
+'alarmingKeysp':alarmingKeysp,
 'hdbsize32':hdbsize32,
 'h1bb':h1bb,
 'h2bb':h2bb,
@@ -1007,6 +1087,7 @@ function tabSize(tabname){
 function bindCol(colname){
   var ocolname=colname;
   //if (parseFloat(colname) == colname && typeof colname == 'number') return colname;
+  if(varnames.indexOf(colname)>-1) return colname;
   if (typeof colname == 'number') return colname;
   if ((colname != null) && typeof colname == 'string' && colname.indexOf('pb')==0){
     if (colname.indexOf('pb$')==0)
@@ -1023,6 +1104,19 @@ function bindCol(colname){
   if (ctype==1)
     return '+(memF32[(('+cptr+' +(trav_'+col2trav(colname)+'<<2))|0)>>2])';
   badFSQL("@bindCol","could not bind:" + ocolname);
+}
+function bindColSoft(colname){
+  var bound=bindCol(colname);
+  if (typeof bound== 'undefined')
+    return;
+  if (bound[0]=='+'){
+    bound=bound.substring(2);
+    return bound.substring(0,bound.length-1);
+  } else if (bound[bound.lenght]==')' && bound[bound.length-1]=='0' && bound[bound.length-2]=='|'){
+    bound=bound.substring(2);
+    return bound.substring(0,bound.lenght-1);
+  }
+  return bound;
 }
 
 function obindCol(colname){
@@ -1081,7 +1175,7 @@ function extractfrom(fromtext,what,opt,filt){
   if (!fromtext) return ret;
   fromtext=fromtext.replace(new RegExp(what+ ":.*?"+filt+".*?::",'g'),'');
   if (!fromtext) return ret;
-  lines=fromtext.match(new RegExp(what+":.*?::",'g'))
+  var lines=fromtext.match(new RegExp(what+":.*?::",'g'))
   if (lines){
     for (var i=0;i<lines.length;i++)
       ret= ret+'\n'+lines[i].replace((new RegExp(what+":|::",'g')), "");
@@ -1246,6 +1340,8 @@ function qc(it){
     tables.push(it.als2tab[it.fromA[i]]);
   for(var i=0;i<it.joinA.length;i++)
     tables.push(it.als2tab[it.joinA[i]]);
+  for(var i=0;i<it.loopA.length;i++)
+    tables.push(it.als2tab[it.loopA[i]]);
   return {
            tabs: tables,
            als2tab: it.als2tab,
@@ -1299,6 +1395,7 @@ function coerceFloatIf(p){
   if (p.indexOf('.')>-1) return p;
   else if (p.indexOf('(+(')>-1) return p;
   else if (p.indexOf('+(memF32')>-1) return p;
+  else if (varnames.indexOf(p)>-1) return "(+(" + p + "))";
   else return "(+(" + p + "|0))";
 }
 //////////////////////////////////////////////////////////////////////////////
@@ -1353,6 +1450,15 @@ function _not(p1){
     ret= p1.substring(0,p1m) + "!(" + p1.substring(p1m+1) +")";
     return ret.replace(";)",");");
   }
+}
+function _null(){
+  return -666;
+}
+function _isnull(p1){
+  return _eq(p1,_null());
+}
+function _isnotnull(p1){
+  return _not(_eq(p1,_null()));
 }
 function _eq(p1,p2){
   return _compare('==',p1,p2);
@@ -1434,7 +1540,7 @@ function _compare(op,p1,p2){
   var p2t=typeCol(p2);
   var ret;
   if (p1b && p2b && p1t==2 && p2t==2 && op=='=='){
-    ret= '(mystrcp(' +p1b+ op + p2b+')|0)';
+    ret= '(mystrcmp(' +p1b+ ',' + p2b+')|0)';
   } else if (p1b && p2b){
     ret= '(' +coerceFloatIf(p1b)+ op + coerceFloatIf(p2b)+')';
   } else if (p1b){
@@ -1632,6 +1738,88 @@ function _avg(p){
   execg:`+varnamecount+`=`+varnamecount+`+1.0;::
   postexek:memF32[(temps+(tempsptr<<2))>>2]=+(+(` +  varnamesum  + `)/ +(` + varnamecount + `));tempsptr= (tempsptr + 1 )|0;::`;
 }
+function _variance(p){
+  if (theGeneratingAB.joinA.length>0){
+    console.log("does not support 2 pass aggs with join");
+    return;
+  }
+  var bound=bindCol(p);
+  var unique=uniqueVarCounter++;
+  var type= typeCol(p);
+  if ((type==0) || (type==3) || (type==4))
+    bound=coerceFloat(bound);
+  var tab= col2trav(p);
+  var varnamesum="variancesum"+unique;
+  var varnamecount="variancecount"+unique;
+  var varnameavg="avg"+unique;
+  var varnameerror="error"+unique;
+  var varerror2sum="error2sum"+unique;
+  return `dec:var `+varnamecount+`=0.0;::
+  dec:var `+varnamesum+`=0.0;::
+  dec:var `+varnameavg+`=0.0;::
+  dec:var `+varnameerror+`=0.0;::
+  dec:var `+varerror2sum+`=0.0;::
+  post:res.addCol2("variance(`+p+`)",1);::
+  preexek:`+varnamesum+`=0.0;::
+  preexek:`+varnamecount+`=0.0;::
+  preexek:`+varerror2sum+`=0.0;::
+  exec:`+varnamesum+`=`+varnamesum+`+(`+bound+`);::
+  excp2:`+varnameerror+`=`+varnameavg+`-(`+ bound  +`);::
+  execg:`+varnamesum+`=`+varnamesum+`+(`+bound+`);::
+  execg2:`+varnameerror+`=`+varnameavg+`-(`+ bound  +`);::
+  exec:`+varnamecount+`=`+varnamecount+`+1.0;::
+  excp2:`+varerror2sum+`=`+varerror2sum+`+(`+ varnameerror  +`*`+ varnameerror + `);::
+  execg:`+varnamecount+`=`+varnamecount+`+1.0;::
+  execg2:`+varerror2sum+`=`+varerror2sum+`+(`+ varnameerror  +`*`+ varnameerror + `);::
+  postp1:`+varnameavg+`=+(+(` +  varnamesum  + `)/ +(` + varnamecount + `)); aggpass=1;::
+  postexek:memF32[(temps+(tempsptr<<2))>>2]=+(+(` + varerror2sum + `)/ +(` + varnamecount + `));tempsptr= (tempsptr + 1 )|0; aggpass=0;::`;
+}
+function _covariance(p1,p2){
+  if (theGeneratingAB.joinA.length>0){
+    console.log("does not support 2 pass aggs with join");
+    return;
+  }
+  var bound1=bindCol(p1);
+  var bound2=bindCol(p2);
+  var unique=uniqueVarCounter++;
+  var type1= typeCol(p1);
+  var type2= typeCol(p2);
+  if ((type1==0) || (type1==3) || (type1==4))
+    bound1=coerceFloat(bound1);
+  if ((type2==0) || (type2==3) || (type2==4))
+    bound2=coerceFloat(bound2);
+
+  var tab1= col2trav(p1);
+  var tab2= col2trav(p2);
+  var varnamesum1="covarsum1"+unique;
+  var varnamesum2="covarsum2"+unique;
+  var varnamecount="covarcount"+unique;
+  var varnameavg1="avg1"+unique;
+  var varnameavg2="avg2"+unique;
+  var varerrormulsum="errormulsum"+unique;
+  return `dec:var `+varnamecount+`=0.0;::
+  dec:var `+varnamesum1+`=0.0;::
+  dec:var `+varnamesum2+`=0.0;::
+  dec:var `+varnameavg1+`=0.0;::
+  dec:var `+varnameavg2+`=0.0;::
+  dec:var `+varerrormulsum+`=0.0;::
+  post:res.addCol2("covariance(`+p1+','+p2+`)",1);::
+  preexek:`+varnamesum1+`=0.0;::
+  preexek:`+varnamesum2+`=0.0;::
+  preexek:`+varnamecount+`=0.0;::
+  preexek:`+varerrormulsum+`=0.0;::
+  exec:`+varnamesum1+`=`+varnamesum1+`+(`+bound1+`);::
+  exec:`+varnamesum2+`=`+varnamesum2+`+(`+bound2+`);::
+  execg:`+varnamesum1+`=`+varnamesum1+`+(`+bound1+`);::
+  execg:`+varnamesum2+`=`+varnamesum2+`+(`+bound2+`);::
+  exec:`+varnamecount+`=`+varnamecount+`+1.0;::
+  excp2:`+varerrormulsum+`=`+varerrormulsum+`+((`+ varnameavg1+`-(`+ bound1 +`)) * (`+ varnameavg2+`-(`+ bound2 +`)));::
+  execg:`+varnamecount+`=`+varnamecount+`+1.0;::
+  execg2:`+varerrormulsum+`=`+varerrormulsum+`+((`+ varnameavg1+`-(`+ bound1 +`)) * (`+ varnameavg2+`-(`+ bound2 +`)));::
+  postp1:`+varnameavg1+`=+(+(` +  varnamesum1  + `)/ +(` + varnamecount + `)); aggpass=1;::
+  postp1:`+varnameavg2+`=+(+(` +  varnamesum2  + `)/ +(` + varnamecount + `)); aggpass=1;::
+  postexek:memF32[(temps+(tempsptr<<2))>>2]=+(+(` + varerrormulsum + `)/ +(` + varnamecount + `));tempsptr= (tempsptr + 1 )|0; aggpass=0;::`;
+}
 function _date(p1){
   if (p1.indexOf('DATE') > -1){
     p1=p1.substring(p1.indexOf('DATE')+5);
@@ -1696,6 +1884,25 @@ function _mul(p1,p2){
 function _div(p1,p2){
   return _arith('/',p1,p2);
 }
+function _pow(p1,p2){
+  var p1b=bindCol(p1);
+  var p2b=bindCol(p2);
+  if (p1b && p2b)
+    return 'pb(math_pow(+('+p1b+'),(+(' + p2b+'))))';
+  else if (p1b)
+    return 'pb(math_pow(+('+p1b+'),(+(' + coerceFloat(p2)+'))))';
+  else if (p2b)
+    return 'pb(math_pow(+('+coerceFloat(p1)+'),(+(' + p2b+'))))';
+  else 
+    return 'pb(math_pow(+('+coerceFloat(p1)+'),(+(' + coerceFloat(p2)+'))))';
+}
+function _log2(p1){
+  var p1b=bindCol(p1);
+  if (p1b)
+    return 'pb((math_log(+('+p1b+'))*1.4426950408889634))';
+  else 
+    return 'pb(math_log(+('+coerceFloat(p1)+'))*1.4426950408889634)';
+}
 
 function _as(p1,al){
   var oNameI=p1.indexOf('"',p1.indexOf("addCol2",0));
@@ -1704,6 +1911,90 @@ function _as(p1,al){
     return p1.substring(0,oNameI+1) + al + p1.substring(oNamelI)
   }
   return 'as{'+p1+'~'+al+'}';
+}
+//UDF
+function _udf(p1, ...rest){
+  if (rest.length>0)
+    return p1 +"\n"+ _udf(rest[0], ...rest.slice(1));
+  else return p1;
+}
+function _integer(){
+  return 0;
+}
+function _float(){
+  return 1;
+}
+function _decvar(type){
+//  console.log("@_decvar: type"+type);
+  uniqueVarCounter++;
+  var varname='var' + uniqueVarCounter;
+  if (type==0)
+    vars.push("var "+varname + "=0;");
+  else if (type==1)
+    vars.push("var "+varname + "=0.0;");
+  varnames.push(varname);
+  return varname;
+}
+function _assign(p1,p2){
+//  console.log("@_assign: p1"+p1+ " p2:"+p2);
+  var p1b;
+  var p1t;
+  var p2b;
+  var p2t;
+  if (!isNaN(p1)){
+     p1b= p1;
+     p1t= 1;
+  }  else if(varnames.indexOf(p1)>-1){
+     p1b=p1;
+     p1t=1;    
+  }  else {
+    p1b=bindColSoft(p1);
+    p1t=typeCol(p1);
+  }
+  if (!isNaN(p2)){
+     p2b= '+('+p2+')';
+     p2t= 1;
+  } else if(varnames.indexOf(p2)>-1){
+     p2b=p2;
+     p2t=1;    
+  } else {
+    p2b=bindCol(p2);
+    p2t=typeCol(p2);
+  }
+  if ((p2t==0) || (p2t==3) || (p2t==4))
+    p2b=coerceFloat(p2b);
+//  }
+  return "exec:"+p1b + "=" + p2b+";::";
+}
+function _reftab(tabname){
+  var atab=theGeneratingAB.tabAliasif(tabname);
+  theGeneratingAB.loopA.push(atab.tab);
+}
+function _loop(tabname,code){
+  var atab=theGeneratingAB.tabAliasif(tabname);
+//  theGeneratingAB.loopA.push(atab.tab);
+  var tabLen=tabSize(atab.tab);
+  return `dec: var trav_`+atab.tab+`=0;::
+          exec:  trav_`+atab.tab+`=-1;::
+          exec:  while(1){trav_`+atab.tab+`=trav_`+atab.tab+`+1|0; if((trav_`+atab.tab+`|0)>=`+tabLen+`) break;::
+               `+code+`
+          exec:  }::`;
+}
+function _if(cond,code){
+  var condo=filterBuilder([cond]);
+  return condo.dec+`
+         exec:  `+condo.cond+`;if(`+condo.condvar+`){::
+         `+code+`
+         exec:  }::`;
+}
+function _ifelse(cond,code,code2){
+  var condo=filterBuilder([cond]);
+  return condo.dec+`
+         exec:  `+condo.cond+`;if(`+condo.condvar+`){::
+         `+code+`
+         exec: } else{::
+         `+code2+`
+         exec: } ::`;
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
