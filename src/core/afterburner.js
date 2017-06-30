@@ -1751,11 +1751,11 @@ function _variance(p){
   if ((type==0) || (type==3) || (type==4))
     bound=coerceFloat(bound);
   var tab= col2trav(p);
-  var varnamesum="avgsum"+unique
-  var varnamecount="avgcount"+unique
-  var varnameavg="avg"+unique
-  var varnameerror="error"+unique
-  var varerror2sum="error2sum"+unique
+  var varnamesum="variancesum"+unique;
+  var varnamecount="variancecount"+unique;
+  var varnameavg="avg"+unique;
+  var varnameerror="error"+unique;
+  var varerror2sum="error2sum"+unique;
   return `dec:var `+varnamecount+`=0.0;::
   dec:var `+varnamesum+`=0.0;::
   dec:var `+varnameavg+`=0.0;::
@@ -1775,6 +1775,52 @@ function _variance(p){
   execg2:`+varerror2sum+`=`+varerror2sum+`+(`+ varnameerror  +`*`+ varnameerror + `);::
   postp1:`+varnameavg+`=+(+(` +  varnamesum  + `)/ +(` + varnamecount + `)); aggpass=1;::
   postexek:memF32[(temps+(tempsptr<<2))>>2]=+(+(` + varerror2sum + `)/ +(` + varnamecount + `));tempsptr= (tempsptr + 1 )|0; aggpass=0;::`;
+}
+function _covariance(p1,p2){
+  if (theGeneratingAB.joinA.length>0){
+    console.log("does not support 2 pass aggs with join");
+    return;
+  }
+  var bound1=bindCol(p1);
+  var bound2=bindCol(p2);
+  var unique=uniqueVarCounter++;
+  var type1= typeCol(p1);
+  var type2= typeCol(p2);
+  if ((type1==0) || (type1==3) || (type1==4))
+    bound1=coerceFloat(bound1);
+  if ((type2==0) || (type2==3) || (type2==4))
+    bound2=coerceFloat(bound2);
+
+  var tab1= col2trav(p1);
+  var tab2= col2trav(p2);
+  var varnamesum1="covarsum1"+unique;
+  var varnamesum2="covarsum2"+unique;
+  var varnamecount="covarcount"+unique;
+  var varnameavg1="avg1"+unique;
+  var varnameavg2="avg2"+unique;
+  var varerrormulsum="errormulsum"+unique;
+  return `dec:var `+varnamecount+`=0.0;::
+  dec:var `+varnamesum1+`=0.0;::
+  dec:var `+varnamesum2+`=0.0;::
+  dec:var `+varnameavg1+`=0.0;::
+  dec:var `+varnameavg2+`=0.0;::
+  dec:var `+varerrormulsum+`=0.0;::
+  post:res.addCol2("covariance(`+p1+','+p2+`)",1);::
+  preexek:`+varnamesum1+`=0.0;::
+  preexek:`+varnamesum2+`=0.0;::
+  preexek:`+varnamecount+`=0.0;::
+  preexek:`+varerrormulsum+`=0.0;::
+  exec:`+varnamesum1+`=`+varnamesum1+`+(`+bound1+`);::
+  exec:`+varnamesum2+`=`+varnamesum2+`+(`+bound2+`);::
+  execg:`+varnamesum1+`=`+varnamesum1+`+(`+bound1+`);::
+  execg:`+varnamesum2+`=`+varnamesum2+`+(`+bound2+`);::
+  exec:`+varnamecount+`=`+varnamecount+`+1.0;::
+  execp2:`+varerrormulsum+`=`+varerrormulsum+`+((`+ varnameavg1+`-(`+ bound1 +`)) * (`+ varnameavg2+`-(`+ bound2 +`)));::
+  execg:`+varnamecount+`=`+varnamecount+`+1.0;::
+  execg2:`+varerrormulsum+`=`+varerrormulsum+`+((`+ varnameavg1+`-(`+ bound1 +`)) * (`+ varnameavg2+`-(`+ bound2 +`)));::
+  postp1:`+varnameavg1+`=+(+(` +  varnamesum1  + `)/ +(` + varnamecount + `)); aggpass=1;::
+  postp1:`+varnameavg2+`=+(+(` +  varnamesum2  + `)/ +(` + varnamecount + `)); aggpass=1;::
+  postexek:memF32[(temps+(tempsptr<<2))>>2]=+(+(` + varerrormulsum + `)/ +(` + varnamecount + `));tempsptr= (tempsptr + 1 )|0; aggpass=0;::`;
 }
 function _date(p1){
   if (p1.indexOf('DATE') > -1){
