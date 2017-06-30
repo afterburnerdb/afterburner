@@ -65,6 +65,7 @@ var storemax;
 //Hash tables
 var hashBits;
 var hashBitFilter;
+var alarmingKeysp;
 //
 var hash1BucketSize;
 var hash2BucketSize;
@@ -171,6 +172,7 @@ function init_store(size){
   storemax=h2db;
   storeready=1;
   latchmem();
+  alarmingKeysp=malloc((1024*1024)<<2);
 }
 function latchmem(){
   var asm_mod= (function (global, env, mem){
