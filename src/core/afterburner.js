@@ -711,7 +711,7 @@ function Afterburner(){
       }
       if(producable){
         `+postp1+`
-        if (aggpass==1){
+        if (aggpass){
           currb=reinintcurrb;curr=1;
           while(currb){ 
             if ((curr|0)>(mem32[currb>>2]|0)){
@@ -778,7 +778,7 @@ function Afterburner(){
    ret=ret+execs+'}/*execs*/';
 
    ret=ret+postp1+'/*postp1*/';
-   ret=ret+'if(aggpass==1){';
+   ret=ret+'if(aggpass){';
    ret=ret+dec.match('trav_.*?;').join(";")+'/*reinit travs*/';
    ret=ret+prepend+'/*prepend*/';
    ret=ret+looper+'/*looper*/';
@@ -1741,6 +1741,10 @@ function _avg(p){
   postexek:memF32[(temps+(tempsptr<<2))>>2]=+(+(` +  varnamesum  + `)/ +(` + varnamecount + `));tempsptr= (tempsptr + 1 )|0;::`;
 }
 function _variance(p){
+  if (theGeneratingAB.joinA.length>0){
+    console.log("does not support 2 pass aggs with join");
+    return;
+  }
   var bound=bindCol(p);
   var unique=uniqueVarCounter++;
   var type= typeCol(p);
@@ -1770,7 +1774,7 @@ function _variance(p){
   execg:`+varnamecount+`=`+varnamecount+`+1.0;::
   execg2:`+varerror2sum+`=`+varerror2sum+`+(`+ varnameerror  +`*`+ varnameerror + `);::
   postp1:`+varnameavg+`=+(+(` +  varnamesum  + `)/ +(` + varnamecount + `)); aggpass=1;::
-  postexek:memF32[(temps+(tempsptr<<2))>>2]=+(+(` + varerror2sum + `)/ +(` + varnamecount + `));tempsptr= (tempsptr + 1 )|0; aggpass=2;::`;
+  postexek:memF32[(temps+(tempsptr<<2))>>2]=+(+(` + varerror2sum + `)/ +(` + varnamecount + `));tempsptr= (tempsptr + 1 )|0; aggpass=0;::`;
 }
 function _date(p1){
   if (p1.indexOf('DATE') > -1){
