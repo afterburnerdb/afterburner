@@ -100,6 +100,30 @@ function newHTMLProgressBarGreenRed(ppct,opts){
   div.appendChild(div2);
   return div;
 }
+function newHTMLProgressBar4Colors(ppct1,ppct2,ppct3,ppct4,opts){
+  opts=opts||{};
+  opts['class']='progress';
+  var div = document.createElement('div');
+  setAtts(div,opts);
+  var opts2={class:'progress-bar progress-bar-success',role:'progressbar','aria-valuenow':'0','aria-valuemin':'0','aria-valuemax':'100',style:'width:'+ppct1+'%'};
+  var div2 = document.createElement('div');
+  setAtts(div2,opts2);
+  div.appendChild(div2);
+  var opts2={class:'progress-bar progress-bar-info',role:'progressbar','aria-valuenow':'0','aria-valuemin':'0','aria-valuemax':'100',style:'width:'+ppct2+'%'};
+  var div2 = document.createElement('div');
+  setAtts(div2,opts2);
+  div.appendChild(div2);
+  var opts2={class:'progress-bar progress-bar-warning',role:'progressbar','aria-valuenow':'0','aria-valuemin':'0','aria-valuemax':'100',style:'width:'+ppct3+'%'};
+  var div2 = document.createElement('div');
+  setAtts(div2,opts2);
+  div.appendChild(div2);
+  var opts2={class:'progress-bar progress-bar-danger',role:'progressbar','aria-valuenow':'0','aria-valuemin':'0','aria-valuemax':'100',style:'width:'+ppct4+'%'};
+  var div2 = document.createElement('div');
+  setAtts(div2,opts2);
+  div.appendChild(div2);
+  return div;
+}
+
 
 function newHTMLContainer(opts){
   opts=opts||{};

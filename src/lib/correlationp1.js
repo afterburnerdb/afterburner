@@ -30,7 +30,7 @@ function correlationTablep1(tabname, numpats, samplesize, att1, att2){
   this.sample;
   this.cet={patsp:0,
             patscount:0,
-            countv:[],
+            support:[],
             countm1v:[],
             countm2v:[],
             summ1v:[],
@@ -78,6 +78,7 @@ function correlationTablep1(tabname, numpats, samplesize, att1, att2){
     this.cet.lambdam1v.push([]);
     this.cet.lambdam2v.push([]);
 
+    this.cet.support.push(freqs[0]+freqs[1]+freqs[2]+freqs[3]);
     this.cet.countm1v[0][0]=freqs[0]+freqs[1];
     this.cet.countm1v[0][1]=freqs[2]+freqs[3];
     this.cet.countm2v[0][0]=freqs[0]+freqs[2];
@@ -121,10 +122,8 @@ function correlationTablep1(tabname, numpats, samplesize, att1, att2){
     qval=abdb.select().from(this.tab.name).field(_variance(att1),_variance(att2),_covariance(att1,att2)).toArray2();
     this.cet.pearson.push(calcPearson(qval[0],qval[1],qval[2]));
     //
-    this.D_em1v0p=malloc(this.tabsize<<2);
-    this.D_em1v1p=malloc(this.tabsize<<2);
-    this.D_em2v0p=malloc(this.tabsize<<2);
-    this.D_em2v1p=malloc(this.tabsize<<2);
+    this.D_em1p=malloc(this.tabsize<<2);
+    this.D_em2p=malloc(this.tabsize<<2);
 
     this.ps_countm1v0p=malloc(this.sofpofs<<2);
     this.ps_countm1v1p=malloc(this.sofpofs<<2);
@@ -141,11 +140,17 @@ function correlationTablep1(tabname, numpats, samplesize, att1, att2){
     this.ps_sumem2v0p=malloc(this.sofpofs<<2);
     this.ps_sumem2v1p=malloc(this.sofpofs<<2);
 
-    for (var i=0;i<this.tabsize;i++){
-      memF32[(this.D_em1v0p+(i<<2))>>2]=this.cet.avgm1v[0][0];
-      memF32[(this.D_em1v1p+(i<<2))>>2]=this.cet.avgm1v[0][1];
-      memF32[(this.D_em2v0p+(i<<2))>>2]=this.cet.avgm2v[0][0];
-      memF32[(this.D_em2v1p+(i<<2))>>2]=this.cet.avgm2v[0][1];
+    for (var rid=0;rid<this.tabsize;rid++){
+      var m1=mem32[(this.m1col + (rid<<2))>>2];
+      var m2=mem32[(this.m2col + (rid<<2))>>2];
+      if (m2==0)
+        memF32[(this.D_em1p+(rid<<2))>>2]=this.cet.avgm1v[0][0];
+      else if (m2==1)
+        memF32[(this.D_em1p+(rid<<2))>>2]=this.cet.avgm1v[0][1];
+      if (m1==0)
+        memF32[(this.D_em2p+(rid<<2))>>2]=this.cet.avgm2v[0][0];
+      else if (m1==1)
+        memF32[(this.D_em2p+(rid<<2))>>2]=this.cet.avgm2v[0][1];
     }
 
     this.kldivo=this.calcKLDIV();
@@ -155,9 +160,10 @@ function correlationTablep1(tabname, numpats, samplesize, att1, att2){
     for (var iter=1;iter<numpats;iter++){
       var tis0=get_time_ms();
       this.sample=this.sampleDraw(this.samplesize,this.tabsize);
+      console.log("this.sample:"+this.sample)
       tis+=get_time_ms()-tis0;
       tsxd+=this.sXd();
-      tit+=this.iterative_scalling();
+//      tit+=this.iterative_scalling();
     }
     console.log("sampling total time(ms):"+tis);
     console.log("sXd total time(ms):"+tsxd);
@@ -253,15 +259,8 @@ function correlationTablep1(tabname, numpats, samplesize, att1, att2){
     for (var rid=0; rid<this.tabsize; rid++){
       var m1=mem32[(this.m1col + (rid<<2))>>2];
       var m2=mem32[(this.m2col + (rid<<2))>>2];
-      if (m2==0)
-       e1=memF32[(this.D_em1v0p+(rid<<2))>>2];
-      else 
-       e1=memF32[(this.D_em1v1p+(rid<<2))>>2];
-
-      if (m1==0)
-       e2=memF32[(this.D_em2v0p+(rid<<2))>>2];
-      else 
-       e2=memF32[(this.D_em2v1p+(rid<<2))>>2];
+      var e1=memF32[(this.D_em1p+(rid<<2))>>2];
+      var e2=memF32[(this.D_em2p+(rid<<2))>>2];
 
       if (m1==1)
         kldivm1-=(Math.log2(e1));
@@ -328,14 +327,16 @@ function correlationTablep1(tabname, numpats, samplesize, att1, att2){
       memF32[(this.ps_sumem2v0p+(i<<2))>>2]=0;
       memF32[(this.ps_sumem2v1p+(i<<2))>>2]=0;
     }
-    var tmpm1,tmpm2,tmpq,tmpanc,curranc;
+    var tmpm1,tmpm2,tmpem1,tmpem2,tmpanc,curranc;
     var shade=0;
     var powit=0;
     for (var rid=0; rid<this.tabsize; rid++){
       for (var sid=0;sid<this.samplesize;sid++){
         tmpm1=mem32[(this.m1col + (rid<<2))>>2]
         tmpm2=mem32[(this.m2col + (rid<<2))>>2]
-        tmpq=memF32[(this.D_ep+(rid<<2))>>2];
+
+        tmpem1=memF32[(this.D_em1p+(rid<<2))>>2];
+        tmpem2=memF32[(this.D_em2p+(rid<<2))>>2]; 
 //
         var patval=0;
         var hamW=0;
@@ -358,37 +359,108 @@ function correlationTablep1(tabname, numpats, samplesize, att1, att2){
             shade^=powit;
           }
           var patid=(sid*this.two2d)+curranc;
-          memF32[(this.ps_sumpp + (patid<<2))>>2]=memF32[(this.ps_sumpp + (patid<<2))>>2]+tmpm1;
-          memF32[(this.ps_sumqp + (patid<<2))>>2]=memF32[(this.ps_sumqp + (patid<<2))>>2]+tmpq;
-          mem32[(this.ps_countp + (patid<<2))>>2]=mem32[(this.ps_countp + (patid<<2))>>2]+1;
+
+          if(tmpm2==0)
+            mem32[(this.ps_countm1v0p + (patid<<2))>>2]=mem32[(this.ps_countm1v0p + (patid<<2))>>2]+1;
+          else if(tmpm2==1)
+            mem32[(this.ps_countm1v1p + (patid<<2))>>2]=mem32[(this.ps_countm1v1p + (patid<<2))>>2]+1;
+          if(tmpm1==0)
+            mem32[(this.ps_countm2v0p + (patid<<2))>>2]=mem32[(this.ps_countm2v0p + (patid<<2))>>2]+1;
+          else if(tmpm1==1)
+            mem32[(this.ps_countm2v1p + (patid<<2))>>2]=mem32[(this.ps_countm2v1p + (patid<<2))>>2]+1;
+
+          if(tmpm2==0)
+            memF32[(this.ps_summ1v0p + (patid<<2))>>2]=memF32[(this.ps_summ1v0p + (patid<<2))>>2]+tmpm1;
+          else if(tmpm2==1)
+            memF32[(this.ps_summ1v1p + (patid<<2))>>2]=memF32[(this.ps_summ1v1p + (patid<<2))>>2]+tmpm1;
+          if(tmpm1==0)
+            memF32[(this.ps_summ2v0p + (patid<<2))>>2]=memF32[(this.ps_summ2v0p + (patid<<2))>>2]+tmpm2;
+          else if(tmpm1==1)
+            memF32[(this.ps_summ2v1p + (patid<<2))>>2]=memF32[(this.ps_summ2v1p + (patid<<2))>>2]+tmpm2;
+ 
+          if(tmpm2==0){
+            memF32[(this.ps_sumem1v0p + (patid<<2))>>2]=memF32[(this.ps_sumem1v0p + (patid<<2))>>2]+tmpem1;
+          }
+          else if(tmpm2==1){
+            memF32[(this.ps_sumem1v1p + (patid<<2))>>2]=memF32[(this.ps_sumem1v1p + (patid<<2))>>2]+tmpem1;
+          }
+          if(tmpm1==0)
+            memF32[(this.ps_sumem2v0p + (patid<<2))>>2]=memF32[(this.ps_sumem2v0p + (patid<<2))>>2]+tmpem2;
+          else if(tmpm1==1)
+            memF32[(this.ps_sumem2v1p + (patid<<2))>>2]=memF32[(this.ps_sumem2v1p + (patid<<2))>>2]+tmpem2;
         }
       }
     }
-    var maxcount;
-    var maxp;
-    var maxq;
+
     var maxgain=0;
     var maxpat;
-    var maxlambda=0;
     for (var pid=0;pid<this.sofpofs;pid++){
-      var count=mem32[(this.ps_countp + (pid<<2))>>2];
-      var p=memF32[(this.ps_sumpp + (pid<<2))>>2]/count;
-      var q=memF32[(this.ps_sumqp + (pid<<2))>>2]/count;
-      var gain=0;
-      if (p==1) gain= count*Math.log2(1/q);
-      else if (p==0) gain= count * ((1-p)*(Math.log2((1-p)/(1-q))));
-      else gain= count * ((p*Math.log2(p/q) ) + ((1-p)*(Math.log2((1-p)/(1-q)))));
+
+      var countm1v0=mem32[(this.ps_countm1v0p + (pid<<2))>>2];
+      var countm1v1=mem32[(this.ps_countm1v1p + (pid<<2))>>2];
+      var countm2v0=mem32[(this.ps_countm2v0p + (pid<<2))>>2];
+      var countm2v1=mem32[(this.ps_countm2v1p + (pid<<2))>>2];
+
+      //console.log("@pid:"+pid+" countm1v0:"+countm1v0+ " countm1v1:"+countm1v1+ " countm2v0:"+countm2v0+ " countm2v1:"+countm2v1);
+
+      //console.log("@pid:"+pid+" summ1v0:" + memF32[(this.ps_summ1v0p + (pid<<2))>>2] + " summ1v1:" + memF32[(this.ps_summ1v1p + (pid<<2))>>2] + 
+      //  " summ2v0:" + memF32[(this.ps_summ2v0p + (pid<<2))>>2] + " summ2v1:" + memF32[(this.ps_summ2v1p + (pid<<2))>>2]);
+
+      //console.log("@pid:"+pid+" sumem1v0:" + memF32[(this.ps_sumem1v0p + (pid<<2))>>2] + " sumem1v1:" + memF32[(this.ps_sumem1v1p + (pid<<2))>>2] + 
+      //  " sumem2v0:" + memF32[(this.ps_sumem2v0p + (pid<<2))>>2] + " sumem2v1:" + memF32[(this.ps_sumem2v1p + (pid<<2))>>2]);
+
+      var avgm1v0=memF32[(this.ps_summ1v0p + (pid<<2))>>2]/countm1v0;
+      var avgm1v1=memF32[(this.ps_summ1v1p + (pid<<2))>>2]/countm1v1;
+      var avgm2v0=memF32[(this.ps_summ2v0p + (pid<<2))>>2]/countm2v0;
+      var avgm2v1=memF32[(this.ps_summ2v1p + (pid<<2))>>2]/countm2v1;
+
+      //console.log("@pid:"+pid+" avgm1v0:" + avgm1v0 + " avgm1v1:" + avgm1v1 + " avgm2v0:" + avgm2v0 + " avgm2v1:" + avgm2v1);
+
+      var avgem1v0=memF32[(this.ps_sumem1v0p + (pid<<2))>>2]/countm1v0;
+      var avgem1v1=memF32[(this.ps_sumem1v1p + (pid<<2))>>2]/countm1v1;
+      var avgem2v0=memF32[(this.ps_sumem2v0p + (pid<<2))>>2]/countm2v0;
+      var avgem2v1=memF32[(this.ps_sumem2v1p + (pid<<2))>>2]/countm2v1;
+
+      //console.log("@pid:"+pid+" avgem1v0:" + avgem1v0 + " avgem1v1:" + avgem1v1 + " avgem2v0:" + avgem2v0 + " avgem2v1:" + avgem2v1);
+
+      var gain_m1v0;
+      var gain_m1v1;
+      var gain_m2v0;
+      var gain_m2v1;
+      
+      if (countm1v0==0) gain_m1v0=0;
+      else if (avgm1v0==1) gain_m1v0= countm1v0*Math.log2(1/avgem1v0);
+      else if (avgm1v0==0) gain_m1v0= countm1v0 * ((1-avgm1v0)*(Math.log2((1-avgm1v0)/(1-avgem1v0))));
+      else gain_m1v0= countm1v0 * ((avgm1v0*Math.log2(avgm1v0/avgem1v0) ) + ((1-avgm1v0)*(Math.log2((1-avgm1v0)/(1-avgem1v0)))));
+
+      if (countm1v1==0) gain_m1v1=0;
+      else if (avgm1v1==1) gain_m1v1= countm1v1*Math.log2(1/avgem1v1);
+      else if (avgm1v1==0) gain_m1v1= countm1v1 * ((1-avgm1v1)*(Math.log2((1-avgm1v1)/(1-avgem1v1))));
+      else gain_m1v1= countm1v1 * ((avgm1v1*Math.log2(avgm1v1/avgem1v1) ) + ((1-avgm1v1)*(Math.log2((1-avgm1v1)/(1-avgem1v1)))));
+
+      if (countm2v0==0) gain_m2v0=0;
+      else if (avgm2v0==1) gain_m2v0= countm2v0*Math.log2(1/avgem2v0);
+      else if (avgm2v0==0) gain_m2v0= countm2v0 * ((1-avgm2v0)*(Math.log2((1-avgm2v0)/(1-avgem2v0))));
+      else gain_m2v0= countm2v0 * ((avgm2v0*Math.log2(avgm2v0/avgem2v0) ) + ((1-avgm2v0)*(Math.log2((1-avgm2v0)/(1-avgem2v0)))));
+
+      if (countm2v1==0) gain_m2v1=0;
+      else if (avgm2v1==1) gain_m2v1= countm2v1*Math.log2(1/avgem2v1);
+      else if (avgm2v1==0) gain_m2v1= countm2v1 * ((1-avgm2v1)*(Math.log2((1-avgm2v1)/(1-avgem2v1))));
+      else gain_m2v1= countm2v1 * ((avgm2v1*Math.log2(avgm2v1/avgem2v1) ) + ((1-avgm2v1)*(Math.log2((1-avgm2v1)/(1-avgem2v1)))));
+
+      var gain= gain_m1v0+gain_m1v1+gain_m2v0+gain_m2v1;
+
+      //console.log("@pid:"+pid+" gain:"+gain+" gain_m1v0:"+gain_m1v0+" gain_m1v1:"+gain_m1v1+" gain_m2v0:"+gain_m2v0+" gain_m2v1:"+gain_m2v1);
+      if(isNaN(gain)) crashme3++;
+
       if (gain>maxgain){
+        console.log("@pid:"+pid+" gain:"+gain+" maxgain:"+maxgain);
         maxgain=gain;
         maxpat=pid;
-        maxcount=count;
-        maxq=q;
-        maxp=p;
-        if (p==0) maxlambda=-lilinf;
-        else if (p==1) maxlambda=lilinf;
-        else maxlambda=Math.log2(p/q);
       }
     }
+
+    //crashme2++;
 
     var aid=maxpat%this.two2d;
     var sid=Math.floor(maxpat/this.two2d);
@@ -401,10 +473,73 @@ function correlationTablep1(tabname, numpats, samplesize, att1, att2){
     this.cet.patscount++;
     //
 
-    this.cet.pearson.push(maxp);
-    this.cet.q.push(maxq);
-    this.cet.count.push(maxcount);
-    this.cet.lambdas.push(maxlambda);
+    var maxcountm1v0=mem32[(this.ps_countm1v0p + (maxpat<<2))>>2];
+    var maxcountm1v1=mem32[(this.ps_countm1v1p + (maxpat<<2))>>2];
+    var maxcountm2v0=mem32[(this.ps_countm2v0p + (maxpat<<2))>>2];
+    var maxcountm2v1=mem32[(this.ps_countm2v1p + (maxpat<<2))>>2];
+
+    var maxavgm1v0=memF32[(this.ps_summ1v0p + (maxpat<<2))>>2]/countm1v0;
+    var maxavgm1v1=memF32[(this.ps_summ1v1p + (maxpat<<2))>>2]/countm1v1;
+    var maxavgm2v0=memF32[(this.ps_summ2v0p + (maxpat<<2))>>2]/countm2v0;
+    var maxavgm2v1=memF32[(this.ps_summ2v1p + (maxpat<<2))>>2]/countm2v1;
+
+    var maxavgem1v0=memF32[(this.ps_sumem1v0p + (maxpat<<2))>>2]/countm1v0;
+    var maxavgem1v1=memF32[(this.ps_sumem1v1p + (maxpat<<2))>>2]/countm1v1;
+    var maxavgem2v0=memF32[(this.ps_sumem2v0p + (maxpat<<2))>>2]/countm2v0;
+    var maxavgem2v1=memF32[(this.ps_sumem2v1p + (maxpat<<2))>>2]/countm2v1;
+
+    var maxlambdam1v0=0;
+    var maxlambdam1v1=0;
+    var maxlambdam2v0=0;
+    var maxlambdam2v1=0;
+
+    if (maxavgm1v0==0) maxlambdam1v0=-lilinf;
+    else if (maxavgm1v0==1) maxlambdam1v0=lilinf;
+    else maxlambdam1v0=Math.log2(maxavgm1v0/maxlambdam1v0);
+
+    if (maxavgm1v1==0) maxlambdam1v1=-lilinf;
+    else if (maxavgm1v1==1) maxlambdam1v1=lilinf;
+    else maxlambdam1v1=Math.log2(maxavgm1v1/maxlambdam1v1);
+
+    if (maxavgm2v0==0) maxlambdam2v0=-lilinf;
+    else if (maxavgm2v0==1) maxlambdam2v0=lilinf;
+    else maxlambdam2v0=Math.log2(maxavgm2v0/maxlambdam2v0);
+
+    if (maxavgm2v1==0) maxlambdam2v1=-lilinf;
+    else if (maxavgm2v1==1) maxlambdam2v1=lilinf;
+    else maxlambdam2v1=Math.log2(maxavgm2v1/maxlambdam2v1);
+
+//-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    this.cet.countm1v.push([]);
+    this.cet.countm2v.push([]);
+    this.cet.summ1v.push([]);
+    this.cet.summ2v.push([]);
+    this.cet.avgm1v.push([]);
+    this.cet.avgm2v.push([]);
+    this.cet.lambdam1v.push([]);
+    this.cet.lambdam2v.push([]);
+    var pi=this.cet.patscount-1;
+
+    this.cet.countm1v[pi][0]=maxcountm1v0;
+    this.cet.countm1v[pi][1]=maxcountm1v1;
+    this.cet.countm2v[pi][0]=maxcountm2v0;
+    this.cet.countm2v[pi][1]=maxcountm2v1;
+
+    this.cet.summ1v[pi][0]=memF32[(this.ps_summ1v0p + (maxpat<<2))>>2];
+    this.cet.summ1v[pi][1]=memF32[(this.ps_summ1v1p + (maxpat<<2))>>2];
+    this.cet.summ2v[pi][0]=memF32[(this.ps_summ2v0p + (maxpat<<2))>>2];
+    this.cet.summ2v[pi][1]=memF32[(this.ps_summ2v1p + (maxpat<<2))>>2];
+
+    this.cet.avgm1v[pi][0]=maxavgm1v0;
+    this.cet.avgm1v[pi][1]=maxavgm1v1;
+    this.cet.avgm2v[pi][0]=maxavgm2v0;
+    this.cet.avgm2v[pi][1]=maxavgm2v1;
+
+    this.cet.lambdam1v[pi][0]=maxlambdam1v0;
+    this.cet.lambdam1v[pi][1]=maxlambdam1v1;
+    this.cet.lambdam2v[pi][0]=maxlambdam2v0;
+    this.cet.lambdam2v[pi][1]=maxlambdam2v1;
+//-==-=-=-=-=-=-=-=-=-=-=-=-=-
     var t1=get_time_ms();
     return t1-t0;
   }
@@ -423,7 +558,7 @@ function correlationTablep1(tabname, numpats, samplesize, att1, att2){
     var pats=[];
     for (var pid=0;pid<this.numpats;pid++){
       var newpat={ cols:[],
-                   count:-1,
+                   support:-1,
                    pearson:-1 };
       for (var cid=0; cid<this.numatts; cid++){
         if (mem32[(this.cet.patsp+(((pid*this.numatts)+cid)<<2))>>2] == -666)
@@ -440,6 +575,7 @@ function correlationTablep1(tabname, numpats, samplesize, att1, att2){
       newpat.count1v1= this.cet.countm1v[pid][1];
       newpat.count2v0= this.cet.countm2v[pid][0];
       newpat.count2v1= this.cet.countm2v[pid][1];
+      newpat.support=newpat.count1v0+ newpat.count1v1 + newpat.count2v0 + newpat.count2v1;
       pats.push(newpat);
     }
     return {  kldiv:this.kldivf,

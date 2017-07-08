@@ -9,10 +9,21 @@ function CExplore(tabname){
   this.selColNames=this.allColNames.slice(0);
   this.selColVals=[];
   this.selColNames.forEach((x)=>{this.selColVals.push('*')});
-  this.aggA=["_count('*')","_avg('p1')","_avg('p2')","_variance('p1')","_variance('p2')","_covariance('p1','p2')"];
-  this.valA=abdb.select().from(this.tabname).field(_count('*'),_avg('p1'),_avg('p2'),_variance('p1'),_variance('p2'),_covariance('p1','p2')).toArray2();
+  this.aggA=["_count('*')",
+    "_as(_countif('*',_and(_eq('p1',0),_eq('p2',0))),'m1=0,m2=0')",
+    "_as(_countif('*',_and(_eq('p1',0),_eq('p2',1))),'m1=0,m2=1')",
+    "_as(_countif('*',_and(_eq('p1',1),_eq('p2',0))),'m1=1,m2=0')",
+    "_as(_countif('*',_and(_eq('p1',1),_eq('p2',1))),'m1=1,m2=1')"];
+//    "_sumif('p1',_eq('p2',1))","_sumif('p2',_eq('p1',0))","_sumif('p2',_eq('p1',1))"];
+  this.valA=abdb.select().from(this.tabname).field(_count('*'),
+    _as(_countif('*',_and(_eq('p1',0),_eq('p2',0))),'m1=0,m2=0'),
+    _as(_countif('*',_and(_eq('p1',0),_eq('p2',1))),'m1=0,m2=1'),
+    _as(_countif('*',_and(_eq('p1',1),_eq('p2',0))),'m1=1,m2=0'),
+    _as(_countif('*',_and(_eq('p1',1),_eq('p2',1))),'m1=1,m2=1')
+  // _sumif('p1',_eq('p2',0)),_sumif('p1',_eq('p2',1)),_sumif('p2',_eq('p1',0)),_sumif('p2',_eq('p1',1))
+  ).toArray2();
   //
-  this.cet= new correlationTablep1(tabname,1,16,"p1","p2");
+  this.cet= new correlationTablep1(tabname,2,16,"p1","p2");
 //Control panel
   this.cpAddDomCol=function(col){
     console.log("@cpAddDomCol col:"+col);
@@ -152,7 +163,7 @@ function CExplore(tabname){
 //    tr.appendChild(newHTMLTH("VARIANCE(p1)"));
 //    tr.appendChild(newHTMLTH("VARIANCE(p2)"));
 //    tr.appendChild(newHTMLTH("COVARIANCE(p1,p2)"));
-    tr.appendChild(newHTMLTH("pearson"));
+    tr.appendChild(newHTMLTH("distribution"));
     //tr.appendChild(newHTMLTH("EST(p)"));
     tr.appendChild(newHTMLTH(""));
     tr.appendChild(newHTMLTH("Explore"));
@@ -163,12 +174,17 @@ function CExplore(tabname){
       tr = body.insertRow(0);
       cetobj.pats[pid].cols.forEach((x)=>{tr.appendChild(newHTMLTD(x))});
       tr.appendChild(newHTMLTD(""));
-      tr.appendChild(newHTMLTD(cetobj.pats[pid].count));
-      tr.appendChild(newHTMLTD(cetobj.pats[pid].pearson.toFixed(2)));
+      tr.appendChild(newHTMLTD(cetobj.pats[pid].support));
+      //tr.appendChild(newHTMLTD(cetobj.pats[pid].pearson.toFixed(2)));
       var td = document.createElement('td');
-      //var pb=newHTMLProgressBarGreenRed((cetobj.pats[pid].pearson.toFixed(2)*100));
-      //td.appendChild(pb);
-      //tr.appendChild(td);
+      var pb=newHTMLProgressBar4Colors(
+        ((cetobj.pats[pid].count1v0/cetobj.pats[pid].support).toFixed(2)*100),
+        ((cetobj.pats[pid].count1v1/cetobj.pats[pid].support).toFixed(2)*100),
+        ((cetobj.pats[pid].count2v0/cetobj.pats[pid].support).toFixed(2)*100),
+        ((cetobj.pats[pid].count2v1/cetobj.pats[pid].support).toFixed(2)*100),
+      );
+      td.appendChild(pb);
+      tr.appendChild(td);
       tr.appendChild(newHTMLTH(""));
 
       var td = document.createElement('td');
@@ -207,7 +223,7 @@ function CExplore(tabname){
     $('#exploreTab thead').on("click","th",function(e){CEi.hcell(this)});
   }
 
-  this.printExploration=function (qeval){
+  this.printExploration=function(qeval){
     this.exploringQEval=qeval;
     var table=document.createElement('table');
     table.setAttribute('class',"table table-bordered table-condensed table-nonfluid table-striped table-hover");
@@ -217,13 +233,13 @@ function CExplore(tabname){
     var tr = thead.insertRow(0);
 
     for (var i=0;i<qeval.numcols;i++){
-        if(i==qeval.numcols-3)
-         tr.appendChild(newHTMLTH(""));
+       // if(i==qeval.numcols-3)
+       //  tr.appendChild(newHTMLTH(""));
         var th = document.createElement('th');
         th.appendChild(document.createTextNode(qeval.colnames[i]));
         tr.appendChild(th);
     }
-    tr.appendChild(newHTMLTH("pearson"));
+    tr.appendChild(newHTMLTH("distribution"));
     tr.appendChild(newHTMLTH(""));
     tr.appendChild(newHTMLTH("explore"));
 
@@ -233,8 +249,8 @@ function CExplore(tabname){
     for (var i=0;(i<qeval.numrows);i++){
       tr = document.createElement('tr');
       for (var ii=0;ii<qeval.numcols;ii++){
-        if(ii==qeval.numcols-3)
-         tr.appendChild(newHTMLTD(""));
+        //if(ii==qeval.numcols-3)
+        // tr.appendChild(newHTMLTD(""));
         var td = document.createElement('td');
         if ( qeval.coltypes[ii] ==0 )
           td.appendChild(document.createTextNode(Number.parseInt(qeval.array2[(i*qeval.numcols)+ii])));
@@ -247,12 +263,17 @@ function CExplore(tabname){
         tr.appendChild(td);
       }
       var td = document.createElement('td');
-      var vari1=qeval.array2[(i*qeval.numcols)+(qeval.numcols-3)];
-      var vari2=qeval.array2[(i*qeval.numcols)+(qeval.numcols-2)];
-      var covar=qeval.array2[(i*qeval.numcols)+(qeval.numcols-1)];
-      var pearson=calcPearson(vari1,vari2,covar).toFixed(2);
-      var pb=newHTMLP(pearson);
-      //var pb=newHTMLProgressBarGreenRed();
+      //var vari1=qeval.array2[(i*qeval.numcols)+(qeval.numcols-3)];
+      //var vari2=qeval.array2[(i*qeval.numcols)+(qeval.numcols-2)];
+      //var covar=qeval.array2[(i*qeval.numcols)+(qeval.numcols-1)];
+      //var pearson=calcPearson(vari1,vari2,covar).toFixed(2);
+      //var pb=newHTMLP(pearson);
+      var pb=newHTMLProgressBar4Colors(
+        (qeval.array2[(i*qeval.numcols)+(qeval.numcols-4)]/qeval.array2[(i*qeval.numcols)+(qeval.numcols-5)]).toFixed(2)*100,
+        (qeval.array2[(i*qeval.numcols)+(qeval.numcols-3)]/qeval.array2[(i*qeval.numcols)+(qeval.numcols-5)]).toFixed(2)*100,
+        (qeval.array2[(i*qeval.numcols)+(qeval.numcols-2)]/qeval.array2[(i*qeval.numcols)+(qeval.numcols-5)]).toFixed(2)*100,
+        (qeval.array2[(i*qeval.numcols)+(qeval.numcols-1)]/qeval.array2[(i*qeval.numcols)+(qeval.numcols-5)]).toFixed(2)*100,
+      );
       td.appendChild(pb);
       tr.appendChild(td);
       tr.appendChild(newHTMLTH(""));
