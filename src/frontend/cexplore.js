@@ -158,10 +158,10 @@ function CExplore(tabname){
     this.selColNames.forEach((x)=>{tr.appendChild(newHTMLTH(x))});
     tr.appendChild(newHTMLTH(""));
     tr.appendChild(newHTMLTH("COUNT(*)"));
-//    tr.appendChild(newHTMLTH("AVG(p1)"));
-//    tr.appendChild(newHTMLTH("AVG(p2)"));
-//    tr.appendChild(newHTMLTH("VARIANCE(p1)"));
-//    tr.appendChild(newHTMLTH("VARIANCE(p2)"));
+    tr.appendChild(newHTMLTH("m1=0,m2=0"));
+    tr.appendChild(newHTMLTH("m1=0,m2=1"));
+    tr.appendChild(newHTMLTH("m1=1,m2=0"));
+    tr.appendChild(newHTMLTH("m1=1,m2=1"));
 //    tr.appendChild(newHTMLTH("COVARIANCE(p1,p2)"));
     tr.appendChild(newHTMLTH("distribution"));
     //tr.appendChild(newHTMLTH("EST(p)"));
@@ -175,13 +175,17 @@ function CExplore(tabname){
       cetobj.pats[pid].cols.forEach((x)=>{tr.appendChild(newHTMLTD(x))});
       tr.appendChild(newHTMLTD(""));
       tr.appendChild(newHTMLTD(cetobj.pats[pid].support));
+      tr.appendChild(newHTMLTD(cetobj.pats[pid].freqsv0v0));
+      tr.appendChild(newHTMLTD(cetobj.pats[pid].freqsv0v1));
+      tr.appendChild(newHTMLTD(cetobj.pats[pid].freqsv1v0));
+      tr.appendChild(newHTMLTD(cetobj.pats[pid].freqsv1v1));
       //tr.appendChild(newHTMLTD(cetobj.pats[pid].pearson.toFixed(2)));
       var td = document.createElement('td');
       var pb=newHTMLProgressBar4Colors(
-        ((cetobj.pats[pid].count1v0/cetobj.pats[pid].support).toFixed(2)*100),
-        ((cetobj.pats[pid].count1v1/cetobj.pats[pid].support).toFixed(2)*100),
-        ((cetobj.pats[pid].count2v0/cetobj.pats[pid].support).toFixed(2)*100),
-        ((cetobj.pats[pid].count2v1/cetobj.pats[pid].support).toFixed(2)*100),
+        ((cetobj.pats[pid].freqsv0v0/cetobj.pats[pid].support).toFixed(2)*100),
+        ((cetobj.pats[pid].freqsv0v1/cetobj.pats[pid].support).toFixed(2)*100),
+        ((cetobj.pats[pid].freqsv1v0/cetobj.pats[pid].support).toFixed(2)*100),
+        ((cetobj.pats[pid].freqsv1v1/cetobj.pats[pid].support).toFixed(2)*100),
       );
       td.appendChild(pb);
       tr.appendChild(td);

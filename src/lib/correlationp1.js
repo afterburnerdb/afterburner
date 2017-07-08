@@ -31,6 +31,10 @@ function correlationTablep1(tabname, numpats, samplesize, att1, att2){
   this.cet={patsp:0,
             patscount:0,
             support:[],
+            freqsv0v0:[],
+            freqsv0v1:[],
+            freqsv1v0:[],
+            freqsv1v1:[],
             countm1v:[],
             countm2v:[],
             summ1v:[],
@@ -69,6 +73,10 @@ function correlationTablep1(tabname, numpats, samplesize, att1, att2){
 
     freqs=freqs.toArray2();
     console.log("freqs:"+freqs);
+    this.cet.freqsv0v0.push(freqs[0]);
+    this.cet.freqsv0v1.push(freqs[2]);
+    this.cet.freqsv1v0.push(freqs[1]);
+    this.cet.freqsv1v1.push(freqs[3]);
     this.cet.countm1v.push([]);
     this.cet.countm2v.push([]);
     this.cet.summ1v.push([]);
@@ -124,6 +132,11 @@ function correlationTablep1(tabname, numpats, samplesize, att1, att2){
     //
     this.D_em1p=malloc(this.tabsize<<2);
     this.D_em2p=malloc(this.tabsize<<2);
+
+    this.ps_freqsv0v0=malloc(this.sofpofs<<2);
+    this.ps_freqsv0v1=malloc(this.sofpofs<<2);
+    this.ps_freqsv1v0=malloc(this.sofpofs<<2);
+    this.ps_freqsv1v1=malloc(this.sofpofs<<2);
 
     this.ps_countm1v0p=malloc(this.sofpofs<<2);
     this.ps_countm1v1p=malloc(this.sofpofs<<2);
@@ -312,6 +325,11 @@ function correlationTablep1(tabname, numpats, samplesize, att1, att2){
   this.sXd=function(){
     var t0=get_time_ms();
     for (var i=0; i<this.sofpofs;i++){
+      mem32[(this.ps_freqsv0v0+(i<<2))>>2]=0;
+      mem32[(this.ps_freqsv0v1+(i<<2))>>2]=0;
+      mem32[(this.ps_freqsv1v0+(i<<2))>>2]=0;
+      mem32[(this.ps_freqsv1v1+(i<<2))>>2]=0;
+
       mem32[(this.ps_countm1v0p+(i<<2))>>2]=0;
       mem32[(this.ps_countm1v1p+(i<<2))>>2]=0;
       mem32[(this.ps_countm2v0p+(i<<2))>>2]=0;
@@ -359,6 +377,16 @@ function correlationTablep1(tabname, numpats, samplesize, att1, att2){
             shade^=powit;
           }
           var patid=(sid*this.two2d)+curranc;
+
+
+          if((tmpm1==0)&(tmpm2==0))
+            mem32[(this.ps_freqsv0v0 + (patid<<2))>>2]=mem32[(this.ps_freqsv0v0 + (patid<<2))>>2]+1;
+          else if((tmpm1==0)&(tmpm2==1)) 
+            mem32[(this.ps_freqsv0v1 + (patid<<2))>>2]=mem32[(this.ps_freqsv0v1 + (patid<<2))>>2]+1;
+          else if((tmpm1==1)&(tmpm2==0)) 
+            mem32[(this.ps_freqsv1v0 + (patid<<2))>>2]=mem32[(this.ps_freqsv1v0 + (patid<<2))>>2]+1;
+          else if((tmpm1==1)&(tmpm2==1)) 
+            mem32[(this.ps_freqsv1v1 + (patid<<2))>>2]=mem32[(this.ps_freqsv1v1 + (patid<<2))>>2]+1;
 
           if(tmpm2==0)
             mem32[(this.ps_countm1v0p + (patid<<2))>>2]=mem32[(this.ps_countm1v0p + (patid<<2))>>2]+1;
@@ -472,6 +500,10 @@ function correlationTablep1(tabname, numpats, samplesize, att1, att2){
       }
     this.cet.patscount++;
     //
+    var maxfreqsv0v0=mem32[(this.ps_freqsv0v0 + (maxpat<<2))>>2];
+    var maxfreqsv0v1=mem32[(this.ps_freqsv0v1 + (maxpat<<2))>>2];
+    var maxfreqsv1v0=mem32[(this.ps_freqsv1v0 + (maxpat<<2))>>2];
+    var maxfreqsv1v1=mem32[(this.ps_freqsv1v1 + (maxpat<<2))>>2];
 
     var maxcountm1v0=mem32[(this.ps_countm1v0p + (maxpat<<2))>>2];
     var maxcountm1v1=mem32[(this.ps_countm1v1p + (maxpat<<2))>>2];
@@ -510,6 +542,11 @@ function correlationTablep1(tabname, numpats, samplesize, att1, att2){
     else maxlambdam2v1=Math.log2(maxavgm2v1/maxlambdam2v1);
 
 //-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    this.cet.freqsv0v0.push(maxfreqsv0v0);
+    this.cet.freqsv0v1.push(maxfreqsv0v1);
+    this.cet.freqsv1v0.push(maxfreqsv1v0);
+    this.cet.freqsv1v1.push(maxfreqsv1v1);
+
     this.cet.countm1v.push([]);
     this.cet.countm2v.push([]);
     this.cet.summ1v.push([]);
@@ -575,7 +612,11 @@ function correlationTablep1(tabname, numpats, samplesize, att1, att2){
       newpat.count1v1= this.cet.countm1v[pid][1];
       newpat.count2v0= this.cet.countm2v[pid][0];
       newpat.count2v1= this.cet.countm2v[pid][1];
-      newpat.support=newpat.count1v0+ newpat.count1v1 + newpat.count2v0 + newpat.count2v1;
+      newpat.freqsv0v0=this.cet.freqsv0v0[pid];
+      newpat.freqsv0v1=this.cet.freqsv0v1[pid];
+      newpat.freqsv1v0=this.cet.freqsv1v0[pid];
+      newpat.freqsv1v1=this.cet.freqsv1v1[pid];
+      newpat.support=newpat.freqsv0v0+ newpat.freqsv0v1 + newpat.freqsv1v0 + newpat.freqsv1v1;
       pats.push(newpat);
     }
     return {  kldiv:this.kldivf,
