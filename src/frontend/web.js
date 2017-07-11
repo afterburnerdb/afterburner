@@ -101,6 +101,13 @@ function newHTMLProgressBarGreenRed(ppct,opts){
   return div;
 }
 function newHTMLProgressBar4Colors(ppct1,ppct2,ppct3,ppct4,opts){
+  console.log("@newHTMLProgressBar4Colors:"+ppct1+"|"+ppct2+"|"+ppct3+"|"+ppct4);
+  if ((ppct1+ppct2+ppct3+ppct4) > 100)
+    if (ppct1>1) ppct1=ppct1-1;
+    else if (ppct2>1) ppct2=ppct2-1;
+    else if (ppct3>1) ppct3=ppct3-1;
+    else if (ppct4>1) ppct4=ppct4-1;
+
   opts=opts||{};
   opts['class']='progress';
   var div = document.createElement('div');

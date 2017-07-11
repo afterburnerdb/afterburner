@@ -39,17 +39,15 @@ function correlationTablep1(tabname, numpats, samplesize, att1, att2){
             countm2v:[],
             summ1v:[],
             summ2v:[],
+            sumem1v:[],
+            sumem2v:[],
             avgm1v:[],
             avgm2v:[],
+            avgem1v:[],
+            avgem2v:[],
             lambdam1v:[],
             lambdam2v:[],
             pearson:[]};
-  //this.kldivm1o=0;
-  //this.kldivm2o=0;
-  //this.kldivo=0;
-  //this.kldivm1f=-1;
-  //this.kldivm2f=-1;
-  //this.kldivf.m1=-1;
   this.cet;
   lilinf=20;
   //
@@ -81,8 +79,12 @@ function correlationTablep1(tabname, numpats, samplesize, att1, att2){
     this.cet.countm2v.push([]);
     this.cet.summ1v.push([]);
     this.cet.summ2v.push([]);
+    this.cet.sumem1v.push([]);
+    this.cet.sumem2v.push([]);
     this.cet.avgm1v.push([]);
     this.cet.avgm2v.push([]);
+    this.cet.avgem1v.push([]);
+    this.cet.avgem2v.push([]);
     this.cet.lambdam1v.push([]);
     this.cet.lambdam2v.push([]);
 
@@ -97,35 +99,52 @@ function correlationTablep1(tabname, numpats, samplesize, att1, att2){
     this.cet.summ2v[0][0]=(freqs[0]*this.att2vals[0]) + (freqs[2]*this.att2vals[1]);
     this.cet.summ2v[0][1]=(freqs[1]*this.att2vals[0]) + (freqs[3]*this.att2vals[1]);
 
+    this.cet.sumem1v[0][0]=(freqs[0]*this.att1vals[0]) + (freqs[1]*this.att1vals[1]);
+    this.cet.sumem1v[0][1]=(freqs[2]*this.att1vals[0]) + (freqs[3]*this.att1vals[1]);
+    this.cet.sumem2v[0][0]=(freqs[0]*this.att2vals[0]) + (freqs[2]*this.att2vals[1]);
+    this.cet.sumem2v[0][1]=(freqs[1]*this.att2vals[0]) + (freqs[3]*this.att2vals[1]);
+
+    //console.log("avg init:"+
+    //this.cet.avgm1v[0][0]+","+
+    //this.cet.avgm1v[0][1]+","+
+    //this.cet.avgm2v[0][0]+","+
+    //this.cet.avgm2v[0][1]+"]");
+
     this.cet.avgm1v[0][0]=this.cet.summ1v[0][0]/this.cet.countm1v[0][0];
     this.cet.avgm1v[0][1]=this.cet.summ1v[0][1]/this.cet.countm1v[0][1];
     this.cet.avgm2v[0][0]=this.cet.summ2v[0][0]/this.cet.countm2v[0][0];
     this.cet.avgm2v[0][1]=this.cet.summ2v[0][1]/this.cet.countm2v[0][1];
+
+    this.cet.avgem1v[0][0]=this.cet.sumem1v[0][0]/this.cet.countm1v[0][0];
+    this.cet.avgem1v[0][1]=this.cet.sumem1v[0][1]/this.cet.countm1v[0][1];
+    this.cet.avgem2v[0][0]=this.cet.sumem2v[0][0]/this.cet.countm2v[0][0];
+    this.cet.avgem2v[0][1]=this.cet.sumem2v[0][1]/this.cet.countm2v[0][1];
+
 
     this.cet.lambdam1v[0][0]=Math.log2(this.cet.avgm1v[0][0]/(1-this.cet.avgm1v[0][0]));
     this.cet.lambdam1v[0][1]=Math.log2(this.cet.avgm1v[0][1]/(1-this.cet.avgm1v[0][1]));
     this.cet.lambdam2v[0][0]=Math.log2(this.cet.avgm2v[0][0]/(1-this.cet.avgm2v[0][0]));
     this.cet.lambdam2v[0][1]=Math.log2(this.cet.avgm2v[0][1]/(1-this.cet.avgm2v[0][1]));
 
-    console.log("this.cet.countm1v[0][0]:"+this.cet.countm1v[0][0]);
-    console.log("this.cet.countm1v[0][1]:"+this.cet.countm1v[0][1]);
-    console.log("this.cet.countm2v[0][0]:"+this.cet.countm2v[0][0]);
-    console.log("this.cet.countm2v[0][1]:"+this.cet.countm2v[0][1]);
+    //console.log("this.cet.countm1v[0][0]:"+this.cet.countm1v[0][0]);
+    //console.log("this.cet.countm1v[0][1]:"+this.cet.countm1v[0][1]);
+    //console.log("this.cet.countm2v[0][0]:"+this.cet.countm2v[0][0]);
+    //console.log("this.cet.countm2v[0][1]:"+this.cet.countm2v[0][1]);
 
-    console.log("this.cet.summ1v[0][0]:"+this.cet.summ1v[0][0]);
-    console.log("this.cet.summ1v[0][1]:"+this.cet.summ1v[0][1]);
-    console.log("this.cet.summ2v[0][0]:"+this.cet.summ2v[0][0]);
-    console.log("this.cet.summ2v[0][1]:"+this.cet.summ2v[0][1]);
+    //console.log("this.cet.summ1v[0][0]:"+this.cet.summ1v[0][0]);
+    //console.log("this.cet.summ1v[0][1]:"+this.cet.summ1v[0][1]);
+    //console.log("this.cet.summ2v[0][0]:"+this.cet.summ2v[0][0]);
+    //console.log("this.cet.summ2v[0][1]:"+this.cet.summ2v[0][1]);
 
-    console.log("this.cet.avgm1v[0][0]:"+this.cet.avgm1v[0][0]);
-    console.log("this.cet.avgm1v[0][1]:"+this.cet.avgm1v[0][1]);
-    console.log("this.cet.avgm2v[0][0]:"+this.cet.avgm2v[0][0]);
-    console.log("this.cet.avgm2v[0][1]:"+this.cet.avgm2v[0][1]);
+    //console.log("this.cet.avgm1v[0][0]:"+this.cet.avgm1v[0][0]);
+    //console.log("this.cet.avgm1v[0][1]:"+this.cet.avgm1v[0][1]);
+    //console.log("this.cet.avgm2v[0][0]:"+this.cet.avgm2v[0][0]);
+    //console.log("this.cet.avgm2v[0][1]:"+this.cet.avgm2v[0][1]);
 
-    console.log("this.cet.lambdam1v[0][0]:"+this.cet.lambdam1v[0][0]);
-    console.log("this.cet.lambdam1v[0][1]:"+this.cet.lambdam1v[0][1]);
-    console.log("this.cet.lambdam2v[0][0]:"+this.cet.lambdam2v[0][0]);
-    console.log("this.cet.lambdam2v[0][1]:"+this.cet.lambdam2v[0][1]);
+    //console.log("this.cet.lambdam1v[0][0]:"+this.cet.lambdam1v[0][0]);
+    //console.log("this.cet.lambdam1v[0][1]:"+this.cet.lambdam1v[0][1]);
+    //console.log("this.cet.lambdam2v[0][0]:"+this.cet.lambdam2v[0][0]);
+    //console.log("this.cet.lambdam2v[0][1]:"+this.cet.lambdam2v[0][1]);
 
     qval=abdb.select().from(this.tab.name).field(_variance(att1),_variance(att2),_covariance(att1,att2)).toArray2();
     this.cet.pearson.push(calcPearson(qval[0],qval[1],qval[2]));
@@ -173,10 +192,9 @@ function correlationTablep1(tabname, numpats, samplesize, att1, att2){
     for (var iter=1;iter<numpats;iter++){
       var tis0=get_time_ms();
       this.sample=this.sampleDraw(this.samplesize,this.tabsize);
-      console.log("this.sample:"+this.sample)
       tis+=get_time_ms()-tis0;
       tsxd+=this.sXd();
-//      tit+=this.iterative_scalling();
+      tit+=this.iterative_scalling();
     }
     console.log("sampling total time(ms):"+tis);
     console.log("sXd total time(ms):"+tsxd);
@@ -203,36 +221,118 @@ function correlationTablep1(tabname, numpats, samplesize, att1, att2){
   this.iterative_scalling = function(){
     var t0=get_time_ms();
     var not_converged=1;
-    var suml;
+    var sumlm1;
+    var sumlm2;
     var doitagain=1;
+
+    console.log("pid0.ests:"+this.lambda2est(this.cet.lambdam1v[0][0])+","+
+      this.lambda2est(this.cet.lambdam1v[0][1])+","+
+      this.lambda2est(this.cet.lambdam2v[0][0])+","+
+      this.lambda2est(this.cet.lambdam2v[0][1])+"] counts:["+
+      this.cet.countm1v[0][0]+","+
+      this.cet.countm1v[0][1]+","+
+      this.cet.countm2v[0][0]+","+
+      this.cet.countm2v[0][1]+"]"); 
+    console.log("pid1.ests:"+this.lambda2est(this.cet.lambdam1v[1][0])+","+
+      this.lambda2est(this.cet.lambdam1v[1][1])+","+
+      this.lambda2est(this.cet.lambdam2v[1][0])+","+
+      this.lambda2est(this.cet.lambdam2v[1][1])+"] counts:["+
+      this.cet.countm1v[1][0]+","+
+      this.cet.countm1v[1][1]+","+
+      this.cet.countm2v[1][0]+","+
+      this.cet.countm2v[1][1]+"]"); 
+
+    var infloop=25;
     while(doitagain){
+      if(!infloop--) { console.log("infloop:"+infloop);break;}
       doitagain=0;
       for (var rid=0; rid<this.tabsize; rid++){
-        suml=0;
+        sumlm1=0;
+        sumlm2=0;
+
+        var m1=mem32[(this.m1col + (rid<<2))>>2];
+        var m2=mem32[(this.m2col + (rid<<2))>>2];
+
         for (var pid=0; pid<this.cet.patscount; pid++){
-          if (this.match(rid,pid))
-            suml+=this.cet.lambdas[pid];
+          if (this.match(rid,pid)){
+            if (m2==0)
+              sumlm1+=this.cet.lambdam1v[pid][0];
+            else if (m2==1)
+              sumlm1+=this.cet.lambdam1v[pid][1];
+            if (m1==0)
+              sumlm2+=this.cet.lambdam2v[pid][0];
+            else if (m1==1)
+              sumlm2+=this.cet.lambdam2v[pid][1];
+          }
         }
-        memF32[(this.D_ep+(rid<<2))>>2]=Math.pow(2, suml)/(Math.pow(2, suml)+1);
+
+        memF32[(this.D_em1p+(rid<<2))>>2]=Math.pow(2, sumlm1)/(Math.pow(2, sumlm1)+1);
+        memF32[(this.D_em2p+(rid<<2))>>2]=Math.pow(2, sumlm2)/(Math.pow(2, sumlm2)+1);
       }
+
       for (var pid=0; pid<this.cet.patscount;pid++){
-        this.cet.sumq[pid]=0;
+        this.cet.sumem1v[pid][0]=0;
+        this.cet.sumem1v[pid][1]=0;
+        this.cet.sumem2v[pid][0]=0;
+        this.cet.sumem2v[pid][1]=0;
       }
+
       for (var rid=0; rid<this.tabsize; rid++){
+        var m1=mem32[(this.m1col + (rid<<2))>>2];
+        var m2=mem32[(this.m2col + (rid<<2))>>2];
         for (var pid=0; pid<this.cet.patscount;pid++){
           if (this.match(rid,pid)){
-            this.cet.sumq[pid]+=memF32[(this.D_ep+(rid<<2))>>2];
+            if (m2==0)
+              this.cet.sumem1v[pid][0]+=memF32[(this.D_em1p+(rid<<2))>>2];
+            else if (m2==1)
+              this.cet.sumem1v[pid][1]+=memF32[(this.D_em1p+(rid<<2))>>2];
+            if (m1==0)
+              this.cet.sumem2v[pid][0]+=memF32[(this.D_em2p+(rid<<2))>>2];
+            else if (m1==1)
+              this.cet.sumem2v[pid][1]+=memF32[(this.D_em2p+(rid<<2))>>2];
           }
         }
       }
       for (var pid=0; pid<this.cet.patscount;pid++){
-        var oldlambda=this.cet.lambdas[pid];
-        this.cet.q[pid]=this.cet.sumq[pid]/this.cet.count[pid];
-        if (this.breakthresh(this.cet.pearson[pid],this.cet.q[pid],this.cet.count[pid])){
+        var oldlambdam1v0=this.cet.lambdam1v[pid][0];
+        var oldlambdam1v1=this.cet.lambdam1v[pid][1];
+        var oldlambdam2v0=this.cet.lambdam2v[pid][0];
+        var oldlambdam2v1=this.cet.lambdam2v[pid][1];
+
+        this.cet.avgem1v[pid][0]=this.cet.sumem1v[pid][0]/this.cet.countm1v[pid][0];
+        this.cet.avgem1v[pid][1]=this.cet.sumem1v[pid][1]/this.cet.countm1v[pid][1];
+        this.cet.avgem2v[pid][0]=this.cet.sumem2v[pid][0]/this.cet.countm2v[pid][0];
+        this.cet.avgem2v[pid][1]=this.cet.sumem2v[pid][1]/this.cet.countm2v[pid][1];
+
+        //console.log("======doitagain:========="+doitagain);
+
+        var tmpbt;
+        tmpbt=this.breakthresh(this.cet.avgm1v[pid][0],this.cet.avgem1v[pid][0],this.cet.countm1v[pid][0]);
+        if(tmpbt){
+          var newlambdam1v0=this.updateLambda(this.cet.avgm1v[pid][0], this.cet.avgem1v[pid][0],this.cet.lambdam1v[pid][0]);
+          this.cet.lambdam1v[pid][0]=newlambdam1v0;
           doitagain=true;
-        } else continue;
-        var newlambda=this.updateLambda(this.cet.pearson[pid],this.cet.q[pid],this.cet.lambdas[pid]);
-        this.cet.lambdas[pid]=newlambda;
+        }
+
+        tmpbt=this.breakthresh(this.cet.avgm1v[pid][1],this.cet.avgem1v[pid][1],this.cet.countm1v[pid][1]);
+        if(tmpbt){
+          var newlambdam1v1=this.updateLambda(this.cet.avgm1v[pid][1], this.cet.avgem1v[pid][1],this.cet.lambdam1v[pid][1]);
+          this.cet.lambdam1v[pid][1]=newlambdam1v1;
+          doitagain=true;
+        }
+
+        tmpbt=this.breakthresh(this.cet.avgm2v[pid][0],this.cet.avgem2v[pid][0],this.cet.countm2v[pid][0]);
+        if(tmpbt){
+          var newlambdam2v0=this.updateLambda(this.cet.avgm2v[pid][0], this.cet.avgem2v[pid][0],this.cet.lambdam2v[pid][0]);
+          this.cet.lambdam2v[pid][0]=newlambdam2v0;
+          doitagain=true;
+        }
+        tmpbt=this.breakthresh(this.cet.avgm2v[pid][1],this.cet.avgem2v[pid][1],this.cet.countm2v[pid][1]);
+        if(tmpbt){
+          var newlambdam2v1=this.updateLambda(this.cet.avgm2v[pid][1], this.cet.avgem2v[pid][1],this.cet.lambdam2v[pid][1]);
+          this.cet.lambdam2v[pid][1]=newlambdam2v1;
+          doitagain=true;
+        }
       }
     }
     var t1=get_time_ms();
@@ -249,7 +349,7 @@ function correlationTablep1(tabname, numpats, samplesize, att1, att2){
     else if (q==0) diff=((count*p*lilinf) + (count*(1-p)*Math.log2(1-p)));
     else if (q==0) diff=((count*p*Math.log2(p))+(count*(1-p)*lilinf));
     else diff= ((count*p*Math.log2(p/q))+(count*(1-p)*(Math.log2((1-p)/(1-q)))));
-//    console.log('debug:'+ 'new diff:' + diff);
+    console.log('debug:'+ 'new diff:' + diff);
     return diff>thresh;
   }
   this.updateLambda=function(p,q,lambda){
@@ -260,6 +360,7 @@ function correlationTablep1(tabname, numpats, samplesize, att1, att2){
     ret=(lambda + Math.log2(p/q) + Math.log2((1-q)/(1-p)));
 //    if (ret > lilinf) return lilinf;
 //    else if (ret < -lilinf) return -lilinf;
+    console.log("updateLambda:"+ret);
     return ret;
   }
   this.lambda2est=function(lambda){
@@ -288,16 +389,6 @@ function correlationTablep1(tabname, numpats, samplesize, att1, att2){
         kldivm2-=(Math.log2(1-e2));
       else 
         crashme++;
-//        console.log("m1:"+m1);
-//        console.log("e1:"+e1);
-//        console.log("m2:"+m2);
-//        console.log("e2:"+e2);
-//        console.log("kldivm1:"+kldivm1);
-//        console.log("kldivm2:"+kldivm2 + "   rid:"+rid);
-//
-//      if(rid==5){
-//        break;
-//      }
     }
     return {m1:kldivm1, m2:kldivm2};
   }
@@ -429,27 +520,16 @@ function correlationTablep1(tabname, numpats, samplesize, att1, att2){
       var countm2v0=mem32[(this.ps_countm2v0p + (pid<<2))>>2];
       var countm2v1=mem32[(this.ps_countm2v1p + (pid<<2))>>2];
 
-      //console.log("@pid:"+pid+" countm1v0:"+countm1v0+ " countm1v1:"+countm1v1+ " countm2v0:"+countm2v0+ " countm2v1:"+countm2v1);
-
-      //console.log("@pid:"+pid+" summ1v0:" + memF32[(this.ps_summ1v0p + (pid<<2))>>2] + " summ1v1:" + memF32[(this.ps_summ1v1p + (pid<<2))>>2] + 
-      //  " summ2v0:" + memF32[(this.ps_summ2v0p + (pid<<2))>>2] + " summ2v1:" + memF32[(this.ps_summ2v1p + (pid<<2))>>2]);
-
-      //console.log("@pid:"+pid+" sumem1v0:" + memF32[(this.ps_sumem1v0p + (pid<<2))>>2] + " sumem1v1:" + memF32[(this.ps_sumem1v1p + (pid<<2))>>2] + 
-      //  " sumem2v0:" + memF32[(this.ps_sumem2v0p + (pid<<2))>>2] + " sumem2v1:" + memF32[(this.ps_sumem2v1p + (pid<<2))>>2]);
-
       var avgm1v0=memF32[(this.ps_summ1v0p + (pid<<2))>>2]/countm1v0;
       var avgm1v1=memF32[(this.ps_summ1v1p + (pid<<2))>>2]/countm1v1;
       var avgm2v0=memF32[(this.ps_summ2v0p + (pid<<2))>>2]/countm2v0;
       var avgm2v1=memF32[(this.ps_summ2v1p + (pid<<2))>>2]/countm2v1;
 
-      //console.log("@pid:"+pid+" avgm1v0:" + avgm1v0 + " avgm1v1:" + avgm1v1 + " avgm2v0:" + avgm2v0 + " avgm2v1:" + avgm2v1);
 
       var avgem1v0=memF32[(this.ps_sumem1v0p + (pid<<2))>>2]/countm1v0;
       var avgem1v1=memF32[(this.ps_sumem1v1p + (pid<<2))>>2]/countm1v1;
       var avgem2v0=memF32[(this.ps_sumem2v0p + (pid<<2))>>2]/countm2v0;
       var avgem2v1=memF32[(this.ps_sumem2v1p + (pid<<2))>>2]/countm2v1;
-
-      //console.log("@pid:"+pid+" avgem1v0:" + avgem1v0 + " avgem1v1:" + avgem1v1 + " avgem2v0:" + avgem2v0 + " avgem2v1:" + avgem2v1);
 
       var gain_m1v0;
       var gain_m1v1;
@@ -478,7 +558,6 @@ function correlationTablep1(tabname, numpats, samplesize, att1, att2){
 
       var gain= gain_m1v0+gain_m1v1+gain_m2v0+gain_m2v1;
 
-      //console.log("@pid:"+pid+" gain:"+gain+" gain_m1v0:"+gain_m1v0+" gain_m1v1:"+gain_m1v1+" gain_m2v0:"+gain_m2v0+" gain_m2v1:"+gain_m2v1);
       if(isNaN(gain)) crashme3++;
 
       if (gain>maxgain){
@@ -487,8 +566,6 @@ function correlationTablep1(tabname, numpats, samplesize, att1, att2){
         maxpat=pid;
       }
     }
-
-    //crashme2++;
 
     var aid=maxpat%this.two2d;
     var sid=Math.floor(maxpat/this.two2d);
@@ -510,15 +587,15 @@ function correlationTablep1(tabname, numpats, samplesize, att1, att2){
     var maxcountm2v0=mem32[(this.ps_countm2v0p + (maxpat<<2))>>2];
     var maxcountm2v1=mem32[(this.ps_countm2v1p + (maxpat<<2))>>2];
 
-    var maxavgm1v0=memF32[(this.ps_summ1v0p + (maxpat<<2))>>2]/countm1v0;
-    var maxavgm1v1=memF32[(this.ps_summ1v1p + (maxpat<<2))>>2]/countm1v1;
-    var maxavgm2v0=memF32[(this.ps_summ2v0p + (maxpat<<2))>>2]/countm2v0;
-    var maxavgm2v1=memF32[(this.ps_summ2v1p + (maxpat<<2))>>2]/countm2v1;
+    var maxavgm1v0=memF32[(this.ps_summ1v0p + (maxpat<<2))>>2]/maxcountm1v0;
+    var maxavgm1v1=memF32[(this.ps_summ1v1p + (maxpat<<2))>>2]/maxcountm1v1;
+    var maxavgm2v0=memF32[(this.ps_summ2v0p + (maxpat<<2))>>2]/maxcountm2v0;
+    var maxavgm2v1=memF32[(this.ps_summ2v1p + (maxpat<<2))>>2]/maxcountm2v1;
 
-    var maxavgem1v0=memF32[(this.ps_sumem1v0p + (maxpat<<2))>>2]/countm1v0;
-    var maxavgem1v1=memF32[(this.ps_sumem1v1p + (maxpat<<2))>>2]/countm1v1;
-    var maxavgem2v0=memF32[(this.ps_sumem2v0p + (maxpat<<2))>>2]/countm2v0;
-    var maxavgem2v1=memF32[(this.ps_sumem2v1p + (maxpat<<2))>>2]/countm2v1;
+    var maxavgem1v0=memF32[(this.ps_sumem1v0p + (maxpat<<2))>>2]/maxcountm1v0;
+    var maxavgem1v1=memF32[(this.ps_sumem1v1p + (maxpat<<2))>>2]/maxcountm1v1;
+    var maxavgem2v0=memF32[(this.ps_sumem2v0p + (maxpat<<2))>>2]/maxcountm2v0;
+    var maxavgem2v1=memF32[(this.ps_sumem2v1p + (maxpat<<2))>>2]/maxcountm2v1;
 
     var maxlambdam1v0=0;
     var maxlambdam1v1=0;
@@ -527,20 +604,20 @@ function correlationTablep1(tabname, numpats, samplesize, att1, att2){
 
     if (maxavgm1v0==0) maxlambdam1v0=-lilinf;
     else if (maxavgm1v0==1) maxlambdam1v0=lilinf;
-    else maxlambdam1v0=Math.log2(maxavgm1v0/maxlambdam1v0);
-
+    else maxlambdam1v0=Math.log2(maxavgm1v0/maxavgem1v0);
+    console.log("maxlambda1v0:"+maxlambdam1v0+" maxavgm1v0:"+maxavgm1v0+" maxavgem1v0:"+maxavgem1v0);
+    
     if (maxavgm1v1==0) maxlambdam1v1=-lilinf;
     else if (maxavgm1v1==1) maxlambdam1v1=lilinf;
-    else maxlambdam1v1=Math.log2(maxavgm1v1/maxlambdam1v1);
+    else maxlambdam1v1=Math.log2(maxavgm1v1/maxavgem1v1);
 
     if (maxavgm2v0==0) maxlambdam2v0=-lilinf;
     else if (maxavgm2v0==1) maxlambdam2v0=lilinf;
-    else maxlambdam2v0=Math.log2(maxavgm2v0/maxlambdam2v0);
+    else maxlambdam2v0=Math.log2(maxavgm2v0/maxavgem2v0);
 
     if (maxavgm2v1==0) maxlambdam2v1=-lilinf;
     else if (maxavgm2v1==1) maxlambdam2v1=lilinf;
-    else maxlambdam2v1=Math.log2(maxavgm2v1/maxlambdam2v1);
-
+    else maxlambdam2v1=Math.log2(maxavgm2v1/maxavgem2v1);
 //-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     this.cet.freqsv0v0.push(maxfreqsv0v0);
     this.cet.freqsv0v1.push(maxfreqsv0v1);
@@ -551,12 +628,16 @@ function correlationTablep1(tabname, numpats, samplesize, att1, att2){
     this.cet.countm2v.push([]);
     this.cet.summ1v.push([]);
     this.cet.summ2v.push([]);
+    this.cet.sumem1v.push([]);
+    this.cet.sumem2v.push([]);
     this.cet.avgm1v.push([]);
     this.cet.avgm2v.push([]);
+    this.cet.avgem1v.push([]);
+    this.cet.avgem2v.push([]);
     this.cet.lambdam1v.push([]);
     this.cet.lambdam2v.push([]);
     var pi=this.cet.patscount-1;
-
+    console.log("pi:"+pi);
     this.cet.countm1v[pi][0]=maxcountm1v0;
     this.cet.countm1v[pi][1]=maxcountm1v1;
     this.cet.countm2v[pi][0]=maxcountm2v0;
@@ -635,7 +716,11 @@ function correlationTablep1(tabname, numpats, samplesize, att1, att2){
         else 
           patstr+=strToString(mem32[(this.cet.patsp+(((pid*this.numatts)+cid)<<2))>>2]) + ',';
       }
-      patstr+="|| est:[" + 
+      patstr+="|| avg:["+
+      this.cet.avgm1v[pid][0]+","+
+      this.cet.avgm1v[pid][1]+","+
+      this.cet.avgm2v[pid][0]+","+
+      this.cet.avgm2v[pid][1]+"] est:[" + 
       this.lambda2est(this.cet.lambdam1v[pid][0])+","+
       this.lambda2est(this.cet.lambdam1v[pid][1])+","+
       this.lambda2est(this.cet.lambdam2v[pid][0])+","+

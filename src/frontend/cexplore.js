@@ -23,7 +23,7 @@ function CExplore(tabname){
   // _sumif('p1',_eq('p2',0)),_sumif('p1',_eq('p2',1)),_sumif('p2',_eq('p1',0)),_sumif('p2',_eq('p1',1))
   ).toArray2();
   //
-  this.cet= new correlationTablep1(tabname,2,16,"p1","p2");
+  this.cet= new correlationTablep1(tabname,5,16,"p1","p2");
 //Control panel
   this.cpAddDomCol=function(col){
     console.log("@cpAddDomCol col:"+col);
