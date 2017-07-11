@@ -242,9 +242,9 @@ function correlationTablep1(tabname, numpats, samplesize, att1, att2){
       this.cet.countm2v[1][0]+","+
       this.cet.countm2v[1][1]+"]"); 
 
-    var infloop=25;
+    //var infloop=250;
     while(doitagain){
-      if(!infloop--) { console.log("infloop:"+infloop);break;}
+      //if(!infloop--) { console.log("infloop:"+infloop);break;}
       doitagain=0;
       for (var rid=0; rid<this.tabsize; rid++){
         sumlm1=0;
@@ -349,7 +349,6 @@ function correlationTablep1(tabname, numpats, samplesize, att1, att2){
     else if (q==0) diff=((count*p*lilinf) + (count*(1-p)*Math.log2(1-p)));
     else if (q==0) diff=((count*p*Math.log2(p))+(count*(1-p)*lilinf));
     else diff= ((count*p*Math.log2(p/q))+(count*(1-p)*(Math.log2((1-p)/(1-q)))));
-    console.log('debug:'+ 'new diff:' + diff);
     return diff>thresh;
   }
   this.updateLambda=function(p,q,lambda){
@@ -358,9 +357,6 @@ function correlationTablep1(tabname, numpats, samplesize, att1, att2){
     if (p==1) return lambda+lilinf;
     if (q==0) return lambda+lilinf;
     ret=(lambda + Math.log2(p/q) + Math.log2((1-q)/(1-p)));
-//    if (ret > lilinf) return lilinf;
-//    else if (ret < -lilinf) return -lilinf;
-    console.log("updateLambda:"+ret);
     return ret;
   }
   this.lambda2est=function(lambda){
@@ -561,7 +557,8 @@ function correlationTablep1(tabname, numpats, samplesize, att1, att2){
       if(isNaN(gain)) crashme3++;
 
       if (gain>maxgain){
-        console.log("@pid:"+pid+" gain:"+gain+" maxgain:"+maxgain);
+        console.log("avgm1v0:"+avgm1v0+" avgem1v0:"+avgem1v0+" countm1v0:"+countm1v0);
+        console.log("@pid:"+pid+" gain:"+gain+" gain_m1v0:"+gain_m1v0+" gain_m1v1:"+gain_m1v1+" gain_m2v0:"+gain_m2v0+" gain_m2v1:"+gain_m2v1+" maxgain:"+maxgain);
         maxgain=gain;
         maxpat=pid;
       }
