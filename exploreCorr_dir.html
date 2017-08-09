@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Correlation Tables Demo</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.2/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pako/1.0.4/pako.min.js"></script>
+    <a href="https://github.com/lintool/afterburner/"><img style="position: absolute; top: 0; right: 0; border: 0; z-index:9999;" src="https://camo.githubusercontent.com/652c5b9acfaddf3a9c326fa6bde407b87f7be0f4/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6f72616e67655f6666373630302e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_orange_ff7600.png"></a>
+ 
+  <style type="text/css">
+    body {
+      padding-top: 50px;
+    }
+    .table-nonfluid {
+      width: auto !important;
+    }
+    .table-responsive {
+      overflow: auto;
+    }
+    .rowspc{ 
+      margin-top:20px; 
+    }
+  </style>
+  </head>
+  <body>
+
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="#">Afterburner</a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+          <ul class="nav navbar-nav">
+            <li><a href="./index.html">Home</a></li>
+            <li><a href="./about.html">About</a></li>
+            <li class="active"><a href="./demo.html">Demo</a></li>
+          </ul>
+
+        </div><!--/.navbar-collapse -->
+      </div>
+    </nav>
+
+  <div class="container">
+    <div class="page-header">
+      <h1>Afterburner: Demo</h1>
+      <p class="lead">Interactive SQL analytics in your browser!</p>
+    </div>
+
+    <!--<p>In this online demo we've prepared  sample data!</p>-->
+
+    <div class="row">
+      <div class="container">
+        <div class="dropdown"  id="initmenu" style="float:left; margin:0 10px 10px 0;">
+          <button class="btn dropdown-toggle btn-warning" id="initbtn" type="button" data-toggle="dropdown">
+            <span class="glyphicon glyphicon-fire" id="initglyph"></span> 
+            Initialize Afterburner!
+          </button>
+          <ul class="dropdown-menu">
+            <li><a>tiny (~0.5 GB)</a></li>
+            <li><a>small (~0.75 GB)</a></li>
+            <li><a>medium (~1.5 GB)</a></li>
+            <li><a>large (~3.0 GB)</a></li>
+          </ul>
+        </div>
+        <div class="dropdown" style="float:left; margin:0 10px 10px 0;" >
+          <button class="btn dropdown-toggle disabled" id="loadwbtn" type="button" data-toggle="dropdown">
+            Explore dataset!
+          </button>
+          <ul class="dropdown-menu">
+            <!-- load all 
+              <li><label class="btn btn-default btn-file" onclick="loadWeb()"
+                       style="border: none; border-color: transparent;">
+                  Load demo data (12 MB compressed)
+                </label>
+              </li>
+            -->
+            <li><label class="btn btn-default btn-file" onclick="loadpostsec()"
+                     style="border: none; border-color: transparent;">
+                Load postsecondary (adult_edu>secondary) (244 KB compressed)
+              </label>
+            </li>
+            <li><label class="btn btn-default btn-file" onclick="loadBank()"
+                     style="border: none; border-color: transparent;">
+                Load bank (m1=succ. mark. camp. | m2=marketing call dur.>median) (586K KB compressed)
+              </label>
+            </li>
+            <li>
+                <label class="btn btn-default btn-file" id="loaddbtn" data-placement="bot"
+                       style="border: none; border-color: transparent;">
+                  Load tables from local disk
+                  <input type="file" id="fileInput" style="display: none;" multiple> 
+                </label>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <!-- schema console
+    <div class="row rowspc" id="">
+      <div class="col-md-12">
+        <div id="sconsole">
+        </div>
+      <div>
+    </div>
+    -->
+    <div class="row">
+      <div class="col-md-12">
+        <div class="panel-group" id="group">
+          <div id="pnlET" class="panel panel-primary">
+            <div class="panel-heading">
+              <h4 class="panel-title">
+                <!--<a data-toggle="collapse" data-parent="#group" href="#etconsole">-->
+                <a>
+                  Correlation Table
+                </a>
+                <!--<a role="button" style='float:right'>
+                   enh:Suggest a new pattern!
+                </a>-->
+              </h4>
+            </div>
+            <!-- <div id="etconsole" class="panel-collapse collapse">-->
+            <div id="etconsole">
+            </div>
+          </div>
+          <div id="pnlE" class="panel panel-success">
+            <div class="panel-heading">
+              <h4 class="panel-title">
+                <!--<a data-toggle="collapse" data-parent="#group" href="#econsole">-->
+                <a>
+                  Control Exploration
+                </a>
+              </h4>
+            </div>
+            <!--<div id="econsole" class="panel-collapse collapse">-->
+            <div id="econsole">
+            </div>
+          </div>
+          <div id="pnlExp" class="panel panel-warning">
+            <div class="panel-heading">
+              <h4 class="panel-title">
+                <!-- <a data-toggle="collapse" data-parent="#group" href="#divcons">-->
+                <a>
+                  Exploration
+                </a>
+                <!-- <a role="button" style='float:right'>
+                    enh:view as icicle!
+                </a>-->
+              </h4>
+            </div>
+            <!-- <div id="divcons" class="panel-collapse collapse"> -->
+            <div id="divcons">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- explanation table console
+    <div class="row rowspc" id="">
+      <div class="col-md-12">
+        <div id="etconsole">
+        </div>
+      <div>
+    </div>
+    -->
+    <!-- explore ctl panel
+    <div class="row rowspc" id="">
+      <div class="col-md-12">
+        <div id="econsole">
+        </div>
+      <div>
+    </div>
+    <br>
+    -->
+    <div class="row" id="divconsole">
+      <div class="col-md-12">
+        <p id="console"></p>
+      </div>
+    </div>
+    <!-- exploration result
+    <div class="row">
+      <div class="col-md-12">
+        <div id="divcons" class="table-responsive">
+        </div>
+      </div>
+    </div>
+    -->
+  </div> <!-- /container -->
+
+<div id="waitForPT" class="modal fade" style="left" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+      </div>
+      <div class="modal-body">
+      </div>
+      <div class="modal-footer">
+          <div class='col-md-1'>
+            <button id="modalgate" type="button" onclick="$('#waitForPT').modal('hide');prepExplore_dir();cExploreTable()" class="btn btn-default" disabled>Explore</button>
+          </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Afterburner -->
+
+<script src="./src/core/afterburner.js"></script>
+<script src="./src/core/store.js"></script>
+<script src="./src/core/aSchema.js"></script>
+<script src="./src/core/aTable.js"></script>
+<script src="./src/core/queryResult.js"></script>
+<script src="./src/core/hashIndex.js"></script>
+<script src="./src/core/dataSource.js"></script>
+<script src="./src/core/common.js"></script>
+<script src="./src/core/html5FileParser.js"></script>
+<script src="./src/core/urlParser.js"></script>
+<script src="./src/frontend/myJS.js"></script>
+<script src="./src/frontend/web.js"></script>
+<script src="./src/frontend/progressTracker.js"></script>
+<script src="./src/frontend/cexplore_dir.js"></script>
+<script src="./src/lib/correlationp1_dir.js"></script>
+<script src="./src/lib/formulas.js"></script>
+
+<!-- TPC-H -->
+
+<script src="./src/tpch/q01.js"></script>
+<script src="./src/tpch/q02.js"></script>
+<script src="./src/tpch/q03.js"></script>
+<script src="./src/tpch/q04.js"></script>
+<script src="./src/tpch/q05.js"></script>
+<script src="./src/tpch/q06.js"></script>
+<script src="./src/tpch/q07.js"></script>
+<script src="./src/tpch/q08.js"></script>
+<script src="./src/tpch/q09.js"></script>
+<script src="./src/tpch/q10.js"></script>
+<script src="./src/tpch/q11.js"></script>
+<script src="./src/tpch/q12.js"></script>
+<script src="./src/tpch/q13.js"></script>
+<script src="./src/tpch/q14.js"></script>
+<script src="./src/tpch/q15.js"></script>
+<script src="./src/tpch/q16.js"></script>
+<script src="./src/tpch/q17.js"></script>
+<script src="./src/tpch/q18.js"></script>
+<script src="./src/tpch/q19.js"></script>
+<script src="./src/tpch/q20.js"></script>
+<script src="./src/tpch/q21.js"></script>
+<script src="./src/tpch/q22.js"></script>
+
+<script src="./src/tpch/answers/ans1.js"></script>
+<script src="./src/tpch/answers/ans2.js"></script>
+<script src="./src/tpch/answers/ans3.js"></script>
+<script src="./src/tpch/answers/ans4.js"></script>
+<script src="./src/tpch/answers/ans5.js"></script>
+<script src="./src/tpch/answers/ans6.js"></script>
+<script src="./src/tpch/answers/ans7.js"></script>
+<script src="./src/tpch/answers/ans8.js"></script>
+<script src="./src/tpch/answers/ans9.js"></script>
+<script src="./src/tpch/answers/ans10.js"></script>
+<script src="./src/tpch/answers/ans11.js"></script>
+<script src="./src/tpch/answers/ans12.js"></script>
+<script src="./src/tpch/answers/ans13.js"></script>
+<script src="./src/tpch/answers/ans14.js"></script>
+<script src="./src/tpch/answers/ans15.js"></script>
+<script src="./src/tpch/answers/ans16.js"></script>
+<script src="./src/tpch/answers/ans17.js"></script>
+<script src="./src/tpch/answers/ans18.js"></script>
+<script src="./src/tpch/answers/ans19.js"></script>
+<script src="./src/tpch/answers/ans20.js"></script>
+<script src="./src/tpch/answers/ans21.js"></script>
+<script src="./src/tpch/answers/ans22.js"></script>
+
+<script src="./src/tpch/benchmark_tpch.js"></script>
+<script src="./src/micro/benchmark_micro.js"></script>
+
+
+<a id='results' type='text/csv'></a>
+
+  
+<script>
+function myOnLoad(){
+  abdb = new Afterburner();
+}
+window.onload = function() {
+  inNode=false;
+  var fileInput = document.getElementById('fileInput');
+  fileInput.addEventListener('change', function(e) {
+    PTi.trackFiles(fileInput.files);
+    var files = fileInput.files;
+    var ds= new dataSource(files, function(){newTable= new aTable(ds);},0);
+  });
+  myOnLoad();
+}
+function URLList(){
+  this.list=[];
+}
+function loadpostsec(){
+  var urls= new URLList();
+  urls.list=["https://afterburnerdb.github.io/afterburner-data/datasets/postsecondary.32561.tbl.gz"]
+  PTi.trackURLs(urls.list);
+  var ds= new dataSource(urls, function(){newTable= new aTable(ds);});
+}
+function loadBank(){
+  var urls= new URLList();
+  urls.list=["https://afterburnerdb.github.io/afterburner-data/datasets/bank/bank_cet.45211.tbl.gz"]
+  PTi.trackURLs(urls.list);
+  var ds= new dataSource(urls, function(){newTable= new aTable(ds);});
+}
+function runcode(){
+  var codecode=document.getElementById("TAFluent").value;
+  var tt0=window.performance.now();
+  runMyAdhocCode(codecode);
+  var tt1=window.performance.now();
+  var ttot=tt1-tt0;
+  document.getElementById("console").innerHTML = "Query completed in " + (ttot.toFixed(2))+"ms" ;
+  console.log('time to run code:'+ (ttot));
+}
+function printtable(htmltable){
+  divcons=document.getElementById("divcons");
+  clearElement(divcons);
+  divcons.appendChild(htmltable);
+}
+function printcet(cettable){
+  etcons=document.getElementById("etconsole");
+  clearElement(etcons);
+  etcons.appendChild(cettable);
+}
+function prepExplore_dir(){
+  console.log("@prepExplore");
+  clearElementsById(["divcons"]);
+  $("#econsole").show();
+}
+$("#initmenu").on("click", "li a", function() {
+  console.log("will store with size:"+$(this).text());
+  var size=$(this).text().split(" ")[0];
+  init_store(size);
+  $("#initbtn").removeClass("btn-warning");
+  $("#initbtn").addClass("disabled");
+  $("#initbtn").text("Initialized: "+$(this).text());
+  $("#loadwbtn").removeClass("disabled");
+  $("#loadwbtn").addClass("btn-success");
+});    
+</script>
+
+<script type="text/javascript">
+
+jQuery("[id*='query']").click(function(e){
+                                var toeval=e.currentTarget.id+".toString().replace(/;/g,'').replace(/noasm/g,'').replace('\"q_sums\",300','\"q_sums\",200').replace(/}\w*/,'').replace('return','').replace(/function query.*{/,'/*"+e.currentTarget.id+"*/')";
+                                document.getElementById("TAFluent")
+                                  .value=eval(toeval)+"  .materialize();\nprinttable(res.toHTMLTableN(100))";
+                                  e.preventDefault();});
+</script>
+
+</body>
+</html>
