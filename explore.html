@@ -58,11 +58,7 @@
       <p class="lead">Interactive SQL analytics in your browser!</p>
     </div>
 
-    <p>In this online demo we've prepared a sample data warehouse based on the <a href="http://www.tpc.org/tpch/">TPC-H</a> schema. 
-      For best performance, we recommend using <a href="https://www.mozilla.org/en-US/firefox/all/">Firefox (64-bit)</a> 
-      (for asm.js support) and running on a client with at least 4GB memory.
-      Begin by clicking on the "initialize" button below and select a memory configuration (how much memory on the client to allocate).
-      Then load some data and you'll be ready to start issuing SQL queries!</p>
+<!--    <p>In this online demo we've prepared a sample data!</p> -->
 
     <div class="row">
       <div class="container">
@@ -98,6 +94,11 @@
             <li><label class="btn btn-default btn-file" onclick="loadAdult()"
                      style="border: none; border-color: transparent;">
                 Load adult (244 KB compressed)
+              </label>
+            </li>
+            <li><label class="btn btn-default btn-file" onclick="loadBank()"
+                     style="border: none; border-color: transparent;">
+                Load bank (586K KB compressed)
               </label>
             </li>
             <li><label class="btn btn-default btn-file" onclick="loadIncome()"
@@ -331,6 +332,12 @@ function loadUpgrade(){
 function loadAdult(){
   var urls= new URLList();
   urls.list=["https://afterburnerdb.github.io/afterburner-data/datasets/adult.32561.tbl.gz"]
+  PTi.trackURLs(urls.list);
+  var ds= new dataSource(urls, function(){newTable= new aTable(ds);});
+}
+function loadBank(){
+  var urls= new URLList();
+  urls.list=["https://afterburnerdb.github.io/afterburner-data/datasets/bank/bank_et.45211.tbl.gz"]
   PTi.trackURLs(urls.list);
   var ds= new dataSource(urls, function(){newTable= new aTable(ds);});
 }

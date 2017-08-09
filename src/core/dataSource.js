@@ -304,6 +304,12 @@ handyColTypes["income"]=[
 2,
 2
 ];
+
+handyColNames["bank_et"]=["id","age","job","marital","education","default","balance","housing","loan","contact","day","month","duration","campaign","pdays","previous","poutcome","p"];
+handyColTypes["bank_et"]=[0,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,0];
+handyColNames["bank_cet"]=["id","age","job","marital","education","default","balance","housing","loan","contact","day","month","p2","campaign","pdays","previous","poutcome","p1"];
+handyColTypes["bank_cet"]=[0,2,2,2,2,2,2,2,2,2,2,2,0,2,2,2,2,0];
+
 handyColNames["fridge"]=["id","item","season","location","p"];
 handyColTypes["fridge"]=[0,2,2,2,0];
 

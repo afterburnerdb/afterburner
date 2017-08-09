@@ -58,7 +58,7 @@
       <p class="lead">Interactive SQL analytics in your browser!</p>
     </div>
 
-    <p>In this online demo we've prepared  sample data!</p>
+    <!--<p>In this online demo we've prepared  sample data!</p>-->
 
     <div class="row">
       <div class="container">
@@ -91,6 +91,12 @@
                 Load postsecondary (adult_edu>secondary) (244 KB compressed)
               </label>
             </li>
+            <li><label class="btn btn-default btn-file" onclick="loadBank()"
+                     style="border: none; border-color: transparent;">
+                Load bank (m1=succ. mark. camp., m2=marketing call dur.>median) (586K KB compressed)
+              </label>
+            </li>
+
             <li>
                 <label class="btn btn-default btn-file" id="loaddbtn" data-placement="bot"
                        style="border: none; border-color: transparent;">
@@ -224,7 +230,6 @@
 <script src="./src/frontend/myJS.js"></script>
 <script src="./src/frontend/web.js"></script>
 <script src="./src/frontend/progressTracker.js"></script>
-<script src="./src/frontend/explore.js"></script>
 <script src="./src/frontend/cexplore.js"></script>
 <script src="./src/lib/explanation.js"></script>
 <script src="./src/lib/explanationp1.js"></script>
@@ -284,6 +289,8 @@
 <script src="./src/micro/benchmark_micro.js"></script>
 
 
+<a id='results' type='text/csv'></a>
+
   
 <script>
 function myOnLoad(){
@@ -305,6 +312,12 @@ function URLList(){
 function loadpostsec(){
   var urls= new URLList();
   urls.list=["https://afterburnerdb.github.io/afterburner-data/datasets/postsecondary.32561.tbl.gz"]
+  PTi.trackURLs(urls.list);
+  var ds= new dataSource(urls, function(){newTable= new aTable(ds);});
+}
+function loadBank(){
+  var urls= new URLList();
+  urls.list=["https://afterburnerdb.github.io/afterburner-data/datasets/bank/bank_cet.45211.tbl.gz"]
   PTi.trackURLs(urls.list);
   var ds= new dataSource(urls, function(){newTable= new aTable(ds);});
 }
