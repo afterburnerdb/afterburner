@@ -86,6 +86,7 @@ function newHTMLProgressBar(pbid,opts){
 }
 
 function newHTMLProgressBarGreenRed(ppct,opts){
+  ppct=ppct.toFixed(0);
   opts=opts||{};
   opts['class']='progress';
   var div = document.createElement('div');
@@ -93,10 +94,12 @@ function newHTMLProgressBarGreenRed(ppct,opts){
   var opts2={class:'progress-bar progress-bar-success',role:'progressbar','aria-valuenow':'0','aria-valuemin':'0','aria-valuemax':'100',style:'width:'+ppct+'%'};
   var div2 = document.createElement('div');
   setAtts(div2,opts2);
+  if (ppct>=50) div2.appendChild(document.createTextNode(ppct+"%"));
   div.appendChild(div2);
   var opts2={class:'progress-bar progress-bar-danger',role:'progressbar','aria-valuenow':'0','aria-valuemin':'0','aria-valuemax':'100',style:'width:'+(100-ppct)+'%'};
   var div2 = document.createElement('div');
   setAtts(div2,opts2);
+  if (ppct<50) div2.appendChild(document.createTextNode(ppct+"%"));
   div.appendChild(div2);
   return div;
 }
@@ -130,7 +133,37 @@ function newHTMLProgressBar4Colors(ppct1,ppct2,ppct3,ppct4,opts){
   div.appendChild(div2);
   return div;
 }
-
+function newHTMLProgressVBar(ppct1){
+  opts={};
+  opts['class']='progress';
+  opts['style']='width:20px;min-height: 40px;display: flex;align-items: flex-end;margin-right: 20px;float: left;';
+  var div = document.createElement('div');
+  setAtts(div,opts);
+  var opts2={class:'progress-bar vertical progress-bar-success',role:'progressbar','aria-valuenow':'0','aria-valuemin':'0','aria-valuemax':'100',style:'height:'+ppct1+'%;width: 100%;' };
+  var div2 = document.createElement('div');
+  setAtts(div2,opts2);
+  div.appendChild(div2);
+  return div;
+}
+function newHTMLProgressVBarGreenRed(ppct,opts){
+  ppct=ppct.toFixed(0);
+  opts=opts||{};
+  opts['class']='progress';
+  opts['style']='width:20px;min-height: 40px;align-items: flex-end;margin-right: 20px;float: left;';
+  var div = document.createElement('div');
+  setAtts(div,opts);
+  var opts2={class:'progress-bar progress-bar-success',role:'progressbar','aria-valuenow':'0','aria-valuemin':'0','aria-valuemax':'100',style:'height:'+ppct+'%;width: 100%;'};
+  var div2 = document.createElement('div');
+  setAtts(div2,opts2);
+  if (ppct>=50) div2.appendChild(document.createTextNode(ppct+"%"));
+  div.appendChild(div2);
+  var opts2={class:'progress-bar progress-bar-danger',role:'progressbar','aria-valuenow':'0','aria-valuemin':'0','aria-valuemax':'100',style:'height:'+(100-ppct)+'%;width: 100%;'};
+  var div2 = document.createElement('div');
+  setAtts(div2,opts2);
+  if (ppct<50) div2.appendChild(document.createTextNode(ppct+"%"));
+  div.appendChild(div2);
+  return div;
+}
 
 function newHTMLContainer(opts){
   opts=opts||{};
@@ -269,4 +302,11 @@ function ppSQLstr(sqlstr){
   sqlstr=sqlstr.replace(/^[\s\t]*[\n|\r|\r\n]/gm,'');
   return sqlstr;
 }
-
+//save to file
+function downloadResultsFile(str, fname){
+  var csv = 'a,b,c\n1,2,3\n';
+  var a = document.getElementById('results');
+  a.href='data:text/csv;base64,' + btoa(str);
+  a.download=fname;
+  a.click();
+}

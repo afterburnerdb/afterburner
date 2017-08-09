@@ -6,6 +6,7 @@ if(typeof module == 'undefined'){
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
+var lilinf=20;
 function correlationTablep1(tabname, numpats, samplesize, att1, att2){
   if (typeof numpats == undefined)
     numpats=10;
@@ -49,9 +50,11 @@ function correlationTablep1(tabname, numpats, samplesize, att1, att2){
             lambdam2v:[],
             pearson:[]};
   this.cet;
-  lilinf=20;
+  //
+
   //
   this.explain = function(){
+    this.explain_t0=get_time_ms();
     var att1=this.att1;
     var att2=this.att2;
     this.att1vals=abdb.select().from(this.tab.name).field(att1).group(att1).toArray2();
@@ -104,12 +107,6 @@ function correlationTablep1(tabname, numpats, samplesize, att1, att2){
     this.cet.sumem2v[0][0]=(freqs[0]*this.att2vals[0]) + (freqs[2]*this.att2vals[1]);
     this.cet.sumem2v[0][1]=(freqs[1]*this.att2vals[0]) + (freqs[3]*this.att2vals[1]);
 
-    //console.log("avg init:"+
-    //this.cet.avgm1v[0][0]+","+
-    //this.cet.avgm1v[0][1]+","+
-    //this.cet.avgm2v[0][0]+","+
-    //this.cet.avgm2v[0][1]+"]");
-
     this.cet.avgm1v[0][0]=this.cet.summ1v[0][0]/this.cet.countm1v[0][0];
     this.cet.avgm1v[0][1]=this.cet.summ1v[0][1]/this.cet.countm1v[0][1];
     this.cet.avgm2v[0][0]=this.cet.summ2v[0][0]/this.cet.countm2v[0][0];
@@ -125,26 +122,6 @@ function correlationTablep1(tabname, numpats, samplesize, att1, att2){
     this.cet.lambdam1v[0][1]=Math.log2(this.cet.avgm1v[0][1]/(1-this.cet.avgm1v[0][1]));
     this.cet.lambdam2v[0][0]=Math.log2(this.cet.avgm2v[0][0]/(1-this.cet.avgm2v[0][0]));
     this.cet.lambdam2v[0][1]=Math.log2(this.cet.avgm2v[0][1]/(1-this.cet.avgm2v[0][1]));
-
-    //console.log("this.cet.countm1v[0][0]:"+this.cet.countm1v[0][0]);
-    //console.log("this.cet.countm1v[0][1]:"+this.cet.countm1v[0][1]);
-    //console.log("this.cet.countm2v[0][0]:"+this.cet.countm2v[0][0]);
-    //console.log("this.cet.countm2v[0][1]:"+this.cet.countm2v[0][1]);
-
-    //console.log("this.cet.summ1v[0][0]:"+this.cet.summ1v[0][0]);
-    //console.log("this.cet.summ1v[0][1]:"+this.cet.summ1v[0][1]);
-    //console.log("this.cet.summ2v[0][0]:"+this.cet.summ2v[0][0]);
-    //console.log("this.cet.summ2v[0][1]:"+this.cet.summ2v[0][1]);
-
-    //console.log("this.cet.avgm1v[0][0]:"+this.cet.avgm1v[0][0]);
-    //console.log("this.cet.avgm1v[0][1]:"+this.cet.avgm1v[0][1]);
-    //console.log("this.cet.avgm2v[0][0]:"+this.cet.avgm2v[0][0]);
-    //console.log("this.cet.avgm2v[0][1]:"+this.cet.avgm2v[0][1]);
-
-    //console.log("this.cet.lambdam1v[0][0]:"+this.cet.lambdam1v[0][0]);
-    //console.log("this.cet.lambdam1v[0][1]:"+this.cet.lambdam1v[0][1]);
-    //console.log("this.cet.lambdam2v[0][0]:"+this.cet.lambdam2v[0][0]);
-    //console.log("this.cet.lambdam2v[0][1]:"+this.cet.lambdam2v[0][1]);
 
     qval=abdb.select().from(this.tab.name).field(_variance(att1),_variance(att2),_covariance(att1,att2)).toArray2();
     this.cet.pearson.push(calcPearson(qval[0],qval[1],qval[2]));
@@ -186,19 +163,19 @@ function correlationTablep1(tabname, numpats, samplesize, att1, att2){
     }
 
     this.kldivo=this.calcKLDIV();
-    var tis=0;
     var tsxd=0;
     var tit=0;
+
+
     for (var iter=1;iter<numpats;iter++){
-      var tis0=get_time_ms();
       this.sample=this.sampleDraw(this.samplesize,this.tabsize);
-      tis+=get_time_ms()-tis0;
       tsxd+=this.sXd();
-      tit+=this.iterative_scalling();
+      tit+=this.iterative_scaling();
     }
-    console.log("sampling total time(ms):"+tis);
     console.log("sXd total time(ms):"+tsxd);
-    console.log("iterative scalling total time(ms):"+tit);
+    console.log("iterative scaling total time(ms):"+tit);
+    this.explain_t1=get_time_ms();
+    this.prepSummary();
     this.printCET();
   }
   this.tlcat=function(rid1,rid2){//*=>0
@@ -218,29 +195,29 @@ function correlationTablep1(tabname, numpats, samplesize, att1, att2){
     }
     return Object.keys(sample);
   }
-  this.iterative_scalling = function(){
+  this.iterative_scaling = function(){
     var t0=get_time_ms();
     var not_converged=1;
     var sumlm1;
     var sumlm2;
     var doitagain=1;
 
-    console.log("pid0.ests:"+this.lambda2est(this.cet.lambdam1v[0][0])+","+
-      this.lambda2est(this.cet.lambdam1v[0][1])+","+
-      this.lambda2est(this.cet.lambdam2v[0][0])+","+
-      this.lambda2est(this.cet.lambdam2v[0][1])+"] counts:["+
-      this.cet.countm1v[0][0]+","+
-      this.cet.countm1v[0][1]+","+
-      this.cet.countm2v[0][0]+","+
-      this.cet.countm2v[0][1]+"]"); 
-    console.log("pid1.ests:"+this.lambda2est(this.cet.lambdam1v[1][0])+","+
-      this.lambda2est(this.cet.lambdam1v[1][1])+","+
-      this.lambda2est(this.cet.lambdam2v[1][0])+","+
-      this.lambda2est(this.cet.lambdam2v[1][1])+"] counts:["+
-      this.cet.countm1v[1][0]+","+
-      this.cet.countm1v[1][1]+","+
-      this.cet.countm2v[1][0]+","+
-      this.cet.countm2v[1][1]+"]"); 
+    //console.log("pid0.ests:"+this.lambda2est(this.cet.lambdam1v[0][0])+","+
+    //  this.lambda2est(this.cet.lambdam1v[0][1])+","+
+    //  this.lambda2est(this.cet.lambdam2v[0][0])+","+
+    //  this.lambda2est(this.cet.lambdam2v[0][1])+"] counts:["+
+    //  this.cet.countm1v[0][0]+","+
+    //  this.cet.countm1v[0][1]+","+
+    //  this.cet.countm2v[0][0]+","+
+    //  this.cet.countm2v[0][1]+"]"); 
+    //console.log("pid1.ests:"+this.lambda2est(this.cet.lambdam1v[1][0])+","+
+    //  this.lambda2est(this.cet.lambdam1v[1][1])+","+
+    //  this.lambda2est(this.cet.lambdam2v[1][0])+","+
+    //  this.lambda2est(this.cet.lambdam2v[1][1])+"] counts:["+
+    //  this.cet.countm1v[1][0]+","+
+    //  this.cet.countm1v[1][1]+","+
+    //  this.cet.countm2v[1][0]+","+
+    //  this.cet.countm2v[1][1]+"]"); 
 
     //var infloop=250;
     while(doitagain){
@@ -387,6 +364,21 @@ function correlationTablep1(tabname, numpats, samplesize, att1, att2){
         crashme++;
     }
     return {m1:kldivm1, m2:kldivm2};
+  }
+  this.calcMultiKLDIV = function(){
+    console.log("@calcMultiKLDIV");
+    var patscount_org=this.cet.patscount;
+    var kldivs=[];
+    var infogains=[];
+    while (this.cet.patscount){
+      this.iterative_scaling();
+      var kldivcur=this.calcKLDIV();
+      kldivs.push(kldivcur);
+      infogains.push({m1:(this.kldivo.m1-kldivcur.m1), m2:(this.kldivo.m2-kldivcur.m2)});
+      this.cet.patscount--;
+    }
+    this.cet.patscount=patscount_org;
+    return {kldivs:kldivs.reverse(), infogains:infogains.reverse()};
   }
   //Database:
   this.getColNsPs=function(){
@@ -557,8 +549,8 @@ function correlationTablep1(tabname, numpats, samplesize, att1, att2){
       if(isNaN(gain)) crashme3++;
 
       if (gain>maxgain){
-        console.log("avgm1v0:"+avgm1v0+" avgem1v0:"+avgem1v0+" countm1v0:"+countm1v0);
-        console.log("@pid:"+pid+" gain:"+gain+" gain_m1v0:"+gain_m1v0+" gain_m1v1:"+gain_m1v1+" gain_m2v0:"+gain_m2v0+" gain_m2v1:"+gain_m2v1+" maxgain:"+maxgain);
+        //console.log("avgm1v0:"+avgm1v0+" avgem1v0:"+avgem1v0+" countm1v0:"+countm1v0);
+        //console.log("@pid:"+pid+" gain:"+gain+" gain_m1v0:"+gain_m1v0+" gain_m1v1:"+gain_m1v1+" gain_m2v0:"+gain_m2v0+" gain_m2v1:"+gain_m2v1+" maxgain:"+maxgain);
         maxgain=gain;
         maxpat=pid;
       }
@@ -602,7 +594,7 @@ function correlationTablep1(tabname, numpats, samplesize, att1, att2){
     if (maxavgm1v0==0) maxlambdam1v0=-lilinf;
     else if (maxavgm1v0==1) maxlambdam1v0=lilinf;
     else maxlambdam1v0=Math.log2(maxavgm1v0/maxavgem1v0);
-    console.log("maxlambda1v0:"+maxlambdam1v0+" maxavgm1v0:"+maxavgm1v0+" maxavgem1v0:"+maxavgem1v0);
+    //console.log("maxlambda1v0:"+maxlambdam1v0+" maxavgm1v0:"+maxavgm1v0+" maxavgem1v0:"+maxavgem1v0);
     
     if (maxavgm1v1==0) maxlambdam1v1=-lilinf;
     else if (maxavgm1v1==1) maxlambdam1v1=lilinf;
@@ -634,7 +626,6 @@ function correlationTablep1(tabname, numpats, samplesize, att1, att2){
     this.cet.lambdam1v.push([]);
     this.cet.lambdam2v.push([]);
     var pi=this.cet.patscount-1;
-    console.log("pi:"+pi);
     this.cet.countm1v[pi][0]=maxcountm1v0;
     this.cet.countm1v[pi][1]=maxcountm1v1;
     this.cet.countm2v[pi][0]=maxcountm2v0;
@@ -668,8 +659,12 @@ function correlationTablep1(tabname, numpats, samplesize, att1, att2){
     return true;
   }
   this.toOBJ=function(){
-    //if (this.kldivf.m1<0)
-    this.kldivf=this.calcKLDIV();
+    return this.tableSummaryOBJ;
+  }
+  this.prepSummary=function (){
+    var infos=this.infos=this.calcMultiKLDIV();
+    this.kldivf=infos.kldivs[infos.kldivs.length-1];
+    this.infogainf=infos.infogains[infos.kldivs.length-1];
     var pats=[];
     for (var pid=0;pid<this.numpats;pid++){
       var newpat={ cols:[],
@@ -697,23 +692,24 @@ function correlationTablep1(tabname, numpats, samplesize, att1, att2){
       newpat.support=newpat.freqsv0v0+ newpat.freqsv0v1 + newpat.freqsv1v0 + newpat.freqsv1v1;
       pats.push(newpat);
     }
-    return {  kldiv:this.kldivf,
-              infogainm1:(this.kldivo.m1-this.kldivf.m1),
-              infogainm2:(this.kldivo.m2-this.kldivf.m2),
-              pats:pats };
+    this.tableSummaryOBJ= {  kldivf:this.kldivf,
+              infogain:this.infogainf,
+              infos:infos,
+              pats:pats,
+              explaintime: (this.explain_t1-this.explain_t0) };
+
   }
-  this.printCET=function(){
-    var etobj=this.toOBJ();
-    var patstr="pid:"+pid+"::";
+  this.printCETstr=function(){
+    var cetstr="";
     for (var pid=0;pid<this.numpats;pid++){
-      var patstr="pid:"+pid+"::";
+      var patstr="pid:"+pid+"::,";
       for (var cid=0; cid<this.numatts; cid++){
         if (mem32[(this.cet.patsp+(((pid*this.numatts)+cid)<<2))>>2] == -666)
           patstr+= '*,';
         else 
           patstr+=strToString(mem32[(this.cet.patsp+(((pid*this.numatts)+cid)<<2))>>2]) + ',';
       }
-      patstr+="|| avg:["+
+      patstr+=",, avg:["+
       this.cet.avgm1v[pid][0]+","+
       this.cet.avgm1v[pid][1]+","+
       this.cet.avgm2v[pid][0]+","+
@@ -728,13 +724,17 @@ function correlationTablep1(tabname, numpats, samplesize, att1, att2){
       this.cet.countm2v[pid][1]+"] pearson:"+
       this.cet.pearson[pid];
 
-      console.log(patstr);
-      console.log("kldiv final m1:"+this.kldivf.m1.toFixed(2)+ " m2:"+this.kldivf.m2.toFixed(2)+ 
-                  " infogainm1:"+(this.kldivo.m1-this.kldivf.m1).toFixed(2)+
-                  " infogainm2:"+(this.kldivo.m2-this.kldivf.m2).toFixed(2));
+      patstr+="kldiv final m1:"+this.kldivf.m1.toFixed(2)+ " m2:"+this.kldivf.m2.toFixed(2);
+      patstr+=" infogainm1:"+(this.infogainf.m1).toFixed(2);
+      patstr+=" infogainm2:"+(this.infogainf.m2).toFixed(2)+"\n";
+      cetstr+=patstr;
     }
+    return cetstr;
   }
-  //
+  this.printCET=function(){
+    console.log(this.printCETstr());
+  }
+  //Constructor:
   console.log('debug:'+ "correlation table:(tabname="+tabname+
                                          ", numpats="+numpats+
                                          ", samplesize="+samplesize+
@@ -742,8 +742,84 @@ function correlationTablep1(tabname, numpats, samplesize, att1, att2){
                                          ", att2="+att2+")" );
   this.getColNsPs();
 }
+//
 function bench_correlationp1(tabname,summaryrows,samplesize){
-//todo:
+  var detlog="tabname,summaryrows,samplesize\n";
+  detlog+=tabname+","+summaryrows+","+samplesize+"\n\n";
+  var tableslog="";
+  var runtimes=[];
+  var kldivfs=[];
+  var infogains=[];
+  var infoss=[];
+  tt1=get_time_ms(); 
+  for (var c=0;c<5;c++){
+    var cet = new correlationTablep1(tabname,summaryrows,samplesize,'p1','p2');
+    cet.explain(); 
+    tableslog+=cet.printCETstr()+"\n\n";
+    var ceto=glob=cet.toOBJ();
+    runtimes.push(ceto.explaintime);
+    kldivfs.push(ceto.kldivf);
+    infogains.push(ceto.infogain);
+    infoss.push(ceto.infos);
+  }
+  tt2=get_time_ms();
+  console.log('benchmark total time (ms)'+(tt2-tt1));
+  console.log('benchmark tabname:'+ tabname);
+  console.log('benchmark summaryrows:'+ summaryrows);
+  console.log('benchmark samplesize:'+ samplesize);
+  console.log('runtimes:'+runtimes);
+
+  detlog+="runtimes:,"+runtimes+"\n";
+  detlog+="kldivfs(m1):,";
+  kldivfs.forEach((x)=>{detlog+=x.m1+","});
+  detlog+="\n";
+  detlog+="infogains(m1):,";
+  infogains.forEach((x)=>{detlog+=x.m1+","});
+  detlog+="\n";
+  detlog+="kldivfs(m2):,";
+  kldivfs.forEach((x)=>{detlog+=x.m2+","});
+  detlog+="\n";
+  detlog+="infogains(m2):,";
+  infogains.forEach((x)=>{detlog+=x.m2+","});
+  detlog+="\n";
+  detlog+="\nper pattern kldivfs(m1):\n";
+  for (var i=0;i<summaryrows;i++){
+    detlog+="pat"+(i+1)+",";
+    infoss.forEach((x)=>{detlog+=x.kldivs[i].m1+","});
+    detlog+="\n";
+  }
+  detlog+="\nper pattern infogains(m1):\n";
+  for (var i=0;i<summaryrows;i++){
+    detlog+="pat"+(i+1)+",";
+    infoss.forEach((x)=>{detlog+=x.infogains[i].m1+","});
+    detlog+="\n";
+  }
+  detlog+="\nper pattern kldivfs(m2):\n";
+  for (var i=0;i<summaryrows;i++){
+    detlog+="pat"+(i+1)+",";
+    infoss.forEach((x)=>{detlog+=x.kldivs[i].m2+","});
+    detlog+="\n";
+  }
+  detlog+="\nper pattern infogains(m2):\n";
+  for (var i=0;i<summaryrows;i++){
+    detlog+="pat"+(i+1)+",";
+    infoss.forEach((x)=>{detlog+=x.infogains[i].m2+","});
+    detlog+="\n";
+  }
+  console.log("@bench_correlationp1:"+detlog);
+  detlog+="\n\n";
+  detlog+=tableslog;
+  return detlog;
+}
+function bench_correlationp1s(tabnames,summaryrows,samplesizes){
+  console.log("@bench_correlationp1s:")
+  var results_str="";
+  for (var i=0;i<tabnames.length;i++){
+    for (var ii=0;ii<samplesizes.length;ii++){
+      results_str+=bench_correlationp1(tabnames[i],summaryrows,samplesizes[ii]);
+    }
+  }
+  downloadResultsFile(results_str, "results."+Date.now()+".csv");
 }
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////

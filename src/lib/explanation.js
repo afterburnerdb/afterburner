@@ -51,7 +51,6 @@ if (typeof binatt == undefined)
     this.D_e=(new Array(this.tabsize)).fill(this.et.q[0]);
 
     //run iterative scaling
-    //this.iterative_scalling();
     this.kldivo=this.calcKLDIV();
     for (var iter=1;iter<numpats;iter++){
 //      console.log('debug:'+ 'gen_new_pats:');
@@ -59,7 +58,7 @@ if (typeof binatt == undefined)
 //      console.log("sample:"+this.sample);
       
       this.sXd();
-      this.iterative_scalling();
+      this.iterative_scaling();
     }
     this.printET();
   }
@@ -85,7 +84,7 @@ if (typeof binatt == undefined)
     }
     return Object.keys(sample);
   }
-  this.iterative_scalling = function(){
+  this.iterative_scaling = function(){
 //    console.log('debug:'+ 'it_scall');
     var not_converged=true;
     var suml;

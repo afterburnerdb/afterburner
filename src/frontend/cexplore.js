@@ -123,8 +123,6 @@ function CExplore(tabname){
     var ttot=tt1-tt0;
     document.getElementById("console").innerHTML = "Query completed in " + (ttot.toFixed(2))+"ms<br>";
     this.printExploration(qeval);
-    console.log('time to run code:'+ (ttot));
-
   }
 //
   this.toHTMLTable=function(){

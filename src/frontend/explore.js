@@ -112,8 +112,6 @@ function Explore(tabname){
     document.getElementById("console").innerHTML = "Query completed in " + (ttot.toFixed(2))+"ms<br>";
     //printtable(res.toHTMLTableN(100))
     this.printExploration(qeval);
-    console.log('time to run code:'+ (ttot));
-
   }
 //
   this.toHTMLTable=function(){
@@ -146,7 +144,7 @@ function Explore(tabname){
     this.selColNames.forEach((x)=>{tr.appendChild(newHTMLTH(x))});
     tr.appendChild(newHTMLTH(""));
     tr.appendChild(newHTMLTH("COUNT(*)"));
-    tr.appendChild(newHTMLTH("AVG(p)"));
+//    tr.appendChild(newHTMLTH("AVG(p)"));
     tr.appendChild(newHTMLTH("distribution"));
     //tr.appendChild(newHTMLTH("EST(p)"));
     tr.appendChild(newHTMLTH(""));
@@ -159,7 +157,7 @@ function Explore(tabname){
       etobj.pats[pid].cols.forEach((x)=>{tr.appendChild(newHTMLTD(x))});
       tr.appendChild(newHTMLTD(""));
       tr.appendChild(newHTMLTD(etobj.pats[pid].count));
-      tr.appendChild(newHTMLTD(etobj.pats[pid].avgp.toFixed(2)));
+//      tr.appendChild(newHTMLTD(etobj.pats[pid].avgp.toFixed(2)));
       var td = document.createElement('td');
       var pb=newHTMLProgressBarGreenRed((etobj.pats[pid].avgp.toFixed(2)*100));
       td.appendChild(pb);

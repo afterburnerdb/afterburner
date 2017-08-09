@@ -112,8 +112,6 @@ function Explore(tabname){
     document.getElementById("console").innerHTML = "Query completed in " + (ttot.toFixed(2))+"ms<br>";
     //printtable(res.toHTMLTableN(100))
     this.printExploration(qeval);
-    console.log('time to run code:'+ (ttot));
-
   }
 //
   this.toHTMLTable=function(){

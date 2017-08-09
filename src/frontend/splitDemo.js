@@ -438,7 +438,6 @@ function splitDemo(qnum,qscen,opencol){
     var ttot=tt1-tt0;
     if(!firsttime)
       document.getElementById("console").innerHTML = "Query completed in " + (ttot.toFixed(2))+"ms" ;
-    console.log('time to run code:'+ (ttot));
   }
 //Slider
   this.drawslider=function(divcons,dashcons,coltype){

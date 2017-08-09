@@ -71,11 +71,11 @@ if (typeof binatt == undefined)
       this.sample=this.sampleDraw(this.samplesize,this.tabsize);
       tis+=get_time_ms()-tis0;
       tsxd+=this.sXd();
-      tit+=this.iterative_scalling();
+      tit+=this.iterative_scaling();
     }
     console.log("sampling total time(ms):"+tis);
     console.log("sXd total time(ms):"+tsxd);
-    console.log("iterative scalling total time(ms):"+tit);
+    console.log("iterative scaling total time(ms):"+tit);
     this.printET();
   }
   this.tlcat=function(rid1,rid2){//*=>0
@@ -95,7 +95,7 @@ if (typeof binatt == undefined)
     }
     return Object.keys(sample);
   }
-  this.iterative_scalling = function(){
+  this.iterative_scaling = function(){
     var t0=get_time_ms();
     var not_converged=1;
     var suml;
