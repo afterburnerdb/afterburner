@@ -670,12 +670,18 @@ function correlationTablep1(tabname, numpats, samplesize, att1, att2){
       var newpat={ cols:[],
                    support:-1,
                    pearson:-1 };
+      var pearsonQ=abdb.select().from(this.tab.name).field(_variance(att1),_variance(att2),_covariance(att1,att2));
       for (var cid=0; cid<this.numatts; cid++){
         if (mem32[(this.cet.patsp+(((pid*this.numatts)+cid)<<2))>>2] == -666)
           newpat.cols.push('*');
-        else 
+        else {
           newpat.cols.push(strToString(mem32[(this.cet.patsp+(((pid*this.numatts)+cid)<<2))>>2]));
+          pearsonQ.where(_eq(this.colNs[cid],strToString(mem32[(this.cet.patsp+(((pid*this.numatts)+cid)<<2))>>2])));
+        }
       }
+      var qval=pearsonQ.toArray2();
+      this.cet.pearson.push(calcPearson(qval[0],qval[1],qval[2]));
+
       newpat.estm1v0= this.lambda2est(this.cet.lambdam1v[pid][0]);
       newpat.estm1v1= this.lambda2est(this.cet.lambdam1v[pid][1]);
       newpat.estm2v0= this.lambda2est(this.cet.lambdam2v[pid][0]);

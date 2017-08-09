@@ -123,8 +123,6 @@ function correlationTablep1_dir(tabname, numpats, samplesize, att1, att2){
     this.cet.lambdam2v[0][0]=Math.log2(this.cet.avgm2v[0][0]/(1-this.cet.avgm2v[0][0]));
     this.cet.lambdam2v[0][1]=Math.log2(this.cet.avgm2v[0][1]/(1-this.cet.avgm2v[0][1]));
 
-    qval=abdb.select().from(this.tab.name).field(_variance(att1),_variance(att2),_covariance(att1,att2)).toArray2();
-    this.cet.pearson.push(calcPearson(qval[0],qval[1],qval[2]));
     //
     this.D_em1p=malloc(this.tabsize<<2);
     this.D_em2p=malloc(this.tabsize<<2);
@@ -671,12 +669,18 @@ function correlationTablep1_dir(tabname, numpats, samplesize, att1, att2){
       var newpat={ cols:[],
                    support:-1,
                    pearson:-1 };
+      var pearsonQ=abdb.select().from(this.tab.name).field(_variance(att1),_variance(att2),_covariance(att1,att2));
       for (var cid=0; cid<this.numatts; cid++){
         if (mem32[(this.cet.patsp+(((pid*this.numatts)+cid)<<2))>>2] == -666)
           newpat.cols.push('*');
-        else 
+        else {
           newpat.cols.push(strToString(mem32[(this.cet.patsp+(((pid*this.numatts)+cid)<<2))>>2]));
+          pearsonQ.where(_eq(this.colNs[cid],strToString(mem32[(this.cet.patsp+(((pid*this.numatts)+cid)<<2))>>2])));
+        }
       }
+      var qval=pearsonQ.toArray2();
+      this.cet.pearson.push(calcPearson(qval[0],qval[1],qval[2]));
+
       newpat.estm1v0= this.lambda2est(this.cet.lambdam1v[pid][0]);
       newpat.estm1v1= this.lambda2est(this.cet.lambdam1v[pid][1]);
       newpat.estm2v0= this.lambda2est(this.cet.lambdam2v[pid][0]);

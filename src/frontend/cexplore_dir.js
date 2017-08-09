@@ -154,17 +154,19 @@ function CExplore(tabname){
     var tr = thead.insertRow(0);
 
     this.selColNames.forEach((x)=>{tr.appendChild(newHTMLTH(x))});
-    tr.appendChild(newHTMLTH(""));
-    tr.appendChild(newHTMLTH("COUNT(*)"));
-    tr.appendChild(newHTMLTH("debug"));
+//    tr.appendChild(newHTMLTH(""));
+    tr.appendChild(newHTMLTH("COUNT"));
+//    tr.appendChild(newHTMLTH("debug"));
 //    tr.appendChild(newHTMLTH("m1=0,m2=0"));
 //    tr.appendChild(newHTMLTH("m1=0,m2=1"));
 //    tr.appendChild(newHTMLTH("m1=1,m2=0"));
 //    tr.appendChild(newHTMLTH("m1=1,m2=1"));
-//    tr.appendChild(newHTMLTH("COVARIANCE(p1,p2)"));
-    tr.appendChild(newHTMLTH("distribution"));
+    //tr.appendChild(newHTMLTH("distribution"));
+    tr.appendChild(newHTMLTH("m2=0"));
+    tr.appendChild(newHTMLTH("m2=1"));
+    tr.appendChild(newHTMLTH("R(m1,m2)"));
     //tr.appendChild(newHTMLTH("EST(p)"));
-    tr.appendChild(newHTMLTH(""));
+//    tr.appendChild(newHTMLTH(""));
     tr.appendChild(newHTMLTH("Explore"));
     //tr.appendChild(newHTMLTH("Edit ET"));
 
@@ -172,20 +174,21 @@ function CExplore(tabname){
     for (var pid=cetobj.pats.length-1;pid>-1;pid--){
       tr = body.insertRow(0);
       cetobj.pats[pid].cols.forEach((x)=>{tr.appendChild(newHTMLTD(x))});
-      tr.appendChild(newHTMLTD(""));
+//      tr.appendChild(newHTMLTD(""));
       tr.appendChild(newHTMLTD(cetobj.pats[pid].support));
-      tr.appendChild(newHTMLTD(cetobj.pats[pid].freqsv0v0+","+cetobj.pats[pid].freqsv0v1+","+cetobj.pats[pid].freqsv1v0+","+cetobj.pats[pid].freqsv1v1,{"font-size": "smaller"}));
+      //tr.appendChild(newHTMLTD(cetobj.pats[pid].freqsv0v0+","+cetobj.pats[pid].freqsv0v1+","+cetobj.pats[pid].freqsv1v0+","+cetobj.pats[pid].freqsv1v1,{"font-size": "smaller"}));
 //      tr.appendChild(newHTMLTD(cetobj.pats[pid].freqsv0v0));
 //      tr.appendChild(newHTMLTD(cetobj.pats[pid].freqsv0v1));
 //      tr.appendChild(newHTMLTD(cetobj.pats[pid].freqsv1v0));
 //      tr.appendChild(newHTMLTD(cetobj.pats[pid].freqsv1v1));
-      //tr.appendChild(newHTMLTD(cetobj.pats[pid].pearson.toFixed(2)));
       var td = document.createElement('td');
       td.appendChild(newHTMLProgressVBarGreenRed(((cetobj.pats[pid].freqsv1v0/(cetobj.pats[pid].freqsv1v0+cetobj.pats[pid].freqsv0v0)).toFixed(2)*100)));
       tr.appendChild(td);
+      td = document.createElement('td');
       td.appendChild(newHTMLProgressVBarGreenRed(((cetobj.pats[pid].freqsv1v1/(cetobj.pats[pid].freqsv1v1+cetobj.pats[pid].freqsv0v1)).toFixed(2)*100)));
       tr.appendChild(td);
-      tr.appendChild(newHTMLTH(""));
+      tr.appendChild(newHTMLTD(cetobj.pats[pid].pearson.toFixed(2)));
+//      tr.appendChild(newHTMLTH(""));
 
       var td = document.createElement('td');
       var a=newHTMLA("explore",{onclick:"CEi.explorePat("+pid+")"});
@@ -239,8 +242,9 @@ function CExplore(tabname){
         th.appendChild(document.createTextNode(qeval.colnames[i]));
         tr.appendChild(th);
     }
-    tr.appendChild(newHTMLTH("distribution"));
-    tr.appendChild(newHTMLTH(""));
+    tr.appendChild(newHTMLTH("m2=0"));
+    tr.appendChild(newHTMLTH("m2=1"));
+//    tr.appendChild(newHTMLTH(""));
     tr.appendChild(newHTMLTH("explore"));
 
     thead.appendChild(tr);
@@ -278,10 +282,11 @@ function CExplore(tabname){
 
       td.appendChild(newHTMLProgressVBarGreenRed((qeval.array2[(i*qeval.numcols)+(qeval.numcols-2)]/(qeval.array2[(i*qeval.numcols)+(qeval.numcols-2)]+qeval.array2[(i*qeval.numcols)+(qeval.numcols-4)])).toFixed(2)*100));
       tr.appendChild(td);
+      td = document.createElement('td');
       td.appendChild(newHTMLProgressVBarGreenRed((qeval.array2[(i*qeval.numcols)+(qeval.numcols-1)]/(qeval.array2[(i*qeval.numcols)+(qeval.numcols-1)]+qeval.array2[(i*qeval.numcols)+(qeval.numcols-3)])).toFixed(2)*100));
       tr.appendChild(td);
 
-      tr.appendChild(newHTMLTH(""));
+//      tr.appendChild(newHTMLTH(""));
       var td = document.createElement('td');
       var a=newHTMLA("explore",{onclick:"CEi.exploreExplore("+i+")"});
       td.appendChild(a);

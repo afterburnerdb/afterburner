@@ -136,7 +136,7 @@ function newHTMLProgressBar4Colors(ppct1,ppct2,ppct3,ppct4,opts){
 function newHTMLProgressVBar(ppct1){
   opts={};
   opts['class']='progress';
-  opts['style']='width:20px;min-height: 40px;display: flex;align-items: flex-end;margin-right: 20px;float: left;';
+  opts['style']='width:20px;min-height: 40px;display: flex;align-items: flex-end;margin-right: 20px;float:left;';
   var div = document.createElement('div');
   setAtts(div,opts);
   var opts2={class:'progress-bar vertical progress-bar-success',role:'progressbar','aria-valuenow':'0','aria-valuemin':'0','aria-valuemax':'100',style:'height:'+ppct1+'%;width: 100%;' };
@@ -149,7 +149,7 @@ function newHTMLProgressVBarGreenRed(ppct,opts){
   ppct=ppct.toFixed(0);
   opts=opts||{};
   opts['class']='progress';
-  opts['style']='width:20px;min-height: 40px;align-items: flex-end;margin-right: 20px;float: left;';
+  opts['style']='width:20px;min-height: 40px;align-items: flex-end;margin-right: 20px;float:left;';
   var div = document.createElement('div');
   setAtts(div,opts);
   var opts2={class:'progress-bar progress-bar-success',role:'progressbar','aria-valuenow':'0','aria-valuemin':'0','aria-valuemax':'100',style:'height:'+ppct+'%;width: 100%;'};
