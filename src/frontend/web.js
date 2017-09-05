@@ -286,6 +286,17 @@ function cExploreTable(tabname){
   $('#exploreTab tbody').on("click","td",function(e){CEi.bcell(this)});
   $('#exploreTab thead').on("click","th",function(e){CEi.hcell(this)});
 }
+function mExploreTable(tabname){
+  if (typeof tabname == 'undefined')
+    tabname= daSchema.tables[daSchema.tables.length-1].name;
+  CEi= new MExplore(tabname);
+  var econs=document.getElementById("econsole");
+  clearElement(econs);
+  econs.appendChild(CEi.toHTMLTable());
+  $('#exploreTab tbody').on("click","td",function(e){CEi.bcell(this)});
+  $('#exploreTab thead').on("click","th",function(e){CEi.hcell(this)});
+}
+
 
 //Prettyrint sql
 function ppSQLstr(sqlstr){
