@@ -9,7 +9,7 @@ function MExplore(tabname){
   this.selColNames=this.allColNames.slice(0);
   this.selColVals=[];
   this.selColNames.forEach((x)=>{this.selColVals.push('*')});
-  this.aggA=["_count('*')","_avg('p1')","_avg(p2)"];
+  this.aggA=["_count('*')","_avg('p1')","_avg('p2')"];
   this.valA=abdb.select().from(this.tabname).field(_count('*'),_avg('p1'),_avg('p2')).toArray2();
   //
   this.et= new mExplanationTablep1(tabname,5,16,"p1","p2");
@@ -42,7 +42,7 @@ function MExplore(tabname){
     cell.appendChild(newHTMLDD('Select!',['ALL','*'].concat(distinct),{id:'bcellmenu'},'-sm'));
     $('.dropdown-toggle').dropdown('toggle');
     $("#bcellmenu").on("click", "li a", function() {
-      Ei.bcello(this,cell.cellIndex,cell,colname);
+      MEi.bcello(this,cell.cellIndex,cell,colname);
     });
     this.uncompute();
   }
@@ -137,7 +137,7 @@ function MExplore(tabname){
   }
   this.printExplanationTable=function(){
     this.et.explain();
-    var etobj=this.et.toOBJ();
+    etobj=this.et.toOBJ();
     var table = newHTMLTable({id:"explanationTab"});
     var thead = newHTMLThead(table);
     var tr = thead.insertRow(0);
@@ -146,7 +146,8 @@ function MExplore(tabname){
     tr.appendChild(newHTMLTH(""));
     tr.appendChild(newHTMLTH("COUNT(*)"));
 //    tr.appendChild(newHTMLTH("AVG(p)"));
-    tr.appendChild(newHTMLTH("distribution"));
+    tr.appendChild(newHTMLTH("dist. p1"));
+    tr.appendChild(newHTMLTH("dist. p2"));
     //tr.appendChild(newHTMLTH("EST(p)"));
     tr.appendChild(newHTMLTH(""));
     tr.appendChild(newHTMLTH("Explore"));
@@ -162,19 +163,21 @@ function MExplore(tabname){
       var td = document.createElement('td');
       var pb=newHTMLProgressBarGreenRed((etobj.pats[pid].avgp1.toFixed(2)*100));
       td.appendChild(pb);
+      tr.appendChild(td);
+      var td = document.createElement('td');
       var pb=newHTMLProgressBarGreenRed((etobj.pats[pid].avgp2.toFixed(2)*100));
       td.appendChild(pb);
       tr.appendChild(td);
       tr.appendChild(newHTMLTH(""));
 
       var td = document.createElement('td');
-      var a=newHTMLA("explore",{onclick:"Ei.explorePat("+pid+")"});
+      var a=newHTMLA("explore",{onclick:"MEi.explorePat("+pid+")"});
       td.appendChild(a);
       tr.appendChild(td);
 
       //tr.appendChild(newHTMLTH("enh:remove"));
     } 
-    printet(table);
+    printmet(table);
     //return table;
   }
   this.explorePat=function(pid){
@@ -185,8 +188,8 @@ function MExplore(tabname){
     this.selColVals=this.et.toOBJ().pats[pid].cols;
 
     econs.appendChild(this.toHTMLTable());
-    $('#exploreTab tbody').on("click","td",function(e){Ei.bcell(this)});
-    $('#exploreTab thead').on("click","th",function(e){Ei.hcell(this)});
+    $('#exploreTab tbody').on("click","td",function(e){MEi.bcell(this)});
+    $('#exploreTab thead').on("click","th",function(e){MEi.hcell(this)});
   }
   this.exploreExplore=function(rid){
     console.log("@exploreExplore: "+rid);
@@ -198,8 +201,8 @@ function MExplore(tabname){
     qscvs=this.exploringQEval.array2.splice((rid*this.exploringQEval.numcols),this.exploringQEval.numcols-3);
     this.selColNames.forEach((x)=>{ qscns.indexOf(x)<0? this.selColVals.push('*') : this.selColVals.push(qscvs[qscns.indexOf(x)])});
     econs.appendChild(this.toHTMLTable());
-    $('#exploreTab tbody').on("click","td",function(e){Ei.bcell(this)});
-    $('#exploreTab thead').on("click","th",function(e){Ei.hcell(this)});
+    $('#exploreTab tbody').on("click","td",function(e){MEi.bcell(this)});
+    $('#exploreTab thead').on("click","th",function(e){MEi.hcell(this)});
   }
 
   this.printExploration=function (qeval){
@@ -218,7 +221,8 @@ function MExplore(tabname){
         th.appendChild(document.createTextNode(qeval.colnames[i]));
         tr.appendChild(th);
     }
-    tr.appendChild(newHTMLTH("distribution"));
+    tr.appendChild(newHTMLTH("dist. p1"));
+    tr.appendChild(newHTMLTH("dist. p2"));
     tr.appendChild(newHTMLTH(""));
     tr.appendChild(newHTMLTH("explore"));
 
@@ -245,12 +249,13 @@ function MExplore(tabname){
       var pb=newHTMLProgressBarGreenRed(qeval.array2[(i*qeval.numcols)+(qeval.numcols-2)].toFixed(2)*100);
       td.appendChild(pb);
       tr.appendChild(td);
+      var td = document.createElement('td');
       var pb=newHTMLProgressBarGreenRed(qeval.array2[(i*qeval.numcols)+(qeval.numcols-1)].toFixed(2)*100);
       td.appendChild(pb);
       tr.appendChild(td);
       tr.appendChild(newHTMLTH(""));
       var td = document.createElement('td');
-      var a=newHTMLA("explore",{onclick:"Ei.exploreExplore("+i+")"});
+      var a=newHTMLA("explore",{onclick:"MEi.exploreExplore("+i+")"});
       td.appendChild(a);
       tr.appendChild(td);
       tbody.appendChild(tr);

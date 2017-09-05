@@ -289,12 +289,12 @@ function cExploreTable(tabname){
 function mExploreTable(tabname){
   if (typeof tabname == 'undefined')
     tabname= daSchema.tables[daSchema.tables.length-1].name;
-  CEi= new MExplore(tabname);
+  MEi= new MExplore(tabname);
   var econs=document.getElementById("econsole");
   clearElement(econs);
-  econs.appendChild(CEi.toHTMLTable());
-  $('#exploreTab tbody').on("click","td",function(e){CEi.bcell(this)});
-  $('#exploreTab thead').on("click","th",function(e){CEi.hcell(this)});
+  econs.appendChild(MEi.toHTMLTable());
+  $('#exploreTab tbody').on("click","td",function(e){MEi.bcell(this)});
+  $('#exploreTab thead').on("click","th",function(e){MEi.hcell(this)});
 }
 
 

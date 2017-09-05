@@ -44,9 +44,12 @@ if (typeof binatt2 == undefined) binatt2="p2";
   this.kldivf=-1;
   this.et;
   lilinf=20;
-  this.D_ep;
-  this.ps_sumpp;
-  this.ps_sumqp;
+  this.D_ep1;
+  this.D_ep2;
+  this.ps_sump1p;
+  this.ps_sump2p;
+  this.ps_sumq1p;
+  this.ps_sumq2p;
   this.ps_countp;
   //
   this.explain = function(){
@@ -111,18 +114,19 @@ if (typeof binatt2 == undefined) binatt2="p2";
   }
   this.iterative_scaling = function(){
     var t0=get_time_ms();
-    var not_converged=1;
     var suml1;
     var suml2;
-    var doitagain=1;
+    var doitagain=true;
     while(doitagain){
-      doitagain=0;
+      doitagain=false;
       for (var rid=0; rid<this.tabsize; rid++){
-        suml=0;
+        suml1=0;
+        suml2=0;
         for (var pid=0; pid<this.et.patscount; pid++){
-          if (this.match(rid,pid))
+          if (this.match(rid,pid)){
             suml1+=this.et.lambdas1[pid];
             suml2+=this.et.lambdas2[pid];
+          }
         }
         memF32[(this.D_ep1+(rid<<2))>>2]=Math.pow(2, suml1)/(Math.pow(2, suml1)+1);
         memF32[(this.D_ep2+(rid<<2))>>2]=Math.pow(2, suml2)/(Math.pow(2, suml2)+1);
@@ -131,11 +135,13 @@ if (typeof binatt2 == undefined) binatt2="p2";
         this.et.sumq1[pid]=0;
         this.et.sumq2[pid]=0;
       }
+      megacounts=[0,0,0,0,0];
       for (var rid=0; rid<this.tabsize; rid++){
         for (var pid=0; pid<this.et.patscount;pid++){
           if (this.match(rid,pid)){
             this.et.sumq1[pid]+=memF32[(this.D_ep1+(rid<<2))>>2];
             this.et.sumq2[pid]+=memF32[(this.D_ep2+(rid<<2))>>2];
+            megacounts[pid]++;
           }
         }
       }
@@ -144,13 +150,20 @@ if (typeof binatt2 == undefined) binatt2="p2";
         var oldlambda2=this.et.lambdas2[pid];
         this.et.q1[pid]=this.et.sumq1[pid]/this.et.count[pid];
         this.et.q2[pid]=this.et.sumq2[pid]/this.et.count[pid];
-        if (this.breakthresh(this.et.p1[pid],this.et.q1[pid],this.et.count[pid])){
+
+        var tmpbt;
+        tmpbt=this.breakthresh(this.et.p1[pid],this.et.q1[pid],this.et.count[pid]);
+        if (tmpbt){
+          var newlambda1=this.updateLambda(this.et.p1[pid],this.et.q1[pid],this.et.lambdas1[pid]);
+          this.et.lambdas1[pid]=newlambda1;
           doitagain=true;
-        } else continue;
-        var newlambda1=this.updateLambda(this.et.p1[pid],this.et.q1[pid],this.et.lambdas1[pid]);
-        this.et.lambdas1[pid]=newlambda;
-        var newlambda2=this.updateLambda(this.et.p2[pid],this.et.q2[pid],this.et.lambdas2[pid]);
-        this.et.lambdas2[pid]=newlambda;
+        }
+        tmpbt=this.breakthresh(this.et.p2[pid],this.et.q2[pid],this.et.count[pid]);
+        if (tmpbt){
+          var newlambda2=this.updateLambda(this.et.p2[pid],this.et.q2[pid],this.et.lambdas2[pid]);
+          this.et.lambdas2[pid]=newlambda2;
+          doitagain=true;
+        } 
       }
     }
     var t1=get_time_ms();
@@ -167,7 +180,6 @@ if (typeof binatt2 == undefined) binatt2="p2";
     else if (q==0) diff=((count*p*lilinf) + (count*(1-p)*Math.log2(1-p)));
     else if (q==0) diff=((count*p*Math.log2(p))+(count*(1-p)*lilinf));
     else diff= ((count*p*Math.log2(p/q))+(count*(1-p)*(Math.log2((1-p)/(1-q)))));
-//    console.log('debug:'+ 'new diff:' + diff);
     return diff>thresh;
   }
   this.updateLambda=function(p,q,lambda){
@@ -176,8 +188,6 @@ if (typeof binatt2 == undefined) binatt2="p2";
     if (p==1) return lambda+lilinf;
     if (q==0) return lambda+lilinf;
     ret=(lambda + Math.log2(p/q) + Math.log2((1-q)/(1-p)));
-//    if (ret > lilinf) return lilinf;
-//    else if (ret < -lilinf) return -lilinf;
     return ret;
   }
   this.lambda2est=function(lambda){
@@ -200,10 +210,8 @@ if (typeof binatt2 == undefined) binatt2="p2";
         kldiv-=(Math.log2(q2));
       else if (p2==0)
         kldiv-=(Math.log2(1-q2));
-      else {
-        console.log("p2col:"+this.p2col);
+      else 
         crashme++;
-      }
     }
     return kldiv;
   }
@@ -215,12 +223,10 @@ if (typeof binatt2 == undefined) binatt2="p2";
       if ( coln == 'id') continue;
       if ( coln == this.binatt1 ){ 
         this.p1col=daSchema.getColPByName(coln,this.tab.name);
-        console.log("p1col:"+this.p1col);
         continue;
       }
       if ( coln == this.binatt2 ){ 
         this.p2col=daSchema.getColPByName(coln,this.tab.name);
-        console.log("p2col:"+this.p2col);
         continue;
       }
       this.colNs.push(coln);
@@ -233,8 +239,10 @@ if (typeof binatt2 == undefined) binatt2="p2";
   this.sXd=function(){
     var t0=get_time_ms();
     for (var i=0; i<this.sofpofs;i++){
-      memF32[(this.ps_sumpp + (i<<2))>>2]=0;
-      memF32[(this.ps_sumqp + (i<<2))>>2]=0;
+      memF32[(this.ps_sump1p + (i<<2))>>2]=0;
+      memF32[(this.ps_sump2p + (i<<2))>>2]=0;
+      memF32[(this.ps_sumq1p + (i<<2))>>2]=0;
+      memF32[(this.ps_sumq2p + (i<<2))>>2]=0;
       mem32[(this.ps_countp + (i<<2))>>2]=0;
     }
     var tmpp,tmpq,tmpanc,curranc;
@@ -242,8 +250,8 @@ if (typeof binatt2 == undefined) binatt2="p2";
     var powit=0;
     for (var rid=0; rid<this.tabsize; rid++){
       for (var sid=0;sid<this.samplesize;sid++){
-        tmpp1=mem32[(this.p1col + (rid<<2))>>2]
-        tmpp2=mem32[(this.p2col + (rid<<2))>>2]
+        tmpp1=mem32[(this.p1col + (rid<<2))>>2];
+        tmpp2=mem32[(this.p2col + (rid<<2))>>2];
         tmpq1=memF32[(this.D_ep1+(rid<<2))>>2];
         tmpq2=memF32[(this.D_ep2+(rid<<2))>>2];
 //
@@ -411,7 +419,7 @@ function bench_mexplainp1(tabname,summaryrows,samplesize){
   var kldivs=[];
   tt1=get_time_ms(); 
   for (var c=0;c<10;c++){
-    var et = new mExplanationTablep1(tabname,summaryrows,samplesize,'p');
+    var et = new mExplanationTablep1(tabname,summaryrows,samplesize,'p1','p2');
     t0=get_time_ms(); 
     et.explain(); 
     t1=get_time_ms();

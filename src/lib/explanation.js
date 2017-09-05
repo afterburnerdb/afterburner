@@ -85,8 +85,6 @@ if (typeof binatt == undefined)
     return Object.keys(sample);
   }
   this.iterative_scaling = function(){
-//    console.log('debug:'+ 'it_scall');
-    var not_converged=true;
     var suml;
     var doitagain=true;
     var inf=0;//debug

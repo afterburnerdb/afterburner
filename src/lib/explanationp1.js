@@ -97,7 +97,6 @@ if (typeof binatt == undefined)
   }
   this.iterative_scaling = function(){
     var t0=get_time_ms();
-    var not_converged=1;
     var suml;
     var doitagain=1;
     while(doitagain){

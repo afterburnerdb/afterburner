@@ -197,7 +197,6 @@ function correlationTablep1(tabname, numpats, samplesize, att1, att2){
   }
   this.iterative_scaling = function(){
     var t0=get_time_ms();
-    var not_converged=1;
     var sumlm1;
     var sumlm2;
     var doitagain=1;
