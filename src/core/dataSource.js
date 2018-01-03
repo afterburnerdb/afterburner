@@ -313,6 +313,9 @@ handyColTypes["bank_cet"]=[0,2,2,2,2,2,2,2,2,2,2,2,0,2,2,2,2,0];
 handyColNames["fridge"]=["id","item","season","location","p"];
 handyColTypes["fridge"]=[0,2,2,2,0];
 
+handyColNames["alberta_salaries_bin150"]=["id","Ministry","Year","PositionTitle","PositionClass","p"];
+handyColTypes["alberta_salaries_bin150"]=[0,2,2,2,2,0];
+
   this.useFnameHints = function(fname){
     doti=fname.indexOf('.');
     tabname=fname.substring(0,doti);

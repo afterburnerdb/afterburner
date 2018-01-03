@@ -91,6 +91,11 @@
                 Load upgrade (58 KB compressed)
               </label>
             </li>
+            <li><label class="btn btn-default btn-file" onclick="loadSalary()"
+                     style="border: none; border-color: transparent;">
+                Load salary (198 KB compressed)
+              </label>
+            </li>
             <li><label class="btn btn-default btn-file" onclick="loadAdult()"
                      style="border: none; border-color: transparent;">
                 Load adult (244 KB compressed)
@@ -149,7 +154,7 @@
               <h4 class="panel-title">
                 <!--<a data-toggle="collapse" data-parent="#group" href="#econsole">-->
                 <a>
-                  Control Exploration
+                  Query Pattern
                 </a>
               </h4>
             </div>
@@ -162,7 +167,7 @@
               <h4 class="panel-title">
                 <!-- <a data-toggle="collapse" data-parent="#group" href="#divcons">-->
                 <a>
-                  Exploration
+                  Results
                 </a>
                 <!-- <a role="button" style='float:right'>
                     enh:view as icicle!
@@ -332,6 +337,12 @@ function loadUpgrade(){
 function loadAdult(){
   var urls= new URLList();
   urls.list=["https://afterburnerdb.github.io/afterburner-data/datasets/adult.32561.tbl.gz"]
+  PTi.trackURLs(urls.list);
+  var ds= new dataSource(urls, function(){newTable= new aTable(ds);});
+}
+function loadSalary(){
+  var urls= new URLList();
+  urls.list=["https://afterburnerdb.github.io/afterburner-data/datasets/alberta_salaries_bin150.18023.tbl.gz"]
   PTi.trackURLs(urls.list);
   var ds= new dataSource(urls, function(){newTable= new aTable(ds);});
 }
